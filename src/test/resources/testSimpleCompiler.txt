@@ -1,0 +1,6 @@
+# 这是注释
+new cn.milai.ib.obj.character.plane.WelcomePlane 0.5 -0.2
+	#这也是注释
+new cn.milai.ib.obj.character.plane.WelcomePlane 0.4 0
+# 还是注释////////////////////\\\\\\\\\\\\\\\\\\\\\\\\##new 
+sleep 10
