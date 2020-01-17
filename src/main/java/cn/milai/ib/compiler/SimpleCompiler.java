@@ -6,8 +6,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.input.BOMInputStream;
+
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 
 import cn.milai.ib.compiler.constant.Constant;
@@ -27,12 +31,13 @@ public class SimpleCompiler {
 	private static final int minorVersion = 0;
 
 	public static byte[] compile(InputStream in) throws IOException {
-		BufferedReader input = new BufferedReader(new InputStreamReader(in));
+		BufferedReader input = new BufferedReader(new InputStreamReader(new BOMInputStream(in), Charsets.UTF_8));
 		List<String> actions = Lists.newArrayList();
 		String line = null;
 		while ((line = input.readLine()) != null) {
 			actions.add(line);
 		}
+		input.close();
 		return doCompile(actions);
 	}
 
@@ -97,6 +102,18 @@ public class SimpleCompiler {
 					out.writeByte(ActType.SLEEP.getCode());
 					// sleepFrame
 					out.writeShort(table.longIndex(Long.parseLong(tokens[1])));
+					break;
+				}
+				case DIALOG : {
+					out.writeByte(ActType.DIALOG.getCode());
+					// characterClass
+					out.writeShort(table.utf8Index(tokens[1]));
+					// xRate
+					out.writeShort(table.floatIndex(Float.parseFloat(tokens[2])));
+					// yRate
+					out.writeShort(table.floatIndex(Float.parseFloat(tokens[3])));
+					// text
+					out.writeShort(table.utf8Index(String.join(" ", Arrays.copyOfRange(tokens, 4, tokens.length)).replace("\\n", "\n")));
 					break;
 				}
 				default :

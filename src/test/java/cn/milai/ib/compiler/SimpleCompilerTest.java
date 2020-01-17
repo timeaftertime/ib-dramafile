@@ -43,4 +43,9 @@ public class SimpleCompilerTest {
 		byte[] bytes = SimpleCompiler.compile(SimpleCompilerTest.class.getResource("/testSimpleCompiler.txt").openStream());
 		assertArrayEquals(testSimpleCompilerTxt, bytes);
 	}
+	
+	@Test
+	public void testShowDialog() throws IOException {
+		SimpleCompiler.compile(SimpleCompilerTest.class.getResource("/testDialog.txt").openStream());
+	}
 }
