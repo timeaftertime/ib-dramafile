@@ -30,7 +30,7 @@ public class SimpleCompiler {
 
 	private static final int minorVersion = 0;
 
-	private static final String EMPTY_PLACE_HOLDER = "_";
+	private static final String EMPTY_PLACEHOLDER = "_";
 
 	public static byte[] compile(InputStream in) throws IOException {
 		BufferedReader input = new BufferedReader(new InputStreamReader(new BOMInputStream(in), Charsets.UTF_8));
@@ -115,7 +115,7 @@ public class SimpleCompiler {
 					// yRate
 					out.writeShort(table.floatIndex(Float.parseFloat(tokens[3])));
 					// spearkerClass
-					int speakerClassIndex = EMPTY_PLACE_HOLDER.equals(tokens[4]) ? 0 : table.utf8Index(tokens[4]);
+					int speakerClassIndex = EMPTY_PLACEHOLDER.equals(tokens[4]) ? 0 : table.utf8Index(tokens[4]);
 					out.writeShort(speakerClassIndex);
 					// text
 					out.writeShort(table.utf8Index(String.join(" ", Arrays.copyOfRange(tokens, 5, tokens.length)).replace("\\n", "\n")));

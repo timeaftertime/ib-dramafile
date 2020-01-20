@@ -40,12 +40,12 @@ public class SimpleCompilerTest {
 
 	@Test
 	public void testCompiler() throws IOException {
-		byte[] bytes = SimpleCompiler.compile(SimpleCompilerTest.class.getResource("/testSimpleCompiler.txt").openStream());
+		byte[] bytes = SimpleCompiler.compile(SimpleCompilerTest.class.getResource("/testSimpleCompiler.ibd").openStream());
 		assertArrayEquals(testSimpleCompilerTxt, bytes);
 	}
 	
 	@Test
 	public void testShowDialog() throws IOException {
-		SimpleCompiler.compile(SimpleCompilerTest.class.getResource("/testDialog.txt").openStream());
+		SimpleCompiler.compile(SimpleCompilerTest.class.getResource("/testDialog.ibd").openStream());
 	}
 }
