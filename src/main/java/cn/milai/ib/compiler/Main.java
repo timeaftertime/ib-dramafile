@@ -8,11 +8,6 @@ import java.io.IOException;
 
 public class Main {
 
-	/**
-	 * Infinity Battle Drama
-	 */
-	private static final String INPUT_EXT = ".ibd";
-
 	private static final String OUTPUT_EXT = ".drama";
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
@@ -21,23 +16,18 @@ public class Main {
 			return;
 		}
 		String inputFile = args[0].trim();
-		if (!isIBDFile(inputFile)) {
-			System.err.println("输入文件必须为 " + INPUT_EXT + " 文件");
-			return;
-		}
-		String outputFile = getOutputFileName(inputFile);
+		String outputFile = getOutputFileName(args);
 		byte[] bytes = SimpleCompiler.compile(new FileInputStream(inputFile));
 		BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile));
 		output.write(bytes);
 		output.close();
 	}
 
-	private static boolean isIBDFile(String fileName) {
-		return fileName.endsWith(INPUT_EXT);
-	}
-
-	private static String getOutputFileName(String inputFileName) {
-		return inputFileName.replace(INPUT_EXT, OUTPUT_EXT);
+	private static String getOutputFileName(String[] args) {
+		if (args.length >= 2) {
+			return args[1].endsWith(OUTPUT_EXT) ? args[1] : args[1] + OUTPUT_EXT;
+		}
+		return "ib" + OUTPUT_EXT;
 	}
 
 }

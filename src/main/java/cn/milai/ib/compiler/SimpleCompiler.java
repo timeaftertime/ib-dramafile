@@ -15,6 +15,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 
 import cn.milai.ib.compiler.constant.Constant;
+import cn.milai.ib.compiler.ex.IBCompilerException;
 import cn.milai.ib.constant.ActType;
 
 /**
@@ -32,15 +33,19 @@ public class SimpleCompiler {
 
 	private static final String EMPTY_PLACEHOLDER = "_";
 
-	public static byte[] compile(InputStream in) throws IOException {
+	public static byte[] compile(InputStream in) {
 		BufferedReader input = new BufferedReader(new InputStreamReader(new BOMInputStream(in), Charsets.UTF_8));
 		List<String> actions = Lists.newArrayList();
 		String line = null;
-		while ((line = input.readLine()) != null) {
-			actions.add(line);
+		try {
+			while ((line = input.readLine()) != null) {
+				actions.add(line);
+			}
+			input.close();
+			return doCompile(actions);
+		} catch (IOException e) {
+			throw new IBCompilerException(e);
 		}
-		input.close();
-		return doCompile(actions);
 	}
 
 	private static byte[] doCompile(List<String> actions) throws NumberFormatException, IOException {
@@ -90,39 +95,40 @@ public class SimpleCompiler {
 			String[] tokens = line.split("\\s+");
 			String command = tokens[0].trim().toLowerCase();
 			switch (ActType.findByName(command)) {
-				case NEW : {
-					out.writeByte(ActType.NEW.getCode());
-					// characterClass
-					out.writeShort(table.utf8Index(tokens[1]));
-					// xRate
-					out.writeShort(table.floatIndex(Float.parseFloat(tokens[2])));
-					// yRate
-					out.writeShort(table.floatIndex(Float.parseFloat(tokens[3])));
-					break;
-				}
-				case SLEEP : {
-					out.writeByte(ActType.SLEEP.getCode());
-					// sleepFrame
-					out.writeShort(table.longIndex(Long.parseLong(tokens[1])));
-					break;
-				}
-				case DIALOG : {
-					out.writeByte(ActType.DIALOG.getCode());
-					// characterClass
-					out.writeShort(table.utf8Index(tokens[1]));
-					// xRate
-					out.writeShort(table.floatIndex(Float.parseFloat(tokens[2])));
-					// yRate
-					out.writeShort(table.floatIndex(Float.parseFloat(tokens[3])));
-					// spearkerClass
-					int speakerClassIndex = EMPTY_PLACEHOLDER.equals(tokens[4]) ? 0 : table.utf8Index(tokens[4]);
-					out.writeShort(speakerClassIndex);
-					// text
-					out.writeShort(table.utf8Index(String.join(" ", Arrays.copyOfRange(tokens, 5, tokens.length)).replace("\\n", "\n")));
-					break;
-				}
-				default :
-					throw new IllegalArgumentException(String.format("未知动作指令 %s", tokens[0]));
+			case NEW: {
+				out.writeByte(ActType.NEW.getCode());
+				// characterClass
+				out.writeShort(table.utf8Index(tokens[1]));
+				// xRate
+				out.writeShort(table.floatIndex(Float.parseFloat(tokens[2])));
+				// yRate
+				out.writeShort(table.floatIndex(Float.parseFloat(tokens[3])));
+				break;
+			}
+			case SLEEP: {
+				out.writeByte(ActType.SLEEP.getCode());
+				// sleepFrame
+				out.writeShort(table.longIndex(Long.parseLong(tokens[1])));
+				break;
+			}
+			case DIALOG: {
+				out.writeByte(ActType.DIALOG.getCode());
+				// characterClass
+				out.writeShort(table.utf8Index(tokens[1]));
+				// xRate
+				out.writeShort(table.floatIndex(Float.parseFloat(tokens[2])));
+				// yRate
+				out.writeShort(table.floatIndex(Float.parseFloat(tokens[3])));
+				// spearkerClass
+				int speakerClassIndex = EMPTY_PLACEHOLDER.equals(tokens[4]) ? 0 : table.utf8Index(tokens[4]);
+				out.writeShort(speakerClassIndex);
+				// text
+				out.writeShort(table.utf8Index(String.join(" ", Arrays.copyOfRange(tokens, 5, tokens.length)).replace(
+					"\\n", "\n")));
+				break;
+			}
+			default:
+				throw new IllegalArgumentException(String.format("未知动作指令 %s", tokens[0]));
 			}
 		}
 		return byteOutput.toByteArray();
