@@ -18,4 +18,8 @@ public class IBCompilerException extends IBException {
 		super(e);
 	}
 
+	public IBCompilerException(String msg) {
+		super(msg);
+	}
+
 }
