@@ -13,17 +13,17 @@ public class Edge {
 
 	private boolean epsilon = false;
 
-	private Set<Character> acceptedChars;
+	private Set<Character> accepts;
 
-	private Status targetStatus;
+	private NFAStatus targetStatus;
 
 	/**
 	 * 获取一个接受指定字符集合的边
-	 * @param acceptedChars
+	 * @param accepts
 	 * @param status 通往的状态
 	 */
-	public Edge(Set<Character> acceptedChars, Status status) {
-		this.acceptedChars = acceptedChars;
+	public Edge(Set<Character> accepts, NFAStatus status) {
+		this.accepts = accepts;
 		this.targetStatus = status;
 	}
 
@@ -31,7 +31,7 @@ public class Edge {
 	 * 获取一个接受空串的边
 	 * @param status 通往的状态
 	 */
-	public Edge(Status status) {
+	public Edge(NFAStatus status) {
 		this.epsilon = true;
 		this.targetStatus = status;
 	}
@@ -45,7 +45,7 @@ public class Edge {
 		if (isEpsilon()) {
 			throw new IBCompilerException("接受空串的边不能消费任何字符");
 		}
-		return acceptedChars.contains(ch);
+		return accepts.contains(ch);
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class Edge {
 	 * 获取边通往的状态
 	 * @return
 	 */
-	public Status getTargetStatus() {
+	public NFAStatus getTargetStatus() {
 		return targetStatus;
 	}
 
@@ -68,16 +68,16 @@ public class Edge {
 	 * 获取接受的字符集合，若为 isEpsilon() == true ，返回 null
 	 * @return
 	 */
-	public Set<Character> getAcceptChars() {
-		return acceptedChars;
+	public Set<Character> getAccepts() {
+		return accepts;
 	}
 
 	@Override
 	public String toString() {
 		if (isEpsilon()) {
-			return "--" + "ϵ" + "-->" + targetStatus.getId();
+			return "--" + "ϵ" + "-->" + targetStatus;
 		}
-		return "--" + acceptedChars + "-->" + targetStatus.getId();
+		return "--" + accepts + "-->" + targetStatus;
 	}
 
 }

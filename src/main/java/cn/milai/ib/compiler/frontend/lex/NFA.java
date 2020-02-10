@@ -12,11 +12,11 @@ import com.google.common.collect.Maps;
  */
 public class NFA {
 
-	private Status first;
+	private NFAStatus first;
 
-	private Status last;
+	private NFAStatus last;
 
-	public NFA(Status first, Status last) {
+	public NFA(NFAStatus first, NFAStatus last) {
 		this.first = first;
 		this.last = last;
 	}
@@ -26,16 +26,16 @@ public class NFA {
 	 * @param ch
 	 */
 	public NFA(Set<Character> set) {
-		this.first = new Status();
-		this.last = new Status();
+		this.first = new NFAStatus();
+		this.last = new NFAStatus();
 		first.addEdge(set, last);
 	}
 
-	public Status getFirst() {
+	public NFAStatus getFirst() {
 		return first;
 	}
 
-	public Status getLast() {
+	public NFAStatus getLast() {
 		return last;
 	}
 
@@ -69,8 +69,8 @@ public class NFA {
 		if (nfa2 == null) {
 			return nfa1;
 		}
-		Status first = new Status();
-		Status last = new Status();
+		NFAStatus first = new NFAStatus();
+		NFAStatus last = new NFAStatus();
 		first.addEdge(nfa2.first);
 		first.addEdge(nfa1.first);
 		nfa2.last.addEdge(last);
@@ -84,7 +84,7 @@ public class NFA {
 	 * @return
 	 */
 	public static NFA copy(NFA nfa) {
-		Map<Status, Status> copied = Maps.newHashMap();
+		Map<NFAStatus, NFAStatus> copied = Maps.newHashMap();
 		copyStatus(nfa.first, copied);
 		return new NFA(copied.get(nfa.first), copied.get(nfa.last));
 	}
@@ -96,8 +96,8 @@ public class NFA {
 	 * @param copied
 	 * @return
 	 */
-	private static Status copyStatus(Status status, Map<Status, Status> copied) {
-		Status newStatus = copiedStatus(status, copied);
+	private static NFAStatus copyStatus(NFAStatus status, Map<NFAStatus, NFAStatus> copied) {
+		NFAStatus newStatus = copiedStatus(status, copied);
 		for (Edge e : status.getEdges()) {
 			if (e.isEpsilon()) {
 				newStatus.addEdge(copyStatus(e.getTargetStatus(), copied));
@@ -112,11 +112,11 @@ public class NFA {
 	 * @param copied
 	 * @return
 	 */
-	private static Status copiedStatus(Status status, Map<Status, Status> copied) {
+	private static NFAStatus copiedStatus(NFAStatus status, Map<NFAStatus, NFAStatus> copied) {
 		if (copied.containsKey(status)) {
 			return copied.get(status);
 		}
-		Status s = new Status();
+		NFAStatus s = new NFAStatus();
 		copied.put(status, s);
 		return s;
 	}

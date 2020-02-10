@@ -8,18 +8,19 @@ import com.google.common.collect.Sets;
 import cn.milai.ib.compiler.ex.IBCompilerException;
 
 /**
- * Thompson 构造法，将正则表达式转换为 NFA
+ * NFA 构造器
+ * 使用 Thompson 构造法，将正则表达式转换为 NFA
  * @author milai
  * @date 2020.02.04
  */
-public class Thompson {
+public class NFABuilder {
 
 	/**
 	 * 将多个正则表达式转换为一个 NFA
 	 * @param res
 	 * @return
 	 */
-	public static NFA transfer(List<String> res) {
+	public static NFA newNFA(List<String> res) {
 		NFA nfa = null;
 		for (String re : res) {
 			nfa = NFA.paralell(nfa, transfer(new StringInput(re), Char.EOF));
@@ -129,10 +130,10 @@ public class Thompson {
 	 * @return
 	 */
 	private static NFA oneOrMoreNFA(Set<Character> inputSet) {
-		Status s0 = new Status();
-		Status s1 = new Status();
-		Status s2 = new Status();
-		Status s3 = new Status();
+		NFAStatus s0 = new NFAStatus();
+		NFAStatus s1 = new NFAStatus();
+		NFAStatus s2 = new NFAStatus();
+		NFAStatus s3 = new NFAStatus();
 		s0.addEdge(s1);
 		s1.addEdge(inputSet, s2);
 		s2.addEdge(s1);
@@ -148,8 +149,8 @@ public class Thompson {
 	 * @return
 	 */
 	private static NFA oneOrMoreNFA(NFA nfa) {
-		Status s0 = new Status();
-		Status s1 = new Status();
+		NFAStatus s0 = new NFAStatus();
+		NFAStatus s1 = new NFAStatus();
 		s0.addEdge(nfa.getFirst());
 		nfa.getLast().addEdge(nfa.getFirst());
 		nfa.getLast().addEdge(s1);
@@ -166,10 +167,10 @@ public class Thompson {
 	 * @return
 	 */
 	private static NFA noneOrMoreNFA(Set<Character> inputSet) {
-		Status s0 = new Status();
-		Status s1 = new Status();
-		Status s2 = new Status();
-		Status s3 = new Status();
+		NFAStatus s0 = new NFAStatus();
+		NFAStatus s1 = new NFAStatus();
+		NFAStatus s2 = new NFAStatus();
+		NFAStatus s3 = new NFAStatus();
 		s0.addEdge(s1);
 		s0.addEdge(s3);
 		s1.addEdge(inputSet, s2);
@@ -187,8 +188,8 @@ public class Thompson {
 	 * @return
 	 */
 	private static NFA noneOrMoreNFA(NFA nfa) {
-		Status s0 = new Status();
-		Status s1 = new Status();
+		NFAStatus s0 = new NFAStatus();
+		NFAStatus s1 = new NFAStatus();
 		s0.addEdge(nfa.getFirst());
 		s0.addEdge(s1);
 		nfa.getLast().addEdge(nfa.getFirst());
