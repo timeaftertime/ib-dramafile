@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -14,45 +15,60 @@ import cn.milai.ib.compiler.ex.IBCompilerException;
 
 /**
  * DFA 构造器
- * 使用子集构造法将 NFA 转换为 DFA ,再使用 Hopcroft 算法最小化 DFA 
  * @author milai
  * @date 2020.02.10
  */
 public class DFABuilder {
 
-	public static DFA newDFA(NFA nfa) {
+	/**
+	 * 使用子集构造法将 NFA 转换为 DFA 并返回头结点
+	 * @param first
+	 * @return
+	 */
+	public static DFAStatus newDFA(NFAStatus first) {
 		Map<Set<NFAStatus>, DFAStatus> status = Maps.newHashMap();
 		Queue<Set<NFAStatus>> q = Queues.newConcurrentLinkedQueue();
-		Set<NFAStatus> firstSet = closure(nfa.getFirst());
+		Set<NFAStatus> firstSet = closure(first);
 		status.put(firstSet, new DFAStatus());
 		q.add(firstSet);
 		while (!q.isEmpty()) {
 			Set<NFAStatus> fromSet = q.poll();
-			for (Character ch : Char.all()) {
-				Set<NFAStatus> toSet = closure(nextStatusOf(fromSet, ch));
+			Set<Character> accepts = Sets.newHashSet();
+			for (NFAStatus s : fromSet) {
+				accepts.addAll(s.accepts());
+			}
+			for (Character ch : accepts) {
+				Set<NFAStatus> toSet = closure(nextsOf(fromSet, ch));
 				if (toSet.isEmpty()) {
 					continue;
 				}
 				if (!status.containsKey(toSet)) {
-					status.put(toSet, new DFAStatus());
 					q.add(toSet);
+					DFAStatus newStatus = new DFAStatus();
+					status.put(toSet, newStatus);
+					for (NFAStatus s : toSet) {
+						if (!s.isAccept()) {
+							continue;
+						}
+						newStatus.addToken(s.token());
+					}
 				}
 				status.get(fromSet).putEdge(ch, status.get(toSet));
 			}
 		}
-		return new DFA(minimize(status.get(firstSet), Sets.newHashSet(status.values())));
+		return firstStatusOf(Lists.newArrayList(status.values()));
 	}
 
 	/**
 	 * 使用 Hopcroft 算法最小化 DFA
-	 * @param s0 
-	 * @param status
+	 * @param first
 	 */
-	private static DFAStatus minimize(DFAStatus s0, Set<DFAStatus> status) {
-		status.remove(s0);
+	public static DFAStatus minimize(DFAStatus first) {
+		Set<DFAStatus> status = allStatusOf(first);
+		Set<DFAStatus> acceptStatus = status.stream().filter(DFAStatus::isAccept).collect(Collectors.toSet());
 		Set<Set<DFAStatus>> nows = Sets.newHashSet();
-		nows.add(Sets.newHashSet(s0));
-		nows.add(status);
+		nows.add(Sets.filter(status, s -> !s.isAccept()));
+		nows.add(acceptStatus);
 		Set<Set<DFAStatus>> pres = null;
 		while (!nows.equals(pres)) {
 			pres = nows;
@@ -62,6 +78,26 @@ public class DFABuilder {
 			}
 		}
 		return rebuildDFA(Lists.newArrayList(nows));
+	}
+
+	/**
+	 * 遍历整个 DFA 返回所有结点的集合
+	 * @param first
+	 * @return
+	 */
+	private static Set<DFAStatus> allStatusOf(DFAStatus first) {
+		return findStatus(first, Sets.newHashSet());
+	}
+
+	private static Set<DFAStatus> findStatus(DFAStatus now, Set<DFAStatus> status) {
+		status.add(now);
+		for (Character ch : now.accepts()) {
+			DFAStatus next = now.next(ch);
+			if (!status.contains(next)) {
+				findStatus(next, status);
+			}
+		}
+		return status;
 	}
 
 	/**
@@ -117,7 +153,14 @@ public class DFABuilder {
 	private static DFAStatus rebuildDFA(List<Set<DFAStatus>> nows) {
 		List<DFAStatus> status = Lists.newArrayList();
 		for (int i = 0; i < nows.size(); i++) {
-			status.add(new DFAStatus());
+			DFAStatus newStatus = new DFAStatus();
+			status.add(newStatus);
+			for (DFAStatus old : nows.get(i)) {
+				if (!old.isAccept()) {
+					continue;
+				}
+				newStatus.addTokens(old.tokens());
+			}
 		}
 		for (int i = 0; i < nows.size(); i++) {
 			DFAStatus from = status.get(i);
@@ -177,7 +220,7 @@ public class DFABuilder {
 	 * @param ch
 	 * @return
 	 */
-	private static Set<NFAStatus> nextStatusOf(Set<NFAStatus> status, char ch) {
+	private static Set<NFAStatus> nextsOf(Set<NFAStatus> status, char ch) {
 		Set<NFAStatus> result = Sets.newHashSet();
 		for (NFAStatus s : status) {
 			for (Edge e : s.getEdges()) {

@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * 词法分析过程中 DFA 的状态
@@ -12,7 +13,15 @@ import com.google.common.collect.Maps;
  */
 public class DFAStatus {
 
+	/**
+	 * 边 -> 通往的状态
+	 */
 	private Map<Character, DFAStatus> edges = Maps.newHashMap();
+
+	/**
+	 * 表示接受状态时所接受的 Token 的 code
+	 */
+	private Set<String> tokens = Sets.newHashSet();
 
 	/**
 	 * 设置通过某个字符通往的状态
@@ -34,6 +43,41 @@ public class DFAStatus {
 	 */
 	public DFAStatus next(char ch) {
 		return edges.get(ch);
+	}
+
+	/**
+	 * 当前状态是否为接收状态
+	 * @return
+	 */
+	public boolean isAccept() {
+		return tokens.size() > 0;
+	}
+
+	/**
+	 * 当前状态时接受状态是返回所接受的 Token 的 code
+	 * @return
+	 */
+	public Set<String> tokens() {
+		if (!isAccept()) {
+			throw new UnsupportedOperationException("当前状态不是接受状态");
+		}
+		return tokens;
+	}
+
+	/**
+	 * 设置当前状态为接受状态且添加 tokenCode 到所接受 Token 列表
+	 * @param token
+	 */
+	public void addToken(String token) {
+		tokens.add(token);
+	}
+
+	/**
+	 * 设置当前状态为接受状态且添加 tokenCodes 到所接受 Token 列表
+	 * @param tokenCode
+	 */
+	public void addTokens(Set<String> tokens) {
+		this.tokens.addAll(tokens);
 	}
 
 	@Override

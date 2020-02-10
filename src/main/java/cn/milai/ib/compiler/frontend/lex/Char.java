@@ -26,8 +26,8 @@ public class Char {
 	public static final char RANGE_CHAR = '-';
 	public static final char ONE_OR_MORE_CHAR = '+';
 	public static final char NONE_OR_MORE_CHAR = '*';
-	public static final char TIMES_LEFT_CHAR = '{';
-	public static final char TIMES_RIGHT_CHAR = '}';
+	public static final char BLOCK_LEFT_CHAR = '{';
+	public static final char BLOCK_RIGHT_CHAR = '}';
 	public static final char SET_LEFT_CHAR = '[';
 	public static final char SET_RIGHT_CHAR = ']';
 	public static final char COMP_LEFT_CHAR = '(';
@@ -163,6 +163,10 @@ public class Char {
 				return Sets.newHashSet(LINEFEED);
 			case 'r':
 				return Sets.newHashSet(CARRIAGE_RETURN);
+			case 's':
+				return Char.unvisible();
+			case 'S':
+				return Char.visible();
 			case 'w':
 				return Char.visible();
 			case 'W':
@@ -171,8 +175,12 @@ public class Char {
 				return Char.numbers();
 			case 'D':
 				return Char.invert(Char.numbers());
+			case Char.BLOCK_LEFT_CHAR:
+				return Sets.newHashSet(Char.BLOCK_LEFT_CHAR);
+			case Char.BLOCK_RIGHT_CHAR:
+				return Sets.newHashSet(Char.BLOCK_RIGHT_CHAR);
 		}
-		throw new IllegalArgumentException("未知转移字符：" + SLASH + ch);
+		throw new IllegalArgumentException("未知转义字符：" + SLASH + ch);
 	}
 
 }

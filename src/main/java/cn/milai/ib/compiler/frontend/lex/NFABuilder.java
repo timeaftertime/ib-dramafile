@@ -3,9 +3,11 @@ package cn.milai.ib.compiler.frontend.lex;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import cn.milai.ib.compiler.ex.IBCompilerException;
+import cn.milai.ib.compiler.frontend.LexToken;
 
 /**
  * NFA 构造器
@@ -20,12 +22,33 @@ public class NFABuilder {
 	 * @param res
 	 * @return
 	 */
-	public static NFA newNFA(List<String> res) {
-		NFA nfa = null;
-		for (String re : res) {
-			nfa = NFA.paralell(nfa, transfer(new StringInput(re), Char.EOF));
+	public static NFAStatus newNFA(List<LexToken> tokens) {
+		if (tokens.isEmpty()) {
+			throw new IllegalArgumentException("tokens 必须大于 0");
 		}
-		return nfa;
+		List<NFAStatus> firsts = Lists.newArrayList();
+		for (LexToken token : tokens) {
+			NFAPair pair = transfer(new StringInput(token.getRE()), Char.EOF);
+			pair.getLast().setToken(token.getCode());
+			firsts.add(pair.getFirst());
+		}
+		return combine(firsts);
+	}
+
+	/**
+	 * 连接多个 NFA 的头节点，返回组合成的 NFA 的头节点
+	 * @param firsts
+	 * @return
+	 */
+	public static NFAStatus combine(List<NFAStatus> firsts) {
+		if (firsts.size() == 1) {
+			return firsts.get(0);
+		}
+		NFAStatus status = new NFAStatus();
+		for (NFAStatus s : firsts) {
+			status.addEdge(s);
+		}
+		return status;
 	}
 
 	/**
@@ -34,8 +57,8 @@ public class NFABuilder {
 	 * @param endChar
 	 * @return
 	 */
-	private static NFA transfer(StringInput input, char endChar) {
-		NFA nfa = null;
+	private static NFAPair transfer(StringInput input, char endChar) {
+		NFAPair nfa = null;
 		while (true) {
 			if (input.getNext() == endChar) {
 				if (input.hasNext()) {
@@ -46,7 +69,7 @@ public class NFABuilder {
 				}
 				return nfa;
 			}
-			nfa = NFA.connect(nfa, parseNextNFA(input, endChar));
+			nfa = NFAPair.connect(nfa, parseNextNFA(input, endChar));
 		}
 	}
 
@@ -56,8 +79,8 @@ public class NFABuilder {
 	 * @param endChar
 	 * @return
 	 */
-	private static NFA parseNextNFA(StringInput input, char endChar) {
-		NFA nfa = null;
+	private static NFAPair parseNextNFA(StringInput input, char endChar) {
+		NFAPair nfa = null;
 		char ch = input.next();
 		switch (ch) {
 			case Char.EOF:
@@ -81,14 +104,14 @@ public class NFABuilder {
 		}
 		if (input.getNext() == Char.OR) {
 			input.next();
-			nfa = NFA.paralell(nfa, parseNextNFA(input, endChar));
+			nfa = NFAPair.paralell(nfa, parseNextNFA(input, endChar));
 		}
 		return nfa;
 	}
 
-	private static NFA dealRepeat(StringInput input, Set<Character> inputSet) {
+	private static NFAPair dealRepeat(StringInput input, Set<Character> inputSet) {
 		if (!input.hasNext()) {
-			return new NFA(inputSet);
+			return new NFAPair(inputSet);
 		}
 		if (input.getNext() == Char.ONE_OR_MORE_CHAR) {
 			input.next();
@@ -98,13 +121,13 @@ public class NFABuilder {
 			input.next();
 			return noneOrMoreNFA(inputSet);
 		}
-		if (input.getNext() == Char.TIMES_LEFT_CHAR) {
+		if (input.getNext() == Char.BLOCK_LEFT_CHAR) {
 			throw new IBCompilerException("暂不支持 {x,x} 表示重复的形式");
 		}
-		return new NFA(inputSet);
+		return new NFAPair(inputSet);
 	}
 
-	private static NFA dealRepeat(StringInput input, NFA nfa) {
+	private static NFAPair dealRepeat(StringInput input, NFAPair nfa) {
 		if (!input.hasNext()) {
 			return nfa;
 		}
@@ -116,7 +139,7 @@ public class NFABuilder {
 			input.next();
 			return noneOrMoreNFA(nfa);
 		}
-		if (input.getNext() == Char.TIMES_LEFT_CHAR) {
+		if (input.getNext() == Char.BLOCK_LEFT_CHAR) {
 			throw new IBCompilerException("暂不支持 {x,x} 表示重复的形式");
 		}
 		return nfa;
@@ -129,7 +152,7 @@ public class NFABuilder {
 	 * @param s
 	 * @return
 	 */
-	private static NFA oneOrMoreNFA(Set<Character> inputSet) {
+	private static NFAPair oneOrMoreNFA(Set<Character> inputSet) {
 		NFAStatus s0 = new NFAStatus();
 		NFAStatus s1 = new NFAStatus();
 		NFAStatus s2 = new NFAStatus();
@@ -138,7 +161,7 @@ public class NFABuilder {
 		s1.addEdge(inputSet, s2);
 		s2.addEdge(s1);
 		s2.addEdge(s3);
-		return new NFA(s0, s3);
+		return new NFAPair(s0, s3);
 	}
 
 	/**
@@ -148,13 +171,13 @@ public class NFABuilder {
 	 * @param nfa
 	 * @return
 	 */
-	private static NFA oneOrMoreNFA(NFA nfa) {
+	private static NFAPair oneOrMoreNFA(NFAPair nfa) {
 		NFAStatus s0 = new NFAStatus();
 		NFAStatus s1 = new NFAStatus();
 		s0.addEdge(nfa.getFirst());
 		nfa.getLast().addEdge(nfa.getFirst());
 		nfa.getLast().addEdge(s1);
-		return new NFA(s0, s1);
+		return new NFAPair(s0, s1);
 	}
 
 	/**
@@ -166,7 +189,7 @@ public class NFABuilder {
 	 * @param s
 	 * @return
 	 */
-	private static NFA noneOrMoreNFA(Set<Character> inputSet) {
+	private static NFAPair noneOrMoreNFA(Set<Character> inputSet) {
 		NFAStatus s0 = new NFAStatus();
 		NFAStatus s1 = new NFAStatus();
 		NFAStatus s2 = new NFAStatus();
@@ -176,7 +199,7 @@ public class NFABuilder {
 		s1.addEdge(inputSet, s2);
 		s2.addEdge(s1);
 		s2.addEdge(s3);
-		return new NFA(s0, s3);
+		return new NFAPair(s0, s3);
 	}
 
 	/**
@@ -187,14 +210,14 @@ public class NFABuilder {
 	 * @param nfa
 	 * @return
 	 */
-	private static NFA noneOrMoreNFA(NFA nfa) {
+	private static NFAPair noneOrMoreNFA(NFAPair nfa) {
 		NFAStatus s0 = new NFAStatus();
 		NFAStatus s1 = new NFAStatus();
 		s0.addEdge(nfa.getFirst());
 		s0.addEdge(s1);
 		nfa.getLast().addEdge(nfa.getFirst());
 		nfa.getLast().addEdge(s1);
-		return new NFA(s0, s1);
+		return new NFAPair(s0, s1);
 	}
 
 	/**

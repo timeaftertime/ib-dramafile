@@ -5,7 +5,7 @@ import java.util.Set;
 import cn.milai.ib.compiler.ex.IBCompilerException;
 
 /**
- * 连接不同状态的边
+ * 连接 NFA 不同状态的边
  * @author milai
  * @date 2020.02.05
  */
