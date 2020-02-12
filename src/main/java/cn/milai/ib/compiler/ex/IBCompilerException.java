@@ -22,4 +22,8 @@ public class IBCompilerException extends IBException {
 		super(msg);
 	}
 
+	public IBCompilerException(String msg, Throwable e) {
+		super(msg, e);
+	}
+
 }

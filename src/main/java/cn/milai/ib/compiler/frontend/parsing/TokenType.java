@@ -10,14 +10,14 @@ public enum TokenType {
 	// 空白间隔
 	BLANK("\\s+", 0),
 	// 标点符号
-	BLOCK_LEFT("{", 1), BLOCK_RIGHT("}", 1), STM_END(";", 1), ASSIGN("=", 1), PROP("\\.", 1),
-	BRACKET_LEFT("(", 1), BRACKET(")", 1),
+	BLOCK_LEFT("\\{", 1), BLOCK_RIGHT("\\}", 1), STM_END(";", 1), ASSIGN("=", 1), EQUALS("==", 1), NOT_EQUALS("!=", 1),
+	PROP("\\.", 1), BRACKET_LEFT("\\(", 1), BRACKET_RIGHT("\\)", 1),
 	// 关键字
 	IF("if", 2), WHILE("while", 2), NEW("new", 2),
 	// 标识符
 	IDENTIFIER("[_a-zA-Z]\\w*", 3),
 	// 常量
-	INT("[1-9][0-9]*", 4), FLOAT("[0-9]+\\.[0-9]+", 4), STR("\"[^\"]*\"", 4),
+	INT("[+\\-]?0|([1-9][0-9]*)", 4), FLOAT("[0-9]+\\.[0-9]+", 4), STR("\"[^\"]*\"", 4),
 	;
 
 	/**
@@ -45,6 +45,33 @@ public enum TokenType {
 
 	public String getCode() {
 		return name();
+	}
+
+	/**
+	 * 获取 code 对应的 TokenType ，若不存在，返回 null
+	 * @param code
+	 */
+	public static TokenType findByCode(String code) {
+		for (TokenType type : TokenType.values()) {
+			if (type.getCode().equals(code)) {
+				return type;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * 获取 code 对应的 TokenType ，若不存在，抛出 IllegalArgumentException 异常
+	 * @param code
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	public static TokenType of(String code) throws IllegalArgumentException {
+		TokenType type = findByCode(code);
+		if (type == null) {
+			throw new IllegalArgumentException(String.format("%s 对应的 TokenType 不存在", code));
+		}
+		return type;
 	}
 
 }

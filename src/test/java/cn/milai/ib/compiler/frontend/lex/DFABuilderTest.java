@@ -4,13 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 
-import java.util.Arrays;
-
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
-
-import cn.milai.ib.compiler.frontend.LexToken;
 
 /**
  * 测试 DFA 构造算法
@@ -26,7 +22,7 @@ public class DFABuilderTest {
 	public void testLineDFA() {
 		// s0--a-->s1--b-->2--c-->s3--d-->s4--e-->s5
 		DFAStatus s = DFABuilder.newDFA(
-			NFABuilder.newNFA(Arrays.asList(new LexToken("abcde", TEST_TOKEN_CODE1))));
+			NFABuilder.newNFA(Sets.newHashSet(new LexToken("abcde", TEST_TOKEN_CODE1))));
 		for (int i = 0; i < 5; i++) {
 			char ch = (char) ('a' + i);
 			assertEquals(Sets.newHashSet(ch), s.accepts());
@@ -40,7 +36,7 @@ public class DFABuilderTest {
 	public void testCombineDFA() {
 		// s0--f-->s1--e-->s2--e-->s3
 		//                +---i-->s4--e-->s5
-		DFAStatus s0 = DFABuilder.newDFA(NFABuilder.newNFA(Arrays.asList(
+		DFAStatus s0 = DFABuilder.newDFA(NFABuilder.newNFA(Sets.newHashSet(
 			new LexToken("fee", TEST_TOKEN_CODE1),
 			new LexToken("fie", TEST_TOKEN_CODE2))));
 		assertEquals(Sets.newHashSet('f'), s0.accepts());
@@ -63,7 +59,7 @@ public class DFABuilderTest {
 	@Test
 	public void testMinimizeDFA() {
 		// s0--f-->s1--[ie]-->s2--e-->s3
-		DFAStatus s0 = DFABuilder.newDFA(NFABuilder.newNFA(Arrays.asList(
+		DFAStatus s0 = DFABuilder.newDFA(NFABuilder.newNFA(Sets.newHashSet(
 			new LexToken("fee", TEST_TOKEN_CODE1),
 			new LexToken("fie", TEST_TOKEN_CODE2))));
 		s0 = DFABuilder.minimize(s0);

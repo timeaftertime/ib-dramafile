@@ -21,11 +21,17 @@ public class Char {
 	private static final Set<Character> UPPER_LETTERS = toSet("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 	private static final Set<Character> LOWER_LETTERS = toSet("abcdefghijklmnopqrstuvwxyz");
 
+	/**
+	 * 可以用过转义字符 \ 来表示原字符的特殊字符
+	 */
+	private static final Set<Character> CAN_SLASH = toSet(".{}?+*|-[]()\\");
+
 	public static final char UNDERLINE = '_';
-	public static final char INVERT_CHAR = '^';
-	public static final char RANGE_CHAR = '-';
-	public static final char ONE_OR_MORE_CHAR = '+';
-	public static final char NONE_OR_MORE_CHAR = '*';
+	public static final char INVERT = '^';
+	public static final char RANGE = '-';
+	public static final char NONE_OR_ONE = '?';
+	public static final char ONE_OR_MORE = '+';
+	public static final char NONE_OR_MORE = '*';
 	public static final char BLOCK_LEFT_CHAR = '{';
 	public static final char BLOCK_RIGHT_CHAR = '}';
 	public static final char SET_LEFT_CHAR = '[';
@@ -38,7 +44,7 @@ public class Char {
 	/**
 	 * 匹配换行符 \n \r 以外任何单个字符
 	 */
-	public static final char INVERT_LF = '.';
+	public static final char INVERT_CRLF = '.';
 
 	public static final char BLANK = ' ';
 	public static final char TAB = '\t';
@@ -60,14 +66,7 @@ public class Char {
 	public static Set<Character> all() {
 		Set<Character> set = Sets.newHashSet();
 		set.addAll(visible());
-		set.add(INVERT_CHAR);
-		set.add(RANGE_CHAR);
-		set.add(ONE_OR_MORE_CHAR);
-		set.add(NONE_OR_MORE_CHAR);
-		set.add(BLANK);
-		set.add(TAB);
-		set.add(LINEFEED);
-		set.add(CARRIAGE_RETURN);
+		set.addAll(unvisible());
 		return set;
 	}
 
@@ -107,15 +106,39 @@ public class Char {
 	}
 
 	/**
-	 * 可见字符（数字、字母、下划线）集合
+	 * 数字、字母、下划线集合
 	 * @return
 	 */
-	public static Set<Character> visible() {
+	public static Set<Character> normals() {
 		Set<Character> set = Sets.newHashSet();
 		set.addAll(NUMBERS);
 		set.addAll(UPPER_LETTERS);
 		set.addAll(LOWER_LETTERS);
 		set.add(UNDERLINE);
+		return set;
+	}
+
+	/**
+	 * 可见（即空格、换行、回车等空白字符以外的）字符集合
+	 * @return
+	 */
+	public static Set<Character> visible() {
+		Set<Character> set = Sets.newHashSet();
+		set.addAll(normals());
+		set.add(INVERT_CRLF);
+		set.add(INVERT);
+		set.add(RANGE);
+		set.add(NONE_OR_ONE);
+		set.add(ONE_OR_MORE);
+		set.add(NONE_OR_MORE);
+		set.add(BLOCK_LEFT_CHAR);
+		set.add(BLOCK_RIGHT_CHAR);
+		set.add(SET_LEFT_CHAR);
+		set.add(SET_RIGHT_CHAR);
+		set.add(COMP_LEFT_CHAR);
+		set.add(COMP_RIGHT_CHAR);
+		set.add(SLASH);
+		set.add(OR);
 		return set;
 	}
 
@@ -142,12 +165,20 @@ public class Char {
 	}
 
 	/**
+	 * 全集去掉 \n \r 的字符集
+	 * @return
+	 */
+	public static Set<Character> invertCRLF() {
+		return invert(Sets.newHashSet(CARRIAGE_RETURN, LINEFEED));
+	}
+
+	/**
 	 * 是否为普通字符
 	 * @param ch
 	 * @return
 	 */
 	public static boolean isNormal(char ch) {
-		return visible().contains(ch);
+		return normals().contains(ch);
 	}
 
 	/**
@@ -156,6 +187,9 @@ public class Char {
 	 * @return
 	 */
 	public static Set<Character> slash(char ch) {
+		if (CAN_SLASH.contains(ch)) {
+			return Sets.newHashSet(ch);
+		}
 		switch (ch) {
 			case 't':
 				return Sets.newHashSet(TAB);
@@ -166,19 +200,15 @@ public class Char {
 			case 's':
 				return Char.unvisible();
 			case 'S':
-				return Char.visible();
+				return Char.invert(Char.unvisible());
 			case 'w':
-				return Char.visible();
+				return Char.normals();
 			case 'W':
-				return Char.invert(Char.visible());
+				return Char.invert(Char.normals());
 			case 'd':
 				return Char.numbers();
 			case 'D':
 				return Char.invert(Char.numbers());
-			case Char.BLOCK_LEFT_CHAR:
-				return Sets.newHashSet(Char.BLOCK_LEFT_CHAR);
-			case Char.BLOCK_RIGHT_CHAR:
-				return Sets.newHashSet(Char.BLOCK_RIGHT_CHAR);
 		}
 		throw new IllegalArgumentException("未知转义字符：" + SLASH + ch);
 	}

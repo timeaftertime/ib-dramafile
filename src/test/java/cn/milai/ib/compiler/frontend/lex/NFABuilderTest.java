@@ -5,15 +5,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
-
-import cn.milai.ib.compiler.frontend.LexToken;
 
 /**
  * 测试 NFA 构造算法
@@ -27,7 +24,7 @@ public class NFABuilderTest {
 
 	@Test
 	public void testLineNFA() {
-		NFAStatus s = NFABuilder.newNFA(Arrays.asList(new LexToken("abcde", TEST_TOKEN_CODE1)));
+		NFAStatus s = NFABuilder.newNFA(Sets.newHashSet(new LexToken("abcde", TEST_TOKEN_CODE1)));
 		s = addEmptyHead(s);
 		// nfa = head--ϵ-->s0--a-->s1--ϵ-->s2--b-->s3--ϵ-->s4--c-->s5--ϵ-->s6--d-->s7--ϵ-->s8--e-->s9
 		for (int i = 0; i < 5; i++) {
@@ -44,7 +41,7 @@ public class NFABuilderTest {
 
 	@Test
 	public void testSimpleComposeNFA() {
-		NFAStatus s = NFABuilder.newNFA(Arrays.asList(new LexToken("a(b)c(de)", TEST_TOKEN_CODE1)));
+		NFAStatus s = NFABuilder.newNFA(Sets.newHashSet(new LexToken("a(b)c(de)", TEST_TOKEN_CODE1)));
 		s = addEmptyHead(s);
 		// nfa = head--ϵ-->s0--a-->s1--ϵ-->s2--b-->s3--ϵ-->s4--c-->s5--ϵ-->s6--d-->s7--ϵ-->s8--e-->s9
 		for (int i = 0; i < 5; i++) {
@@ -75,7 +72,7 @@ public class NFABuilderTest {
 		//                                              ↓----ϵ---+                                         ↓----ϵ----+
 		// s0--a-->s1--ϵ-->s2--ϵ-->s3--b-->s4--ϵ-->s5--ϵ-->s6--ϵ-->s7--c-->s8--ϵ-->s9
 		//                               +-----------ϵ--------------↑
-		NFAStatus s0 = NFABuilder.newNFA(Arrays.asList(new LexToken("ab*c+", TEST_TOKEN_CODE1)));
+		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new LexToken("ab*c+", TEST_TOKEN_CODE1)));
 		assertFalse(s0.isAccept());
 		assertEquals(Sets.newHashSet('a'), s0.getEdges().get(0).getAccepts());
 		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
@@ -122,7 +119,7 @@ public class NFABuilderTest {
 		//                                                                                     ↓------ϵ-----+
 		// s0--a-->s1--ϵ-->s2--[xy0-9]-->s3--ϵ-->s4--ϵ-->s5--[a-z]-->s6--ϵ-->s7
 		//                                                                      +---------------ϵ--------------↑
-		NFAStatus s0 = NFABuilder.newNFA(Arrays.asList(new LexToken("a[xy\\d][a-z]*", TEST_TOKEN_CODE1)));
+		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new LexToken("a[xy\\d][a-z]*", TEST_TOKEN_CODE1)));
 		assertFalse(s0.isAccept());
 		assertEquals(Sets.newHashSet('a'), s0.getEdges().get(0).getAccepts());
 		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
@@ -166,7 +163,7 @@ public class NFABuilderTest {
 		// s0--a-->s1--ϵ-->s12--ϵ-->s10--ϵ--+---------------->s2--[bc]-->s3-------------------+--ϵ-->s11--ϵ-->s13
 		//                                 +             ↑--------------------------------ϵ------------------------------------+              ↑
 		//                                 +-----------------------------------------ϵ-----------------------------------------------+
-		NFAStatus s0 = NFABuilder.newNFA(Arrays.asList(new LexToken("a([bc]|d|e)*", TEST_TOKEN_CODE1)));
+		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new LexToken("a([bc]|d|e)*", TEST_TOKEN_CODE1)));
 		assertFalse(s0.isAccept());
 		assertEquals(Sets.newHashSet('a'), s0.getEdges().get(0).getAccepts());
 		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
@@ -234,11 +231,12 @@ public class NFABuilderTest {
 	public void testMultipleRe() {
 		//             +-->s0---a---->s1
 		// s4--ϵ--+-->s2--[cd]-->s3
-		NFAStatus s4 = NFABuilder.newNFA(Arrays.asList(
+		NFAStatus s4 = NFABuilder.newNFA(Sets.newHashSet(
 			new LexToken("a", TEST_TOKEN_CODE1),
 			new LexToken("[cd]", TEST_TOKEN_CODE2)));
 		assertFalse(s4.isAccept());
 		List<Edge> e4 = s4.getEdges();
+		// 这里的顺序取决于两个 LexToken 在 Set 中的顺序
 		Edge e4S0 = e4.get(0);
 		Edge e4S2 = e4.get(1);
 		assertTrue(e4S0.isEpsilon());
@@ -253,6 +251,53 @@ public class NFABuilderTest {
 		assertEquals(TEST_TOKEN_CODE1, s1.token());
 		NFAStatus s3 = s2.getEdges().get(0).getTargetStatus();
 		assertEquals(TEST_TOKEN_CODE2, s3.token());
+	}
+
+	@Test
+	public void testNoneOrOne() {
+		// s0--a-->s1--ϵ-->s2--ϵ-->s3--b--s4--ϵ-->s5--ϵ-->s6-->c-->s7
+		//                               +------------------------↑
+		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new LexToken("ab?c", TEST_TOKEN_CODE1)));
+		assertFalse(s0.isAccept());
+		assertEquals(Sets.newHashSet('a'), s0.getEdges().get(0).getAccepts());
+		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
+		assertFalse(s1.isAccept());
+		assertTrue(s1.getEdges().get(0).isEpsilon());
+		NFAStatus s2 = s1.getEdges().get(0).getTargetStatus();
+		assertFalse(s2.isAccept());
+		assertTrue(s2.getEdges().get(0).isEpsilon());
+		NFAStatus s3 = s2.getEdges().get(0).getTargetStatus();
+		assertFalse(s3.isAccept());
+		assertEquals(Sets.newHashSet('b'), s3.getEdges().get(0).getAccepts());
+		NFAStatus s4 = s3.getEdges().get(0).getTargetStatus();
+		assertFalse(s4.isAccept());
+		assertTrue(s4.getEdges().get(0).isEpsilon());
+		NFAStatus s5 = s4.getEdges().get(0).getTargetStatus();
+		assertFalse(s5.isAccept());
+		assertTrue(s5.getEdges().get(0).isEpsilon());
+		assertSame(s5, s2.getEdges().get(1).getTargetStatus());
+		NFAStatus s6 = s5.getEdges().get(0).getTargetStatus();
+		assertFalse(s6.isAccept());
+		assertEquals(Sets.newHashSet('c'), s6.getEdges().get(0).getAccepts());
+		NFAStatus s7 = s6.getEdges().get(0).getTargetStatus();
+		assertTrue(s7.isAccept());
+		assertEquals(TEST_TOKEN_CODE1, s7.token());
+	}
+
+	@Test
+	public void testInvertCRLF() {
+		// s0--x-->s1--ϵ-->s2 -->(invertCRLF)-->s3
+		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new LexToken("x.", TEST_TOKEN_CODE1)));
+		assertFalse(s0.isAccept());
+		assertEquals(Sets.newHashSet('x'), s0.getEdges().get(0).getAccepts());
+		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
+		assertFalse(s1.isAccept());
+		assertTrue(s1.getEdges().get(0).isEpsilon());
+		NFAStatus s2 = s1.getEdges().get(0).getTargetStatus();
+		assertFalse(s2.isAccept());
+		assertEquals(Char.invertCRLF(), s2.getEdges().get(0).getAccepts());
+		NFAStatus s3 = s2.getEdges().get(0).getTargetStatus();
+		assertTrue(s3.isAccept());
 	}
 
 }

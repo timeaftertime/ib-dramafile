@@ -4,16 +4,18 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import cn.milai.ib.compiler.frontend.Input;
+
 /**
- * 处理 String 类型的 Input
+ * 处理 char 类型的 Input
  * @author milai
  * @date 2020.02.04
  */
-public class StringInput extends Input<Character> {
+public class CharInput extends Input<Character> {
 
 	private static final char EOF = Char.EOF;
 
-	public StringInput(String str) {
+	public CharInput(String str) {
 		super(toChracterArray(str));
 	}
 

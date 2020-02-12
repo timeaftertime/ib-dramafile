@@ -1,4 +1,4 @@
-package cn.milai.ib.compiler.frontend.lex;
+package cn.milai.ib.compiler.frontend;
 
 import java.util.List;
 
@@ -42,10 +42,26 @@ public class Input<T> {
 	}
 
 	/**
-	 * 获取之前一个元素
+	 * 使读指针移动 offset 个元素
+	 * offset 为正数时将跳过指定个元素，offset 为负数时将回溯指定个元素
+	 * 超出范围将抛出 
+	 * @param es
+	 */
+	public void seek(int offset) {
+		int newIndex = index + offset;
+		if (newIndex < 0 || newIndex > elements.size()) {
+			throw new IndexOutOfBoundsException(String.format("size = %d, newIndex = %d", elements.size(), newIndex));
+		}
+		index = newIndex;
+	}
+
+	/**
+	 * 将剩余的元素转换为数组返回，不改变读指针位置
+	 * @param array
 	 * @return
 	 */
-	public T getPre() {
-		return elements.get(index - 1);
+	public T[] toArray(T[] array) {
+		return elements.subList(index, elements.size()).toArray(array);
 	}
+
 }
