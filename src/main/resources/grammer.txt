@@ -1,0 +1,43 @@
+# 定义符号到 Token code 的映射，便于推导式的阅读
+{ = BLOCK_LEFT
+} = BLOCK_RIGHT
+( = BRACKET_LEFT
+) = BRACKET_RIGHT
+= = ASSIGN
++ = PLUS
+- = MINUS
+* = TIMES
+/ = DIVISION
+; = STMD_END
+. = PROP
+
+# 定义推导式
+
+# 文法开始符号必须为 CFG
+CFG -> if ( Expr ) Block
+CFG -> while ( Expr ) Block
+
+Block -> { StmdList }
+
+StmdList -> Stmd StmdList
+StmdList -> ϵ
+
+Stmd -> Block
+Stmd -> Expr ;
+
+Expr -> Expr + Term
+Expr -> Expr - Term
+Expr -> Term
+Expr -> IDENTIFIER = Expr
+
+Term -> Term * Factor
+Term -> Term / Factor
+Term -> Factor
+
+Factor -> Identity
+Factor -> ( Expr )
+Factor -> INT
+Factor -> FLOAT
+
+Identity -> Identity . IDENTIFIER
+Identity -> IDENTIFIER

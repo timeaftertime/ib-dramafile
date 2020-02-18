@@ -1,0 +1,23 @@
++ = PLUS
+- = MINUS
+* = TIMES
+/ = DIVISION
+= = ASSIGN
+( = BRACKET_LEFT
+) = BRACKET_RIGHT
+
+CFG -> Expr
+
+Expr -> Expr + Term
+Expr -> Expr - Term
+Expr -> Term
+Expr -> IDENTIFIER = Expr
+
+Term -> Term * Factor
+Term -> Term / Factor
+Term -> Factor
+
+Factor -> IDENTIFIER
+Factor -> ( Expr )
+Factor -> INT
+Factor -> FLOAT

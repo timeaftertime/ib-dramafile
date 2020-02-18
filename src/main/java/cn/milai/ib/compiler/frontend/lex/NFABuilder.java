@@ -21,12 +21,12 @@ public class NFABuilder {
 	 * @param res
 	 * @return
 	 */
-	public static NFAStatus newNFA(Set<LexToken> tokens) {
+	public static NFAStatus newNFA(Set<TokenDef> tokens) {
 		if (tokens.isEmpty()) {
 			throw new IllegalArgumentException("tokens 必须大于 0");
 		}
 		List<NFAStatus> firsts = Lists.newArrayList();
-		for (LexToken token : tokens) {
+		for (TokenDef token : tokens) {
 			NFAPair pair = null;
 			try {
 				pair = transfer(new CharInput(token.getRE()), Char.EOF);

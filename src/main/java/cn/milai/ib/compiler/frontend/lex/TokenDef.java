@@ -1,11 +1,11 @@
 package cn.milai.ib.compiler.frontend.lex;
 
 /**
- * 词法分析的 Token
+ * 词法分析的单词定义
  * @author milai
  * @date 2020.02.10
  */
-public class LexToken {
+public class TokenDef {
 
 	/**
 	 * 正则表达式定义
@@ -17,7 +17,7 @@ public class LexToken {
 	 */
 	private String code;
 
-	public LexToken(String re, String code) {
+	public TokenDef(String re, String code) {
 		super();
 		this.re = re;
 		this.code = code;
@@ -47,7 +47,7 @@ public class LexToken {
 		if (obj.getClass() != this.getClass()) {
 			return false;
 		}
-		return code.equals(((LexToken) obj).code);
+		return code.equals(((TokenDef) obj).code);
 	}
 
 }

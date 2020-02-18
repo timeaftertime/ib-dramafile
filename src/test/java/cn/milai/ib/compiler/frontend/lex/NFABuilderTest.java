@@ -24,7 +24,7 @@ public class NFABuilderTest {
 
 	@Test
 	public void testLineNFA() {
-		NFAStatus s = NFABuilder.newNFA(Sets.newHashSet(new LexToken("abcde", TEST_TOKEN_CODE1)));
+		NFAStatus s = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("abcde", TEST_TOKEN_CODE1)));
 		s = addEmptyHead(s);
 		// nfa = head--ϵ-->s0--a-->s1--ϵ-->s2--b-->s3--ϵ-->s4--c-->s5--ϵ-->s6--d-->s7--ϵ-->s8--e-->s9
 		for (int i = 0; i < 5; i++) {
@@ -41,7 +41,7 @@ public class NFABuilderTest {
 
 	@Test
 	public void testSimpleComposeNFA() {
-		NFAStatus s = NFABuilder.newNFA(Sets.newHashSet(new LexToken("a(b)c(de)", TEST_TOKEN_CODE1)));
+		NFAStatus s = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("a(b)c(de)", TEST_TOKEN_CODE1)));
 		s = addEmptyHead(s);
 		// nfa = head--ϵ-->s0--a-->s1--ϵ-->s2--b-->s3--ϵ-->s4--c-->s5--ϵ-->s6--d-->s7--ϵ-->s8--e-->s9
 		for (int i = 0; i < 5; i++) {
@@ -72,7 +72,7 @@ public class NFABuilderTest {
 		//                                              ↓----ϵ---+                                         ↓----ϵ----+
 		// s0--a-->s1--ϵ-->s2--ϵ-->s3--b-->s4--ϵ-->s5--ϵ-->s6--ϵ-->s7--c-->s8--ϵ-->s9
 		//                               +-----------ϵ--------------↑
-		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new LexToken("ab*c+", TEST_TOKEN_CODE1)));
+		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("ab*c+", TEST_TOKEN_CODE1)));
 		assertFalse(s0.isAccept());
 		assertEquals(Sets.newHashSet('a'), s0.getEdges().get(0).getAccepts());
 		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
@@ -119,7 +119,7 @@ public class NFABuilderTest {
 		//                                                                                     ↓------ϵ-----+
 		// s0--a-->s1--ϵ-->s2--[xy0-9]-->s3--ϵ-->s4--ϵ-->s5--[a-z]-->s6--ϵ-->s7
 		//                                                                      +---------------ϵ--------------↑
-		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new LexToken("a[xy\\d][a-z]*", TEST_TOKEN_CODE1)));
+		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("a[xy\\d][a-z]*", TEST_TOKEN_CODE1)));
 		assertFalse(s0.isAccept());
 		assertEquals(Sets.newHashSet('a'), s0.getEdges().get(0).getAccepts());
 		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
@@ -163,7 +163,7 @@ public class NFABuilderTest {
 		// s0--a-->s1--ϵ-->s12--ϵ-->s10--ϵ--+---------------->s2--[bc]-->s3-------------------+--ϵ-->s11--ϵ-->s13
 		//                                 +             ↑--------------------------------ϵ------------------------------------+              ↑
 		//                                 +-----------------------------------------ϵ-----------------------------------------------+
-		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new LexToken("a([bc]|d|e)*", TEST_TOKEN_CODE1)));
+		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("a([bc]|d|e)*", TEST_TOKEN_CODE1)));
 		assertFalse(s0.isAccept());
 		assertEquals(Sets.newHashSet('a'), s0.getEdges().get(0).getAccepts());
 		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
@@ -232,8 +232,8 @@ public class NFABuilderTest {
 		//             +-->s0---a---->s1
 		// s4--ϵ--+-->s2--[cd]-->s3
 		NFAStatus s4 = NFABuilder.newNFA(Sets.newHashSet(
-			new LexToken("a", TEST_TOKEN_CODE1),
-			new LexToken("[cd]", TEST_TOKEN_CODE2)));
+			new TokenDef("a", TEST_TOKEN_CODE1),
+			new TokenDef("[cd]", TEST_TOKEN_CODE2)));
 		assertFalse(s4.isAccept());
 		List<Edge> e4 = s4.getEdges();
 		// 这里的顺序取决于两个 LexToken 在 Set 中的顺序
@@ -257,7 +257,7 @@ public class NFABuilderTest {
 	public void testNoneOrOne() {
 		// s0--a-->s1--ϵ-->s2--ϵ-->s3--b--s4--ϵ-->s5--ϵ-->s6-->c-->s7
 		//                               +------------------------↑
-		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new LexToken("ab?c", TEST_TOKEN_CODE1)));
+		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("ab?c", TEST_TOKEN_CODE1)));
 		assertFalse(s0.isAccept());
 		assertEquals(Sets.newHashSet('a'), s0.getEdges().get(0).getAccepts());
 		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
@@ -287,7 +287,7 @@ public class NFABuilderTest {
 	@Test
 	public void testInvertCRLF() {
 		// s0--x-->s1--ϵ-->s2 -->(invertCRLF)-->s3
-		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new LexToken("x.", TEST_TOKEN_CODE1)));
+		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("x.", TEST_TOKEN_CODE1)));
 		assertFalse(s0.isAccept());
 		assertEquals(Sets.newHashSet('x'), s0.getEdges().get(0).getAccepts());
 		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();

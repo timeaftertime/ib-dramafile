@@ -10,8 +10,9 @@ public enum TokenType {
 	// 空白间隔
 	BLANK("\\s+", 0),
 	// 标点符号
-	BLOCK_LEFT("\\{", 1), BLOCK_RIGHT("\\}", 1), STM_END(";", 1), ASSIGN("=", 1), EQUALS("==", 1), NOT_EQUALS("!=", 1),
+	BLOCK_LEFT("\\{", 1), BLOCK_RIGHT("\\}", 1), STMD_END(";", 1), ASSIGN("=", 1), EQUALS("==", 1), NOT_EQUALS("!=", 1),
 	PROP("\\.", 1), BRACKET_LEFT("\\(", 1), BRACKET_RIGHT("\\)", 1),
+	PLUS("\\+", 1), MINUS("\\-", 1), TIMES("\\*", 1), DIVISION("\\\\", 1),
 	// 关键字
 	IF("if", 2), WHILE("while", 2), NEW("new", 2),
 	// 标识符

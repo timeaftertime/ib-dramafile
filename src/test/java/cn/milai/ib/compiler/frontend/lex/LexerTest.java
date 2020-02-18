@@ -16,7 +16,7 @@ public class LexerTest {
 	@Test
 	public void testIfStatement() {
 		Lexer lexer = new Lexer(Arrays.stream(TokenType.values())
-			.map(t -> new LexToken(t.getRE(), t.getCode()))
+			.map(t -> new TokenDef(t.getRE(), t.getCode()))
 			.collect(Collectors.toSet()));
 		TokenInput tokens = lexer.lex(new CharInput("if(player.getLife() == 0) { gameOver(); }"));
 		assertArrayEquals(new Token[] {
@@ -38,7 +38,7 @@ public class LexerTest {
 			new Token("gameOver", TokenType.IDENTIFIER),
 			new Token("(", TokenType.BRACKET_LEFT),
 			new Token(")", TokenType.BRACKET_RIGHT),
-			new Token(";", TokenType.STM_END),
+			new Token(";", TokenType.STMD_END),
 			new Token(" ", TokenType.BLANK),
 			new Token("}", TokenType.BLOCK_RIGHT),
 		}, tokens.toArray());
@@ -47,7 +47,7 @@ public class LexerTest {
 	@Test
 	public void testWhileAndNew() {
 		Lexer lexer = new Lexer(Arrays.stream(TokenType.values())
-			.map(t -> new LexToken(t.getRE(), t.getCode()))
+			.map(t -> new TokenDef(t.getRE(), t.getCode()))
 			.collect(Collectors.toSet()));
 		TokenInput tokens = lexer.lex(new CharInput(
 			"while(boss.isAlive()) { new(\"cn.milai.ib.character.plane.WelcomePlane\"); }"));
@@ -67,7 +67,7 @@ public class LexerTest {
 			new Token("(", TokenType.BRACKET_LEFT),
 			new Token("\"cn.milai.ib.character.plane.WelcomePlane\"", TokenType.STR),
 			new Token(")", TokenType.BRACKET_RIGHT),
-			new Token(";", TokenType.STM_END),
+			new Token(";", TokenType.STMD_END),
 			new Token(" ", TokenType.BLANK),
 			new Token("}", TokenType.BLOCK_RIGHT),
 		}, tokens.toArray());

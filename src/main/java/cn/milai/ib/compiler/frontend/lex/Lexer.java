@@ -23,7 +23,7 @@ public class Lexer {
 
 	private DFAStatus start;
 
-	public Lexer(Set<LexToken> tokens) {
+	public Lexer(Set<TokenDef> tokens) {
 		start = DFABuilder.newDFA(NFABuilder.newNFA(tokens));
 	}
 
