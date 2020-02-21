@@ -1,13 +1,11 @@
-package cn.milai.ib.compiler;
-
-import cn.milai.ib.ex.IBException;
+package cn.milai.ib.compiler.ex;
 
 /**
  * 常量表超出最大大小的异常
  * 2020.01.04
  * @author milai
  */
-public class ConstantTableOverflow extends IBException {
+public class ConstantTableOverflow extends IBCompilerException {
 
 	/**
 	 * 

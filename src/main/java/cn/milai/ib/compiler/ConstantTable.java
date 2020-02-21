@@ -9,6 +9,7 @@ import cn.milai.ib.compiler.constant.FloatConstant;
 import cn.milai.ib.compiler.constant.IntConstant;
 import cn.milai.ib.compiler.constant.LongConstant;
 import cn.milai.ib.compiler.constant.UTF8Constant;
+import cn.milai.ib.compiler.ex.ConstantTableOverflow;
 
 /**
  * 常量表，用于保存已经发现的常量

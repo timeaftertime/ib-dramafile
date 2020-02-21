@@ -10,7 +10,7 @@ public class ByteTestUtils {
 
 	@Test
 	public void printUTF8Bytes() {
-		for (byte b : getBytes("cn.milai.ib.obj.character.plane.WelcomePlane")) {
+		for (byte b : getBytes("测试用的剧本")) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
@@ -28,7 +28,7 @@ public class ByteTestUtils {
 
 	@Test
 	public void printShortBytes() {
-		for (byte b : getShortBytes(1)) {
+		for (byte b : getShortBytes(20)) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
@@ -37,16 +37,16 @@ public class ByteTestUtils {
 
 	@Test
 	public void printLongBytes() {
-		for (byte b : getBytes(10L)) {
+		for (byte b : getBytes(20L)) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
 		}
 	}
-	
+
 	@Test
 	public void printFloatBytes() {
-		for (byte b : getBytes(0.5f)) {
+		for (byte b : getBytes(-0.1f)) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
@@ -96,7 +96,7 @@ public class ByteTestUtils {
 		}
 		return out.toByteArray();
 	}
-	
+
 	public static byte[] getBytes(float value) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		DataOutputStream writer = new DataOutputStream(out);

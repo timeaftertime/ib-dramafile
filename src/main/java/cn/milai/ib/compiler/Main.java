@@ -8,26 +8,33 @@ import java.io.IOException;
 
 public class Main {
 
-	private static final String OUTPUT_EXT = ".drama";
+	private static final String INPUT_EXT = ".drama";
+	private static final String OUTPUT_EXT = ".cdrama";
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		if (args.length < 1) {
-			System.err.println("请指定输入文件");
-			return;
-		}
-		String inputFile = args[0].trim();
-		String outputFile = getOutputFileName(args);
+		String inputFile = getInputFileName(args);
+		String outputFile = getOutputFileName(inputFile);
 		byte[] bytes = SimpleCompiler.compile(new FileInputStream(inputFile));
 		BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile));
 		output.write(bytes);
 		output.close();
 	}
 
-	private static String getOutputFileName(String[] args) {
-		if (args.length >= 2) {
-			return args[1].endsWith(OUTPUT_EXT) ? args[1] : args[1] + OUTPUT_EXT;
+	private static String getInputFileName(String[] args) {
+		if (args.length < 1) {
+			throw new IllegalArgumentException("未指定输入文件");
 		}
-		return "ib" + OUTPUT_EXT;
+		String inputFileName = args[0];
+		inputFileName = inputFileName.trim();
+		if (!inputFileName.endsWith(INPUT_EXT)) {
+			inputFileName = inputFileName + INPUT_EXT;
+		}
+		return inputFileName;
+	}
+
+	private static String getOutputFileName(String inputFileName) {
+		String outputFileName = inputFileName.substring(0, inputFileName.length() - INPUT_EXT.length());
+		return outputFileName + OUTPUT_EXT;
 	}
 
 }
