@@ -1,6 +1,8 @@
 package cn.milai.ib.compiler.frontend.lex;
 
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
@@ -13,21 +15,12 @@ import cn.milai.ib.compiler.frontend.Input;
  */
 public class CharInput extends Input<Character> {
 
-	private static final char EOF = Char.EOF;
-
 	public CharInput(String str) {
 		super(toChracterArray(str));
 	}
 
-	/**
-	 * 尝试获取下一个元素，若已经没有元素将返回 Char.EOF
-	 */
-	@Override
-	public Character getNext() {
-		if (index >= elements.size()) {
-			return EOF;
-		}
-		return super.getNext();
+	public CharInput(List<Character> chs) {
+		super(chs.toArray(new Character[0]));
 	}
 
 	private static Character[] toChracterArray(String str) {
@@ -38,4 +31,8 @@ public class CharInput extends Input<Character> {
 		return list.toArray(new Character[0]);
 	}
 
+	@Override
+	public CharInput filter(Predicate<Character> p) {
+		return new CharInput((elements.stream().filter(p).collect(Collectors.toList())));
+	}
 }

@@ -1,0 +1,21 @@
+( = BRACKET_LEFT
+) = BRACKET_RIGHT
+{ = BLOCK_LEFT
+} = BLOCK_RIGHT
+; = STMD_END
+
+CFG -> Stmds
+
+Stmds -> Stmds Stmd
+Stmds -> Stmd
+
+Stmd -> WHILE ( Expr ) Block
+Stmd -> IF ( Expr ) Block
+Stmd -> IDENTIFIER ( ) ;
+Stmd -> ;
+
+Block -> { Stmds }
+Block -> {  }
+Block -> Stmd
+
+Expr -> IDENTIFIER

@@ -1,0 +1,12 @@
+( = BRACKET_LEFT
+) = BRACKET_RIGHT
+{ = BLOCK_LEFT
+} = BLOCK_RIGHT
+; = STMD_END
+
+CFG -> Stmd
+
+Stmd -> IF ( Expr ) { Stmd }
+Stmd -> IDENTIFIER ( ) ;
+
+Expr -> IDENTIFIER

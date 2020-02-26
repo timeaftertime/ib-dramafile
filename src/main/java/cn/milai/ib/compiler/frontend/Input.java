@@ -1,10 +1,11 @@
 package cn.milai.ib.compiler.frontend;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
 
-public class Input<T> {
+public abstract class Input<T> {
 
 	protected int index;
 	protected List<T> elements;
@@ -34,20 +35,24 @@ public class Input<T> {
 	}
 
 	/**
-	 * 查看下一个元素
-	 * @return
+	 * 尝试获取下一个元素
+	 * 若已经没有元素将返回 null
 	 */
 	public T getNext() {
+		if (index >= elements.size()) {
+			return null;
+		}
 		return elements.get(index);
 	}
 
 	/**
 	 * 使读指针移动 offset 个元素
 	 * offset 为正数时将跳过指定个元素，offset 为负数时将回溯指定个元素
-	 * 超出范围将抛出 
+	 * 超出范围将抛出 IndexOutOfBoundsException
 	 * @param es
+	 * @throws IndexOutOfBoundsException
 	 */
-	public void seek(int offset) {
+	public void seek(int offset) throws IndexOutOfBoundsException {
 		int newIndex = index + offset;
 		if (newIndex < 0 || newIndex > elements.size()) {
 			throw new IndexOutOfBoundsException(String.format("size = %d, newIndex = %d", elements.size(), newIndex));
@@ -62,6 +67,18 @@ public class Input<T> {
 	 */
 	public T[] toArray(T[] array) {
 		return elements.subList(index, elements.size()).toArray(array);
+	}
+
+	/**
+	 * 返回一个新输入序列，其中所有元素来自当前序列且满足给定条件
+	 * @param p
+	 * @return
+	 */
+	public abstract Input<T> filter(Predicate<T> p);
+
+	@Override
+	public String toString() {
+		return "Input[next=" + getNext() + ", index=" + index + "]";
 	}
 
 }

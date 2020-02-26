@@ -23,13 +23,13 @@ public class NFABuilder {
 	 */
 	public static NFAStatus newNFA(Set<TokenDef> tokens) {
 		if (tokens.isEmpty()) {
-			throw new IllegalArgumentException("tokens 必须大于 0");
+			throw new IllegalArgumentException("tokens 不能为空");
 		}
 		List<NFAStatus> firsts = Lists.newArrayList();
 		for (TokenDef token : tokens) {
 			NFAPair pair = null;
 			try {
-				pair = transfer(new CharInput(token.getRE()), Char.EOF);
+				pair = transfer(new CharInput(token.getRE()));
 			} catch (Exception e) {
 				throw new IBCompilerException(String.format("输入的 %s 不是合法的正则表达式", token.getRE()), e);
 			}
@@ -56,6 +56,24 @@ public class NFABuilder {
 	}
 
 	/**
+	 * 将 input 的正则表达式转换为 NFA
+	 * @param input
+	 * @return
+	 */
+	private static NFAPair transfer(CharInput input) {
+		NFAPair nfa = null;
+		while (true) {
+			if (!input.hasNext()) {
+				if (nfa == null) {
+					throw new IBCompilerException(String.format("正则表达式构建的 NFA 为空"));
+				}
+				return nfa;
+			}
+			nfa = NFAPair.connect(nfa, parseNextNFA(input));
+		}
+	}
+
+	/**
 	 * 将 input 在 endChar 之前的正则表达式转换为 NFA
 	 * @param input
 	 * @param endChar
@@ -64,41 +82,39 @@ public class NFABuilder {
 	private static NFAPair transfer(CharInput input, char endChar) {
 		NFAPair nfa = null;
 		while (true) {
+			if (!input.hasNext()) {
+				throw new IBCompilerException("结束符 " + endChar + " 出现前遇到输入结束");
+			}
 			if (input.getNext() == endChar) {
-				if (input.hasNext()) {
-					input.next();
-				}
 				if (nfa == null) {
 					throw new IBCompilerException(String.format("正则表达式构建的 NFA 为空"));
 				}
+				input.next();
 				return nfa;
 			}
-			nfa = NFAPair.connect(nfa, parseNextNFA(input, endChar));
+			nfa = NFAPair.connect(nfa, parseNextNFA(input));
 		}
 	}
 
 	/**
 	 * 解析并返回当前层次的下一个 NFA
-	 * @param input
 	 * @param endChar
 	 * @return
 	 */
-	private static NFAPair parseNextNFA(CharInput input, char endChar) {
+	private static NFAPair parseNextNFA(CharInput input) {
 		NFAPair nfa = null;
 		switch (input.getNext()) {
-			case Char.EOF:
-				throw new IBCompilerException(String.format("括号匹配之前遇到输入终止符"));
-			case Char.SET_LEFT_CHAR: {
+			case Char.SET_LEFT_CHAR : {
 				input.next();
 				nfa = dealRepeat(input, dealInputSet(input));
 				break;
 			}
-			case Char.COMP_LEFT_CHAR: {
+			case Char.COMP_LEFT_CHAR : {
 				input.next();
 				nfa = dealRepeat(input, transfer(input, Char.COMP_RIGHT_CHAR));
 				break;
 			}
-			case Char.SLASH: {
+			case Char.SLASH : {
 				input.next();
 				nfa = dealRepeat(input, Char.slash(input.next()));
 				break;
@@ -109,9 +125,9 @@ public class NFABuilder {
 				break;
 			}
 		}
-		if (input.getNext() == Char.OR) {
+		if (input.hasNext() && input.getNext() == Char.OR) {
 			input.next();
-			nfa = NFAPair.paralell(nfa, parseNextNFA(input, endChar));
+			nfa = NFAPair.paralell(nfa, parseNextNFA(input));
 		}
 		return nfa;
 	}

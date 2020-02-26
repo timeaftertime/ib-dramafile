@@ -1,5 +1,8 @@
 package cn.milai.ib.compiler.frontend.parsing;
 
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import cn.milai.ib.compiler.frontend.Input;
 
 public class TokenInput extends Input<Token> {
@@ -16,4 +19,8 @@ public class TokenInput extends Input<Token> {
 		return super.toArray(new Token[0]);
 	}
 
+	@Override
+	public TokenInput filter(Predicate<Token> p) {
+		return new TokenInput(elements.stream().filter(p).collect(Collectors.toList()).toArray(new Token[0]));
+	}
 }

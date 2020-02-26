@@ -136,7 +136,7 @@ public class Grammer {
 				}
 			}
 			if (notCursion == null) {
-				throw new IllegalStateException("找不到非左递归的产生式");
+				throw new IllegalStateException(String.format("找不到非左递归的产生式：symbol = %s", now));
 			}
 			List<Production> leftCursions = Lists.newArrayList();
 			for (Production p : now.getProductions()) {
@@ -313,6 +313,10 @@ public class Grammer {
 		NonTerminalSymbol symbol = new NonTerminalSymbol(code);
 		nonTerminals.add(symbol);
 		return symbol;
+	}
+
+	public NonTerminalSymbol getStartSymbol() {
+		return startSymbol;
 	}
 
 	public List<NonTerminalSymbol> getNonTerminals() {
