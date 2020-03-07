@@ -1,0 +1,25 @@
+# 宏定义，不会写到编译后的文件
+define  PlayerPlane  cn.milai.ib.character.plane.PlayerPlane
+define  WelcomePlane  cn.milai.ib.character.plane.WelcomePlane
+define  DramaDialog  cn.milai.ib.component.form.DramaDialog
+define  FollowPlane  cn.milai.ib.character.plane.FollowPlane
+define  MissileBoss  cn.milai.ib.character.plane.MissileBoss
+
+# dialog  全类名  x坐标  y坐标  说话者全类名  对话内容
+dialog ${DramaDialog} 0.5 0.75 ${PlayerPlane} new_feature_about_dialog
+####注释
+add  ${WelcomePlane}  0.4  0
+# 这是注释
+add  ${WelcomePlane}  0.5  -0.2
+    #这也是注释
+    # 还是注释////////////////////\\\\\\\\\\\\\\\\\\\\\\\\##add 
+  sleep 10
+add ${FollowPlane} 0.2 0
+add ${FollowPlane} 0.8 0
+sleep 20
+add  ${MissileBoss}  0.5 -0.1
+
+# 剧本 code
+dramacode   testDialog
+# 剧本名，不定义时与 dramaCode 一致
+dramaname  测试用的剧本

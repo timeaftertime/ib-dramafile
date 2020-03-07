@@ -1,0 +1,21 @@
+import  cn.milai.ib.character.plane.PlayerPlane;
+import  cn.milai.ib.character.plane.WelcomePlane;
+import  cn.milai.ib.component.form.DramaDialog;
+import  cn.milai.ib.character.plane.FollowPlane;
+import  cn.milai.ib.character.plane.MissileBoss;
+
+# 这是华丽的注释
+drama testDialog("测试用的剧本") {
+	# 这条注释更华丽
+	void main() {
+	    add DramaDialog(0.5, 0.75, img("/img/speaker.gif"), "new_feature_about_dialog");
+	    add WelcomePlane(0.4, 0);
+	    add WelcomePlane(0.5, -0.2);
+	    sleep(10);
+################### 你见过这么帅的注释吗  ##########################
+	    add FollowPlane(0.2, 0);
+	    add FollowPlane(0.8, 0);
+	    sleep(20);
+	    add MissileBoos, 0.5, -0.1);
+	}
+}
