@@ -33,7 +33,7 @@ public class Parser {
 			Node now = stack.pop();
 			if (now == null) {
 				if (token != null) {
-					rollback(input, now, stack);
+					last = rollback(input, now, stack);
 					continue;
 				}
 				return root;
@@ -45,7 +45,7 @@ public class Parser {
 				if (selectNextProduction(input, stack, now)) {
 					continue;
 				}
-				rollback(input, now, stack);
+				last = rollback(input, now, stack);
 				continue;
 			}
 			if (match(symbol, token)) {
@@ -53,12 +53,30 @@ public class Parser {
 				input.next();
 				continue;
 			}
-			rollback(input, now, stack);
+			last = rollback(input, now, stack);
 		}
 		throw new IllegalStateException("匹配完成前栈空");
 	}
 
-	private void rollback(TokenInput input, Node now, Stack<Node> stack) {
+	/**
+	 * 回滚，若回滚成功，返回最后重新选择了产生式的结点
+	 * @param input
+	 * @param now
+	 * @param stack
+	 * @return
+	 */
+	private Node rollback(TokenInput input, Node now, Stack<Node> stack) {
+		Node pre = now.getPre();
+		// 存在前一个结点 pre ，且 pre 是非终结符且使用的不是空产生式，则 pre 一定是 now 的父节点
+		if (pre != null && pre.getSymbol().isNonTerminal() && !pre.getNowProduction().isEpsilon()) {
+			// 弹出在栈中尚未匹配的兄弟节点
+			Production p = pre.getNowProduction();
+			for (Symbol child : p.getRights()) {
+				if (stack.peek().getSymbol() == child) {
+					stack.pop();
+				}
+			}
+		}
 		while (true) {
 			// 回到当前结点的父节点或左兄弟节点
 			now = now.getPre();
@@ -71,18 +89,9 @@ public class Parser {
 				input.seek(-1);
 				continue;
 			}
-			NonTerminalSymbol s = (NonTerminalSymbol) now.getSymbol();
-			Production p = s.getProductions().get(now.getProductionIndex());
-			if(!p.isEpsilon()) {
-				for (Symbol child : p.getRights()) {
-					// 弹出在栈中尚未匹配的兄弟节点
-					if (stack.peek() != null && stack.peek().getSymbol() == child) {
-						stack.pop();
-					}
-				}
-			}
+			// 如果是非终结符，则尝试选择下一个产生式
 			if (selectNextProduction(input, stack, now)) {
-				return;
+				return now;
 			}
 		}
 	}
@@ -100,6 +109,7 @@ public class Parser {
 		List<Production> productions = symbol.getProductions();
 		for (int i = now.getProductionIndex() + 1; i < productions.size(); i++) {
 			Production p = productions.get(i);
+			now.setProductionIndex(i);
 			if (contains(p, input.getNext())) {
 				if (p.isEpsilon()) {
 					return true;
@@ -112,7 +122,6 @@ public class Parser {
 				for (int j = children.size() - 1; j >= 0; j--) {
 					stack.push(children.get(j));
 				}
-				now.setProductionIndex(i);
 				return true;
 			}
 		}

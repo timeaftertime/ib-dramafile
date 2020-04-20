@@ -15,12 +15,12 @@ public enum TokenType {
 	PLUS("\\+", 1), MINUS("\\-", 1), TIMES("\\*", 1), DIVISION("\\\\", 1),
 	COMMA(",", 1),
 	// 关键字
-	DRAMA("drama", 2), IF("if", 2), WHILE("while", 2), ADD("add", 2), TYPE_VOID("void", 2), IMPORT("import", 2),
-	IMG("img", 2), AUDIO("audio", 2),
+	IF("if", 2), WHILE("while", 2), ADD("add", 2), TYPE_VOID("void", 2), IMPORT("import", 2),
+	IMG("img", 2), AUDIO("audio", 2), SLEEP("sleep", 2),
 	// 标识符
 	IDENTIFIER("[_a-zA-Z]\\w*", 3),
 	// 常量
-	INT("[+\\-]?0|([1-9][0-9]*)", 4), FLOAT("[0-9]+\\.[0-9]+", 4), STR("\"[^\"]*\"", 4),
+	INT("[+\\-]?0|([1-9][0-9]*)", 4), FLOAT("[+\\-]?0|([1-9][0-9]*)\\.[0-9]+", 4), STR("\"[^\"]*\"", 4),
 	;
 
 	/**

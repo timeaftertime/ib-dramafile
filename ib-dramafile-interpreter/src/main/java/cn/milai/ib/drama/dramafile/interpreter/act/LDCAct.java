@@ -7,24 +7,27 @@ import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
 
 /**
- * 设置 BGM 的指令
+ * 加载一个常量并压入栈顶
  * @author milai
- * @date 2020.02.19
+ * @date 2020.04.19
  */
-public class BGMAct extends AbstractAct {
+public class LDCAct extends AbstractAct {
+
+	private int constIndex;
 
 	@Override
 	public ActType getCode() {
-		return ActType.BGM;
+		return ActType.LDC;
 	}
 
 	@Override
 	protected void action(Frame frame, Container container) throws Exception {
-		throw new UnsupportedOperationException("暂未实现");
+		frame.getOperands().push(frame.getClip().getValueConst(constIndex));
 	}
 
 	@Override
 	protected void readOperands(ByteReader reader) throws IOException {
+		constIndex = reader.readUint16();
 	}
 
 }

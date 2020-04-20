@@ -2,18 +2,15 @@ package cn.milai.ib.compiler.frontend.lex;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-
-import java.util.HashSet;
-import java.util.List;
 
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cn.milai.ib.drama.dramafile.compiler.frontend.lex.Char;
-import cn.milai.ib.drama.dramafile.compiler.frontend.lex.Edge;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.NFABuilder;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.NFAStatus;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.TokenDef;
@@ -35,12 +32,13 @@ public class NFABuilderTest {
 		// nfa = head--ϵ-->s0--a-->s1--ϵ-->s2--b-->s3--ϵ-->s4--c-->s5--ϵ-->s6--d-->s7--ϵ-->s8--e-->s9
 		for (int i = 0; i < 5; i++) {
 			assertFalse(s.isAccept());
-			assertTrue(s.getEdges().get(0).isEpsilon());
-			s = s.getEdges().get(0).getTargetStatus();
+			assertEquals(1, s.getEpsilonNexts().size());
+			s = s.getEpsilonNexts().get(0);
 
 			assertFalse(s.isAccept());
-			assertEquals(Sets.newHashSet((char) ('a' + i)), s.getEdges().get(0).getAccepts());
-			s = s.getEdges().get(0).getTargetStatus();
+			char ch = (char) ('a' + i);
+			s = s.nextOf(ch);
+			assertNotNull(s);
 		}
 		assertEquals(TEST_TOKEN_CODE1, s.token());
 	}
@@ -52,12 +50,13 @@ public class NFABuilderTest {
 		// nfa = head--ϵ-->s0--a-->s1--ϵ-->s2--b-->s3--ϵ-->s4--c-->s5--ϵ-->s6--d-->s7--ϵ-->s8--e-->s9
 		for (int i = 0; i < 5; i++) {
 			assertFalse(s.isAccept());
-			assertTrue(s.getEdges().get(0).isEpsilon());
-			s = s.getEdges().get(0).getTargetStatus();
+			assertEquals(1, s.getEpsilonNexts().size());
+			s = s.getEpsilonNexts().get(0);
 
 			assertFalse(s.isAccept());
-			assertEquals(Sets.newHashSet((char) ('a' + i)), s.getEdges().get(0).getAccepts());
-			s = s.getEdges().get(0).getTargetStatus();
+			char ch = (char) ('a' + i);
+			s = s.nextOf(ch);
+			assertNotNull(s);
 		}
 		assertEquals(TEST_TOKEN_CODE1, s.token());
 	}
@@ -69,7 +68,7 @@ public class NFABuilderTest {
 	 */
 	private NFAStatus addEmptyHead(NFAStatus s) {
 		NFAStatus tmp = new NFAStatus();
-		tmp.addEdge(s);
+		tmp.addEpsilonNext(s);
 		return tmp;
 	}
 
@@ -80,44 +79,35 @@ public class NFABuilderTest {
 		//                               +-----------ϵ--------------↑
 		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("ab*c+", TEST_TOKEN_CODE1)));
 		assertFalse(s0.isAccept());
-		assertEquals(Sets.newHashSet('a'), s0.getEdges().get(0).getAccepts());
-		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
+		NFAStatus s1 = s0.nextOf('a');
+		assertNotNull(s1);
 		assertFalse(s1.isAccept());
-		assertTrue(s1.getEdges().get(0).isEpsilon());
-		NFAStatus s2 = s1.getEdges().get(0).getTargetStatus();
+		assertEquals(1, s1.getEpsilonNexts().size());
+		NFAStatus s2 = s1.getEpsilonNexts().get(0);
 		assertFalse(s2.isAccept());
-		List<Edge> e2 = s2.getEdges();
-		assertEquals(2, e2.size());
-		// 以下两个变量的 0 / 1 取决于构造 NFA 时添加边的顺序
-		Edge e2S3 = e2.get(0);
-		Edge e2S5 = e2.get(1);
-		NFAStatus s3 = e2S3.getTargetStatus();
+		NFAStatus s3 = s2.getEpsilonNexts().get(0);
 		assertFalse(s3.isAccept());
-		assertEquals(Sets.newHashSet('b'), s3.getEdges().get(0).getAccepts());
-		NFAStatus s4 = s3.getEdges().get(0).getTargetStatus();
+		NFAStatus s4 = s3.nextOf('b');
+		assertNotNull(s4);
 		assertFalse(s4.isAccept());
-		List<Edge> e4 = s4.getEdges();
-		Edge e4S3 = e4.get(0).getTargetStatus() == s3 ? e4.get(0) : e4.get(1);
-		Edge e4S5 = e4.get(0).getTargetStatus() == s3 ? e4.get(1) : e4.get(0);
-		NFAStatus s5 = e4S5.getTargetStatus();
+		assertSame(s3, s2.getEpsilonNexts().get(0));
+		assertSame(s3, s4.getEpsilonNexts().get(0));
+		NFAStatus s5 = s4.getEpsilonNexts().get(1);
 		assertFalse(s5.isAccept());
-		assertSame(s5, e2S5.getTargetStatus());
-		assertSame(s3, e4S3.getTargetStatus());
-		assertTrue(s5.getEdges().get(0).isEpsilon());
-		NFAStatus s6 = s5.getEdges().get(0).getTargetStatus();
+		assertSame(s5, s2.getEpsilonNexts().get(1));
+		assertEquals(1, s5.getEpsilonNexts().size());
+		NFAStatus s6 = s5.getEpsilonNexts().get(0);
 		assertFalse(s6.isAccept());
-		assertTrue(s6.getEdges().get(0).isEpsilon());
-		NFAStatus s7 = s6.getEdges().get(0).getTargetStatus();
+		assertEquals(1, s6.getEpsilonNexts().size());
+		NFAStatus s7 = s6.getEpsilonNexts().get(0);
 		assertFalse(s7.isAccept());
-		assertEquals(Sets.newHashSet('c'), s7.getEdges().get(0).getAccepts());
-		NFAStatus s8 = s7.getEdges().get(0).getTargetStatus();
+		NFAStatus s8 = s7.nextOf('c');
+		assertNotNull(s8);
 		assertFalse(s8.isAccept());
-		List<Edge> e8 = s8.getEdges();
-		Edge e8S7 = e8.get(0).getTargetStatus() == s7 ? e8.get(0) : e8.get(1);
-		Edge e8S9 = e8.get(0) == e8S7 ? e8.get(1) : e8.get(0);
-		assertSame(s7, e8S7.getTargetStatus());
-		assertTrue(e8S9.isEpsilon());
-		assertEquals(TEST_TOKEN_CODE1, e8S9.getTargetStatus().token());
+		assertEquals(2, s8.getEpsilonNexts().size());
+		assertSame(s7, s8.getEpsilonNexts().get(0));
+		NFAStatus s9 = s8.getEpsilonNexts().get(1);
+		assertEquals(TEST_TOKEN_CODE1, s9.token());
 	}
 
 	@Test
@@ -127,38 +117,33 @@ public class NFABuilderTest {
 		//                                                                      +---------------ϵ--------------↑
 		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("a[xy\\d][a-z]*", TEST_TOKEN_CODE1)));
 		assertFalse(s0.isAccept());
-		assertEquals(Sets.newHashSet('a'), s0.getEdges().get(0).getAccepts());
-		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
+		NFAStatus s1 = s0.nextOf('a');
+		assertNotNull(s1);
 		assertFalse(s1.isAccept());
-		assertTrue(s1.getEdges().get(0).isEpsilon());
-		NFAStatus s2 = s1.getEdges().get(0).getTargetStatus();
+		assertEquals(1, s1.getEpsilonNexts().size());
+		NFAStatus s2 = s1.getEpsilonNexts().get(0);
 		assertFalse(s2.isAccept());
-		HashSet<Character> xy0_9 = Sets.newHashSet();
-		xy0_9.add('x');
-		xy0_9.add('y');
-		xy0_9.addAll(Char.numbers());
-		assertEquals(xy0_9, s2.getEdges().get(0).getAccepts());
-		NFAStatus s3 = s2.getEdges().get(0).getTargetStatus();
+		NFAStatus s3 = s2.nextOf('x');
+		assertSame(s3, s2.nextOf('y'));
+		assertSame(s3, s2.nextOf('0'));
+		assertSame(s3, s2.nextOf('4'));
+		assertSame(s3, s2.nextOf('9'));
+		assertNull(s2.nextOf('a'));
 		assertFalse(s3.isAccept());
-		assertTrue(s3.getEdges().get(0).isEpsilon());
-		NFAStatus s4 = s3.getEdges().get(0).getTargetStatus();
+		assertEquals(1, s3.getEpsilonNexts().size());
+		NFAStatus s4 = s3.getEpsilonNexts().get(0);
 		assertFalse(s4.isAccept());
-		List<Edge> e4 = s4.getEdges();
-		assertEquals(2, e4.size());
-		Edge e4S5 = e4.get(0);
-		Edge e4S7 = e4.get(1);
-		NFAStatus s5 = e4S5.getTargetStatus();
+		NFAStatus s5 = s4.getEpsilonNexts().get(0);
 		assertFalse(s5.isAccept());
-		assertEquals(Char.lowers(), s5.getEdges().get(0).getAccepts());
-		NFAStatus s6 = s5.getEdges().get(0).getTargetStatus();
+		NFAStatus s6 = s5.nextOf('c');
+		assertSame(s6, s5.nextOf('a'));
+		assertSame(s6, s5.nextOf('d'));
+		assertSame(s6, s5.nextOf('z'));
 		assertFalse(s6.isAccept());
-		List<Edge> e6 = s6.getEdges();
-		Edge e6S5 = e6.get(0).getTargetStatus() == s5 ? e6.get(0) : e6.get(1);
-		Edge e6S7 = e6.get(0) == e6S5 ? e6.get(1) : e6.get(0);
-		assertSame(s5, e6S5.getTargetStatus());
-		NFAStatus s7 = e6S7.getTargetStatus();
+		assertSame(s5, s6.getEpsilonNexts().get(0));
+		NFAStatus s7 = s6.getEpsilonNexts().get(1);
+		assertSame(s7, s4.getEpsilonNexts().get(1));
 		assertEquals(TEST_TOKEN_CODE1, s7.token());
-		assertSame(s7, e4S7.getTargetStatus());
 	}
 
 	@Test
@@ -171,66 +156,46 @@ public class NFABuilderTest {
 		//                                 +-----------------------------------------ϵ-----------------------------------------------+
 		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("a([bc]|d|e)*", TEST_TOKEN_CODE1)));
 		assertFalse(s0.isAccept());
-		assertEquals(Sets.newHashSet('a'), s0.getEdges().get(0).getAccepts());
-		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
+		NFAStatus s1 = s0.nextOf('a');
+		assertNotNull(s1);
 		assertFalse(s1.isAccept());
-		assertTrue(s1.getEdges().get(0).isEpsilon());
-		NFAStatus s12 = s1.getEdges().get(0).getTargetStatus();
+		assertEquals(1, s1.getEpsilonNexts().size());
+		NFAStatus s12 = s1.getEpsilonNexts().get(0);
 		assertFalse(s12.isAccept());
-		List<Edge> e12 = s12.getEdges();
-		assertEquals(2, e12.size());
-		Edge e12S10 = e12.get(0);
-		Edge e12S13 = e12.get(1);
-		assertTrue(e12S10.isEpsilon());
-		assertTrue(e12S13.isEpsilon());
-		NFAStatus s10 = s12.getEdges().get(0).getTargetStatus();
+		NFAStatus s10 = s12.getEpsilonNexts().get(0);
 		assertFalse(s10.isAccept());
-		List<Edge> e10 = s10.getEdges();
-		assertEquals(2, e10.size());
-		Edge e10S8 = e10.get(0);
-		Edge e10S2 = e10.get(1);
-		assertTrue(e10S8.isEpsilon());
-		assertTrue(e10S2.isEpsilon());
-		NFAStatus s8 = e10S8.getTargetStatus();
+		assertEquals(2, s10.getEpsilonNexts().size());
+		NFAStatus s8 = s10.getEpsilonNexts().get(0);
 		assertFalse(s8.isAccept());
-		List<Edge> e8 = s8.getEdges();
-		Edge e8S6 = e8.get(0);
-		Edge e8S4 = e8.get(1);
-		assertTrue(e8S6.isEpsilon());
-		assertTrue(e8S4.isEpsilon());
-		NFAStatus s6 = e8S6.getTargetStatus();
+		NFAStatus s6 = s8.getEpsilonNexts().get(0);
 		assertFalse(s6.isAccept());
-		assertEquals(Sets.newHashSet('e'), s6.getEdges().get(0).getAccepts());
-		NFAStatus s7 = s6.getEdges().get(0).getTargetStatus();
+		NFAStatus s7 = s6.nextOf('e');
+		assertNotNull(s7);
 		assertFalse(s7.isAccept());
-		NFAStatus s4 = e8S4.getTargetStatus();
+		assertEquals(1, s7.getEpsilonNexts().size());
+		NFAStatus s4 = s8.getEpsilonNexts().get(1);
 		assertFalse(s4.isAccept());
-		assertEquals(Sets.newHashSet('d'), s4.getEdges().get(0).getAccepts());
-		NFAStatus s5 = s4.getEdges().get(0).getTargetStatus();
-		assertTrue(s7.getEdges().get(0).isEpsilon());
-		assertTrue(s5.getEdges().get(0).isEpsilon());
-		assertSame(s7.getEdges().get(0).getTargetStatus(), s5.getEdges().get(0).getTargetStatus());
-		NFAStatus s9 = s7.getEdges().get(0).getTargetStatus();
+		NFAStatus s5 = s4.nextOf('d');
+		assertNotNull(s5);
+		assertEquals(1, s5.getEpsilonNexts().size());
+		NFAStatus s9 = s7.getEpsilonNexts().get(0);
+		assertSame(s9, s5.getEpsilonNexts().get(0));
 		assertFalse(s9.isAccept());
-		NFAStatus s2 = e10S2.getTargetStatus();
+		assertEquals(1, s9.getEpsilonNexts().size());
+		NFAStatus s2 = s10.getEpsilonNexts().get(1);
 		assertFalse(s2.isAccept());
-		assertEquals(Sets.newHashSet('b', 'c'), s2.getEdges().get(0).getAccepts());
-		NFAStatus s3 = s2.getEdges().get(0).getTargetStatus();
+		NFAStatus s3 = s2.nextOf('b');
+		assertNotNull(s3);
 		assertFalse(s3.isAccept());
-		assertTrue(s3.getEdges().get(0).isEpsilon());
-		assertTrue(s9.getEdges().get(0).isEpsilon());
-		assertSame(s3.getEdges().get(0).getTargetStatus(), s9.getEdges().get(0).getTargetStatus());
-		NFAStatus s11 = s3.getEdges().get(0).getTargetStatus();
+		assertSame(s3, s2.nextOf('c'));
+		assertEquals(1, s3.getEpsilonNexts().size());
+		NFAStatus s11 = s3.getEpsilonNexts().get(0);
+		assertSame(s11, s9.getEpsilonNexts().get(0));
 		assertFalse(s11.isAccept());
-		List<Edge> e11 = s11.getEdges();
-		Edge e11S10 = e11.get(0);
-		Edge e11S13 = e11.get(1);
-		assertTrue(e11S10.isEpsilon());
-		assertTrue(e11S13.isEpsilon());
-		assertSame(s10, e11S10.getTargetStatus());
-		NFAStatus s13 = e11S13.getTargetStatus();
+		NFAStatus s13 = s11.getEpsilonNexts().get(1);
+		assertSame(s10, s11.getEpsilonNexts().get(0));
+		assertSame(s13, s12.getEpsilonNexts().get(1));
 		assertEquals(TEST_TOKEN_CODE1, s13.token());
-		assertSame(s13, e12S13.getTargetStatus());
 	}
 
 	@Test
@@ -241,21 +206,17 @@ public class NFABuilderTest {
 			new TokenDef("a", TEST_TOKEN_CODE1),
 			new TokenDef("[cd]", TEST_TOKEN_CODE2)));
 		assertFalse(s4.isAccept());
-		List<Edge> e4 = s4.getEdges();
-		// 这里的顺序取决于两个 LexToken 在 Set 中的顺序
-		Edge e4S0 = e4.get(0);
-		Edge e4S2 = e4.get(1);
-		assertTrue(e4S0.isEpsilon());
-		assertTrue(e4S2.isEpsilon());
-		NFAStatus s0 = e4S0.getTargetStatus();
+		assertEquals(2, s4.getEpsilonNexts().size());
+		NFAStatus s0 = s4.getEpsilonNexts().get(0);
 		assertFalse(s0.isAccept());
-		assertEquals(Sets.newHashSet('a'), s0.getEdges().get(0).getAccepts());
-		NFAStatus s2 = e4S2.getTargetStatus();
-		assertFalse(s2.isAccept());
-		assertEquals(Sets.newHashSet('c', 'd'), s2.getEdges().get(0).getAccepts());
-		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
+		NFAStatus s1 = s0.nextOf('a');
+		assertNotNull(s1);
 		assertEquals(TEST_TOKEN_CODE1, s1.token());
-		NFAStatus s3 = s2.getEdges().get(0).getTargetStatus();
+		NFAStatus s2 = s4.getEpsilonNexts().get(1);
+		assertFalse(s2.isAccept());
+		NFAStatus s3 = s2.nextOf('c');
+		assertNotNull(s3);
+		assertSame(s3, s2.nextOf('d'));
 		assertEquals(TEST_TOKEN_CODE2, s3.token());
 	}
 
@@ -265,45 +226,48 @@ public class NFABuilderTest {
 		//                               +------------------------↑
 		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("ab?c", TEST_TOKEN_CODE1)));
 		assertFalse(s0.isAccept());
-		assertEquals(Sets.newHashSet('a'), s0.getEdges().get(0).getAccepts());
-		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
+		NFAStatus s1 = s0.nextOf('a');
+		assertNotNull(s1);
 		assertFalse(s1.isAccept());
-		assertTrue(s1.getEdges().get(0).isEpsilon());
-		NFAStatus s2 = s1.getEdges().get(0).getTargetStatus();
+		assertEquals(1, s1.getEpsilonNexts().size());
+		NFAStatus s2 = s1.getEpsilonNexts().get(0);
 		assertFalse(s2.isAccept());
-		assertTrue(s2.getEdges().get(0).isEpsilon());
-		NFAStatus s3 = s2.getEdges().get(0).getTargetStatus();
+		assertEquals(2, s2.getEpsilonNexts().size());
+		NFAStatus s3 = s2.getEpsilonNexts().get(0);
 		assertFalse(s3.isAccept());
-		assertEquals(Sets.newHashSet('b'), s3.getEdges().get(0).getAccepts());
-		NFAStatus s4 = s3.getEdges().get(0).getTargetStatus();
+		NFAStatus s4 = s3.nextOf('b');
+		assertNotNull(s4);
 		assertFalse(s4.isAccept());
-		assertTrue(s4.getEdges().get(0).isEpsilon());
-		NFAStatus s5 = s4.getEdges().get(0).getTargetStatus();
+		NFAStatus s5 = s4.getEpsilonNexts().get(0);
 		assertFalse(s5.isAccept());
-		assertTrue(s5.getEdges().get(0).isEpsilon());
-		assertSame(s5, s2.getEdges().get(1).getTargetStatus());
-		NFAStatus s6 = s5.getEdges().get(0).getTargetStatus();
+		assertSame(s5, s2.getEpsilonNexts().get(1));
+		NFAStatus s6 = s5.getEpsilonNexts().get(0);
 		assertFalse(s6.isAccept());
-		assertEquals(Sets.newHashSet('c'), s6.getEdges().get(0).getAccepts());
-		NFAStatus s7 = s6.getEdges().get(0).getTargetStatus();
+		NFAStatus s7 = s6.nextOf('c');
+		assertNotNull(s7);
 		assertTrue(s7.isAccept());
 		assertEquals(TEST_TOKEN_CODE1, s7.token());
 	}
 
 	@Test
 	public void testInvertCRLF() {
-		// s0--x-->s1--ϵ-->s2 -->(invertCRLF)-->s3
+		// s0--x-->s1--ϵ-->s2 -->(.)-->s3
 		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("x.", TEST_TOKEN_CODE1)));
 		assertFalse(s0.isAccept());
-		assertEquals(Sets.newHashSet('x'), s0.getEdges().get(0).getAccepts());
-		NFAStatus s1 = s0.getEdges().get(0).getTargetStatus();
+		NFAStatus s1 = s0.nextOf('x');
+		assertNotNull(s1);
 		assertFalse(s1.isAccept());
-		assertTrue(s1.getEdges().get(0).isEpsilon());
-		NFAStatus s2 = s1.getEdges().get(0).getTargetStatus();
+		NFAStatus s2 = s1.getEpsilonNexts().get(0);
 		assertFalse(s2.isAccept());
-		assertEquals(Char.invertCRLF(), s2.getEdges().get(0).getAccepts());
-		NFAStatus s3 = s2.getEdges().get(0).getTargetStatus();
+		NFAStatus s3 = s2.nextOf('a');
+		assertNotNull(s3);
+		assertSame(s3, s2.nextOf('x'));
+		assertSame(s3, s2.nextOf('2'));
+		assertSame(s3, s2.nextOf('0'));
+		assertSame(s3, s2.nextOf('='));
+		assertSame(s3, s2.nextOf('\\'));
 		assertTrue(s3.isAccept());
+		assertEquals(TEST_TOKEN_CODE1, s3.token());
 	}
 
 }

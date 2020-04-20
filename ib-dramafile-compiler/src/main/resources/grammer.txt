@@ -14,14 +14,11 @@
 
 # 定义推导式
 # 文法开始符号必须为 CFG
-CFG -> Imports DRAMA IDENTIFIER DramaName { Methods }
+CFG -> Imports Identity DramaName { Methods }
 
 # 导入语句列表
-Imports -> Import
+Imports -> IMPORT Identity Alias ; Imports
 Imports -> ϵ
-
-# 导入角色语句
-Import -> IMPORT Identity Alias ;
 
 # 重定义导入角色名
 Alias -> IDENTIFIER
@@ -43,8 +40,7 @@ ParamDeclares -> FirstParamDeclare NonFirstParamDeclare
 ParamDeclares -> ϵ
 
 # 第一个参数声明
-FirstParamDeclare -> Type IDENTITY
-FirstParamDeclare -> ϵ
+FirstParamDeclare -> Type IDENTIFIER
 
 # 非第一个参数声明
 NonFirstParamDeclare -> , FirstParamDeclare NonFirstParamDeclare
@@ -61,7 +57,7 @@ Params -> ϵ
 FirstParam -> Expr
 
 # 非第一个参数
-NonFirstParams -> , Expr NonFirstParams
+NonFirstParams -> , FirstParam NonFirstParams
 NonFirstParams -> ϵ
 
 # 语句列表
@@ -70,6 +66,7 @@ Stmds -> ϵ
 
 # 语句，暂时只支持部分语法
 Stmd -> Expr ;
+Stmd -> SLEEP ( INT ) ;
 # Stmd -> { Stmds }
 # Stmd -> if ( Expr ) { Stmds }
 # Stmd -> while ( Expr ) { Stmds }
@@ -81,7 +78,7 @@ Expr -> Term
 # Expr -> IDENTIFIER = Expr
 Expr -> ADD IDENTIFIER ( Params )
 Expr -> IMG ( STR )
-Expr -> AUDIO ( STR )
+Expr -> AUDIO ( STR , STR )
 
 # 乘除优先级表达式，暂时只支持部分语法
 # Term -> Term * Factor

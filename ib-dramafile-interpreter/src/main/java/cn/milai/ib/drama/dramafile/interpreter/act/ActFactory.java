@@ -31,6 +31,15 @@ public class ActFactory {
 			case BGI : {
 				return new BGIAct();
 			}
+			case IMG : {
+				return new IMGAct();
+			}
+			case AUDIO : {
+				return new AudioAct();
+			}
+			case LDC : {
+				return new LDCAct();
+			}
 			default: {
 				throw new ActNotExistsException(code);
 			}

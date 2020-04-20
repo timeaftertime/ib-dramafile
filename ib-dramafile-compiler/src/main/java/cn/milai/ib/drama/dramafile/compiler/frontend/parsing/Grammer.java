@@ -453,13 +453,13 @@ public class Grammer {
 		 */
 		public void addProduction(String leftCode, String[] rightCodes) {
 			checkSymbolCode(leftCode);
-			for (String code : rightCodes) {
-				checkSymbolCode(code);
-			}
 			NonTerminalSymbol left = nonTerminalOf(leftCode);
 			if (rightCodes.length == 1 && rightCodes[0].equals(Symbol.EPSILON.getCode())) {
 				left.addEpsilonProduction();
 				return;
+			}
+			for (String code : rightCodes) {
+				checkSymbolCode(code);
 			}
 			left.addProduction(Arrays.stream(rightCodes).map(this::symbolOf).collect(Collectors.toList()));
 		}

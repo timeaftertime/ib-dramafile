@@ -5,7 +5,7 @@ import java.io.IOException;
 import cn.milai.ib.container.Container;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
-import cn.milai.ib.util.TimeUtil;
+import cn.milai.ib.util.WaitUtil;
 
 /**
  * 使剧情休眠（无动作）指定帧数的动作
@@ -29,7 +29,7 @@ public class SleepAct extends AbstractAct {
 	@Override
 	protected void action(Frame frame, Container container) throws Exception {
 		long sleepFrame = frame.getClip().getLongConst(sleepFrameIndex);
-		TimeUtil.wait(container, sleepFrame);
+		WaitUtil.wait(container, sleepFrame);
 	}
 
 	@Override

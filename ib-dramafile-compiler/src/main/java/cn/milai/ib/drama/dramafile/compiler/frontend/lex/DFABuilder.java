@@ -33,12 +33,8 @@ public class DFABuilder {
 		q.add(firstSet);
 		while (!q.isEmpty()) {
 			Set<NFAStatus> fromSet = q.poll();
-			Set<Character> accepts = Sets.newHashSet();
-			for (NFAStatus s : fromSet) {
-				accepts.addAll(s.accepts());
-			}
-			for (Character ch : accepts) {
-				Set<NFAStatus> toSet = closure(nextsOf(fromSet, ch));
+			for (int ch = 1; ch <= Character.MAX_VALUE; ch++) {
+				Set<NFAStatus> toSet = closure(nextsOf(fromSet, (char) ch));
 				if (toSet.isEmpty()) {
 					continue;
 				}
@@ -53,7 +49,7 @@ public class DFABuilder {
 						newStatus.addToken(s.token());
 					}
 				}
-				status.get(fromSet).putEdge(ch, status.get(toSet));
+				status.get(fromSet).putEdge((char) ch, status.get(toSet));
 			}
 		}
 		return firstStatusOf(Lists.newArrayList(status.values()));
@@ -89,15 +85,15 @@ public class DFABuilder {
 		return findStatus(first, Sets.newHashSet());
 	}
 
-	private static Set<DFAStatus> findStatus(DFAStatus now, Set<DFAStatus> status) {
-		status.add(now);
+	private static Set<DFAStatus> findStatus(DFAStatus now, Set<DFAStatus> visited) {
+		visited.add(now);
 		for (Character ch : now.accepts()) {
 			DFAStatus next = now.next(ch);
-			if (!status.contains(next)) {
-				findStatus(next, status);
+			if (!visited.contains(next)) {
+				findStatus(next, visited);
 			}
 		}
-		return status;
+		return visited;
 	}
 
 	/**
@@ -108,10 +104,10 @@ public class DFABuilder {
 	 */
 	private static Set<Set<DFAStatus>> split(Set<Set<DFAStatus>> pres, Set<DFAStatus> p) {
 		if (p.size() >= 2) {
-			for (char ch : Char.all()) {
+			for (int ch = 1; ch <= Character.MAX_VALUE; ch++) {
 				Map<Set<DFAStatus>, Set<DFAStatus>> map = Maps.newHashMap();
 				for (DFAStatus status : p) {
-					Set<DFAStatus> key = setOf(pres, status.next(ch));
+					Set<DFAStatus> key = setOf(pres, status.next((char) ch));
 					if (!map.containsKey(key)) {
 						map.put(key, Sets.newHashSet());
 					}
@@ -223,13 +219,9 @@ public class DFABuilder {
 	private static Set<NFAStatus> nextsOf(Set<NFAStatus> status, char ch) {
 		Set<NFAStatus> result = Sets.newHashSet();
 		for (NFAStatus s : status) {
-			for (Edge e : s.getEdges()) {
-				if (e.isEpsilon()) {
-					continue;
-				}
-				if (e.accept(ch)) {
-					result.add(e.getTargetStatus());
-				}
+			NFAStatus next = s.nextOf(ch);
+			if (next != null) {
+				result.add(next);
 			}
 		}
 		return result;
@@ -241,9 +233,8 @@ public class DFABuilder {
 	 * @return
 	 */
 	private static Set<NFAStatus> closure(Set<NFAStatus> set) {
-		Set<NFAStatus> result = Sets.newHashSet();
+		Set<NFAStatus> result = Sets.newHashSet(set);
 		for (NFAStatus s : set) {
-			result.add(s);
 			result.addAll(closure(s));
 		}
 		return result;
@@ -265,9 +256,9 @@ public class DFABuilder {
 	 * @return
 	 */
 	private static Set<NFAStatus> closure(NFAStatus s, Set<NFAStatus> found) {
-		for (Edge e : s.getEdges()) {
-			if (e.isEpsilon() && found.add(e.getTargetStatus())) {
-				found.addAll(closure(e.getTargetStatus(), found));
+		for (NFAStatus next : s.getEpsilonNexts()) {
+			if (found.add(next)) {
+				found.addAll(closure(next, found));
 			}
 		}
 		return found;

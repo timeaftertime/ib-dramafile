@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cn.milai.ib.conf.PathConf;
-import cn.milai.ib.drama.dramafile.compiler.SimpleCompiler;
+import cn.milai.ib.drama.dramafile.compiler.IBCompiler;
 import cn.milai.ib.drama.dramafile.interpreter.statics.DramaMetadata;
 import cn.milai.ib.util.FileUtil;
 import cn.milai.ib.util.HttpUtil;
@@ -50,7 +50,7 @@ public class DramaFileLoader {
 		} else {
 			dramaBytes = FileUtil.read(file);
 		}
-		return SimpleCompiler.compile(IOUtil.toInputStream(dramaBytes));
+		return IBCompiler.compile(IOUtil.toInputStream(dramaBytes));
 	}
 
 }

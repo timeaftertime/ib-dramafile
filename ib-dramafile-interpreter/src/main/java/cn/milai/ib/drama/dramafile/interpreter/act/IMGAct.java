@@ -3,28 +3,36 @@ package cn.milai.ib.drama.dramafile.interpreter.act;
 import java.io.IOException;
 
 import cn.milai.ib.container.Container;
+import cn.milai.ib.container.Image;
 import cn.milai.ib.drama.dramafile.act.ActType;
+import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
+import cn.milai.ib.loader.ImageLoader;
 
 /**
- * 设置 BGM 的指令
+ * 加载一张图片并压入栈顶的指令
  * @author milai
- * @date 2020.02.19
+ * @date 2020.04.19
  */
-public class BGMAct extends AbstractAct {
+public class IMGAct extends AbstractAct {
+
+	private int resourceIndex;
 
 	@Override
 	public ActType getCode() {
-		return ActType.BGM;
+		return ActType.IMG;
 	}
 
 	@Override
 	protected void action(Frame frame, Container container) throws Exception {
-		throw new UnsupportedOperationException("暂未实现");
+		Clip clip = frame.getClip();
+		Image img = ImageLoader.load(clip.getCode(), clip.getUTF8Const(resourceIndex));
+		frame.getOperands().push(img);
 	}
 
 	@Override
 	protected void readOperands(ByteReader reader) throws IOException {
+		resourceIndex = reader.readUint16();
 	}
 
 }

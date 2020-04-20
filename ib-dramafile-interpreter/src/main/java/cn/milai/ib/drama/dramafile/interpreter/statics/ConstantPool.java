@@ -8,6 +8,7 @@ import cn.milai.ib.drama.dramafile.interpreter.statics.constant.FloatConstant;
 import cn.milai.ib.drama.dramafile.interpreter.statics.constant.IntConstant;
 import cn.milai.ib.drama.dramafile.interpreter.statics.constant.LongConstant;
 import cn.milai.ib.drama.dramafile.interpreter.statics.constant.UTF8Constant;
+import cn.milai.ib.drama.dramafile.interpreter.statics.constant.ValueConstant;
 
 /**
  * 静态常量池，对应 .drama 文件里的常量池
@@ -29,16 +30,20 @@ public class ConstantPool {
 	public IntConstant getInt(int index) {
 		return (IntConstant) pool[index];
 	}
-	
+
 	public LongConstant getLong(int index) {
 		return (LongConstant) pool[index];
 	}
-	
+
 	public FloatConstant getFloat(int index) {
 		return (FloatConstant) pool[index];
 	}
-	
+
 	public UTF8Constant getUTF8(int index) {
 		return (UTF8Constant) pool[index];
+	}
+
+	public ValueConstant<?> getValue(int index) {
+		return (ValueConstant<?>) pool[index];
 	}
 }

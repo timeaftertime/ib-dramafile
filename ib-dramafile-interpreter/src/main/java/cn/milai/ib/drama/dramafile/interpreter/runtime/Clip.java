@@ -1,9 +1,5 @@
 package cn.milai.ib.drama.dramafile.interpreter.runtime;
 
-import java.util.Map;
-
-import com.google.common.collect.Maps;
-
 import cn.milai.ib.drama.dramafile.interpreter.statics.DramaMetadata;
 
 /**
@@ -14,11 +10,9 @@ import cn.milai.ib.drama.dramafile.interpreter.statics.DramaMetadata;
 public class Clip {
 
 	protected DramaMetadata drama;
-	protected final Map<String, String> PARAMS;
 
 	public Clip(DramaMetadata drama) {
 		this.drama = drama;
-		this.PARAMS = Maps.newHashMap();
 	}
 
 	/**
@@ -34,24 +28,6 @@ public class Clip {
 	 */
 	public String getName() {
 		return drama.getName();
-	}
-
-	/**
-	 * 设置一个参数值
-	 * @param key
-	 * @param value
-	 */
-	public void setVariable(String key, String value) {
-		PARAMS.put(key, value);
-	}
-
-	/**
-	 * 获取一个参数值
-	 * @param key
-	 * @return
-	 */
-	public String getVariable(String key) {
-		return PARAMS.get(key);
 	}
 
 	/**
@@ -96,6 +72,15 @@ public class Clip {
 	 */
 	public String getUTF8Const(int index) {
 		return drama.getUTF8Const(index);
+	}
+
+	/**
+	 * 获取常量池中序号为 index 的值类型常量
+	 * @param index
+	 * @return
+	 */
+	public Object getValueConst(int index) {
+		return drama.getValueConst(index);
 	}
 
 }

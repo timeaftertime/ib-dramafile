@@ -18,6 +18,7 @@ public class ValueType {
 
 	private static Map<String, ValueType> types = Maps.newHashMap();
 
+	public static final ValueType VOID = of("void");
 	public static final ValueType INT = of("int");
 	public static final ValueType FLOAT = of("float");
 	public static final ValueType STR = of("str");
@@ -67,6 +68,10 @@ public class ValueType {
 		return types.computeIfAbsent(typeName, name -> {
 			String canonical;
 			switch (name) {
+				case "void" : {
+					canonical = "V";
+					break;
+				}
 				case "int" : {
 					canonical = "I";
 					break;
@@ -88,7 +93,7 @@ public class ValueType {
 					break;
 				}
 				default: {
-					throw new IllegalArgumentException("赞不支持的类型：" + name);
+					throw new IllegalArgumentException("暂不支持的类型：" + name);
 				}
 			}
 			ValueType valueType = new ValueType();

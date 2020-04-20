@@ -34,7 +34,7 @@ public abstract class ConstantFactory {
 				return new LongConstant(reader.readLong());
 			case UTF8 :
 				return new UTF8Constant(reader.readUTF());
-			default :
+			default:
 				throw new UnknownConstantException(code);
 		}
 	}

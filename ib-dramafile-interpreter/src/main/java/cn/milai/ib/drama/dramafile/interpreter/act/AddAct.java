@@ -2,13 +2,15 @@ package cn.milai.ib.drama.dramafile.interpreter.act;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+import cn.milai.ib.IBObject;
 import cn.milai.ib.container.Container;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.act.ex.IllegalOperandsException;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
-import cn.milai.ib.obj.IBCharacter;
+import cn.milai.ib.drama.dramafile.interpreter.runtime.OperandsStack;
 
 /**
  * 添加对象的动作
@@ -23,51 +25,127 @@ public class AddAct extends AbstractAct {
 	private int characteClassIndex;
 
 	/**
-	 * x 坐标相对于容器 width 的百分比， float 类型常量
+	 * 构造函数参数描述符序号
 	 */
-	private int xRateIndex;
-
-	/**
-	 * y 坐标相对于容器 height 的百分比，float 类型常量
-	 */
-	private int yRateIndex;
+	private int descriptorIndex;
 
 	@Override
 	protected void action(Frame frame, Container container) throws Exception {
+		OperandsStack operands = frame.getOperands();
 		Clip clip = frame.getClip();
-		String characteClass = clip.getUTF8Const(characteClassIndex);
-		int x = (int) (clip.getFloatConst(xRateIndex) * container.getWidth());
-		int y = (int) (clip.getFloatConst(yRateIndex) * container.getContentHeight());
-		container.addObject(createInstance(characteClass, x, y, container));
+		String className = clip.getUTF8Const(characteClassIndex);
+		String descriptor = clip.getUTF8Const(descriptorIndex);
+		container.addObject(createInstance(operands, className, descriptor, container));
 	}
 
-	private IBCharacter createInstance(String characteClass, int x, int y, Container container) throws Exception {
-		return iicConstructor(characteClass).newInstance(x, y, container);
+	private IBObject createInstance(OperandsStack operands, String className, String descriptor, Container container)
+		throws Exception {
+		Class<?> clazz = Class.forName(className);
+		if (!IBObject.class.isAssignableFrom(clazz)) {
+			throw new IllegalOperandsException(this,
+				String.format("ADD 指令的参数必须为 %s 子类的全类名, characterClass = %s", IBObject.class.getName(), clazz
+					.getName()));
+		}
+		int paramCnt = countsParam(descriptor);
+		Object[] params = new Object[paramCnt];
+		for (int i = paramCnt - 1; i >= 0; i--) {
+			params[i] = operands.pop();
+		}
+		Constructor<?>[] cs = clazz.getConstructors();
+		for (Constructor<?> c : cs) {
+			IBObject obj = createIfFit(params, container, c);
+			if (obj != null) {
+				return obj;
+			}
+		}
+		throw new IllegalOperandsException(this, String.format("找不到指定类型构造方法：class = %s, descriptor = %s", clazz
+			.getName(), descriptor));
 	}
 
 	/**
-	 * 获取 characterClass 对应类的 (int, int Container) 类型构造方法
+	 * 尝试使用指定构造方法构造实例，若参数匹配，则返回构造的实例，否则返回 null
+	 * 其中 Container 类型参数可出现在任意位置 
+	 * @param params
+	 * @param container
+	 * @param c
 	 * @return
-	 * @throws NoSuchMethodException
-	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
 	 */
-	@SuppressWarnings("unchecked")
-	private Constructor<? extends IBCharacter> iicConstructor(String characteClass) throws NoSuchMethodException,
-		ClassNotFoundException {
-		Class<?> clazz = Class.forName(characteClass);
-		if (!IBCharacter.class.isAssignableFrom(clazz)) {
-			throw new IllegalOperandsException(this,
-				String.format("New 指令的参数必须为 %s 子类的全类名, characterClass = %s", IBCharacter.class.getName(), clazz
-					.getName()));
+	private IBObject createIfFit(Object[] params, Container container, Constructor<?> c) throws InstantiationException,
+		IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		Class<?>[] types = c.getParameterTypes();
+		// 实际参数列表应该比 paramCnt 多一个 Container
+		if (types.length != params.length + 1) {
+			return null;
 		}
-		return (Constructor<? extends IBCharacter>) clazz.getConstructor(int.class, int.class, Container.class);
+		Object[] args = new Object[params.length + 1];
+		int inputIndex = 0;
+		int typeIndex = 0;
+		while (typeIndex < types.length) {
+			if (types[typeIndex] == Container.class) {
+				args[typeIndex++] = container;
+				continue;
+			}
+			if (inputIndex >= params.length) {
+				return null;
+			}
+			if (!fit(params[inputIndex], types[typeIndex])) {
+				return null;
+			}
+			args[typeIndex++] = params[inputIndex++];
+		}
+		if (inputIndex < params.length) {
+			return null;
+		}
+		return (IBObject) c.newInstance(args);
+	}
+
+	private boolean fit(Object obj, Class<?> clazz) {
+		try {
+			if (obj.getClass() == Integer.class && clazz == int.class) {
+				return true;
+			}
+			if (obj.getClass() == Float.class && clazz == float.class) {
+				return true;
+			}
+			clazz.cast(obj);
+		} catch (ClassCastException e) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * 计算描述符所表示的参数列表个参数个数
+	 * @param descriptor
+	 * @return
+	 */
+	private int countsParam(String descriptor) {
+		int cnt = 0;
+		for (int i = 0; i < descriptor.length(); i++) {
+			switch (descriptor.charAt(i)) {
+				case 'I' :
+				case 'F' :
+				case 'S' :
+				case 'P' :
+				case 'A' :
+					cnt++;
+					continue;
+				default: {
+					throw new UnsupportedOperationException("暂未实现");
+				}
+			}
+		}
+		return cnt;
 	}
 
 	@Override
 	protected void readOperands(ByteReader reader) throws IOException {
 		characteClassIndex = reader.readUint16();
-		xRateIndex = reader.readUint16();
-		yRateIndex = reader.readUint16();
+		descriptorIndex = reader.readUint16();
 	}
 
 	@Override

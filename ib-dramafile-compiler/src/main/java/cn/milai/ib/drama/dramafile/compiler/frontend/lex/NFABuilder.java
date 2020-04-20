@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 
@@ -48,11 +47,11 @@ public class NFABuilder {
 		if (firsts.size() == 1) {
 			return firsts.get(0);
 		}
-		NFAStatus status = new NFAStatus();
+		NFAStatus head = new NFAStatus();
 		for (NFAStatus s : firsts) {
-			status.addEdge(s);
+			head.addEpsilonNext(s);
 		}
-		return status;
+		return head;
 	}
 
 	/**
@@ -69,7 +68,7 @@ public class NFABuilder {
 				}
 				return nfa;
 			}
-			nfa = NFAPair.connect(nfa, parseNextNFA(input));
+			nfa = NFAPair.connect(nfa, parseNext(input));
 		}
 	}
 
@@ -92,16 +91,16 @@ public class NFABuilder {
 				input.next();
 				return nfa;
 			}
-			nfa = NFAPair.connect(nfa, parseNextNFA(input));
+			nfa = NFAPair.connect(nfa, parseNext(input));
 		}
 	}
 
 	/**
-	 * 解析并返回当前层次的下一个 NFA
+	 * 解析并返回当前层次的下一个 NFAPair
 	 * @param endChar
 	 * @return
 	 */
-	private static NFAPair parseNextNFA(CharInput input) {
+	private static NFAPair parseNext(CharInput input) {
 		NFAPair nfa = null;
 		switch (input.getNext()) {
 			case Char.SET_LEFT_CHAR : {
@@ -121,18 +120,19 @@ public class NFABuilder {
 			}
 			default: {
 				char ch = input.next();
-				nfa = dealRepeat(input, ch == Char.INVERT_CRLF ? Char.invertCRLF() : Sets.newHashSet(ch));
+				nfa = dealRepeat(input, ch == Char.INVERT_CRLF ? new NotSetCharAcceptor(Char.LINEFEED,
+					Char.CARRIAGE_RETURN) : new SetCharAcceptor(ch));
 				break;
 			}
 		}
 		if (input.hasNext() && input.getNext() == Char.OR) {
 			input.next();
-			nfa = NFAPair.paralell(nfa, parseNextNFA(input));
+			nfa = NFAPair.paralell(nfa, parseNext(input));
 		}
 		return nfa;
 	}
 
-	private static NFAPair dealRepeat(CharInput input, Set<Character> inputSet) {
+	private static NFAPair dealRepeat(CharInput input, CharAcceptor inputSet) {
 		if (!input.hasNext()) {
 			return new NFAPair(inputSet);
 		}
@@ -142,7 +142,7 @@ public class NFABuilder {
 		}
 		if (input.getNext() == Char.ONE_OR_MORE) {
 			input.next();
-			return oneOrMoreNFA(inputSet);
+			return oneOrMore(inputSet);
 		}
 		if (input.getNext() == Char.NONE_OR_MORE) {
 			input.next();
@@ -180,18 +180,18 @@ public class NFABuilder {
 	 * 构造一个如下图示的 NFA
 	 *                 ↓--ϵ--+
 	 * S0--ϵ-->S1-->S2--ϵ-->S3
-	 * @param s
+	 * @param acceptor
 	 * @return
 	 */
-	private static NFAPair oneOrMoreNFA(Set<Character> inputSet) {
+	private static NFAPair oneOrMore(CharAcceptor acceptor) {
 		NFAStatus s0 = new NFAStatus();
 		NFAStatus s1 = new NFAStatus();
 		NFAStatus s2 = new NFAStatus();
 		NFAStatus s3 = new NFAStatus();
-		s0.addEdge(s1);
-		s1.addEdge(inputSet, s2);
-		s2.addEdge(s1);
-		s2.addEdge(s3);
+		s0.addEpsilonNext(s1);
+		s1.addNext(acceptor, s2);
+		s2.addEpsilonNext(s1);
+		s2.addEpsilonNext(s3);
 		return new NFAPair(s0, s3);
 	}
 
@@ -205,9 +205,9 @@ public class NFABuilder {
 	private static NFAPair oneOrMoreNFA(NFAPair pair) {
 		NFAStatus s0 = new NFAStatus();
 		NFAStatus s1 = new NFAStatus();
-		s0.addEdge(pair.getFirst());
-		pair.getLast().addEdge(pair.getFirst());
-		pair.getLast().addEdge(s1);
+		s0.addEpsilonNext(pair.getFirst());
+		pair.getLast().addEpsilonNext(pair.getFirst());
+		pair.getLast().addEpsilonNext(s1);
 		return new NFAPair(s0, s1);
 	}
 
@@ -217,19 +217,19 @@ public class NFABuilder {
 	 * S0--ϵ-->S1-->S2--ϵ-->S3
 	 *  +-----------------------↑
 	 * 其中 S0 为开始状态，S3 为结束状态
-	 * @param inputSet
+	 * @param acceptor
 	 * @return
 	 */
-	private static NFAPair noneOrMoreNFA(Set<Character> inputSet) {
+	private static NFAPair noneOrMoreNFA(CharAcceptor acceptor) {
 		NFAStatus s0 = new NFAStatus();
 		NFAStatus s1 = new NFAStatus();
 		NFAStatus s2 = new NFAStatus();
 		NFAStatus s3 = new NFAStatus();
-		s0.addEdge(s1);
-		s0.addEdge(s3);
-		s1.addEdge(inputSet, s2);
-		s2.addEdge(s1);
-		s2.addEdge(s3);
+		s0.addEpsilonNext(s1);
+		s0.addEpsilonNext(s3);
+		s1.addNext(acceptor, s2);
+		s2.addEpsilonNext(s1);
+		s2.addEpsilonNext(s3);
 		return new NFAPair(s0, s3);
 	}
 
@@ -244,10 +244,10 @@ public class NFABuilder {
 	private static NFAPair noneOrMoreNFA(NFAPair pair) {
 		NFAStatus s0 = new NFAStatus();
 		NFAStatus s1 = new NFAStatus();
-		s0.addEdge(pair.getFirst());
-		s0.addEdge(s1);
-		pair.getLast().addEdge(pair.getFirst());
-		pair.getLast().addEdge(s1);
+		s0.addEpsilonNext(pair.getFirst());
+		s0.addEpsilonNext(s1);
+		pair.getLast().addEpsilonNext(pair.getFirst());
+		pair.getLast().addEpsilonNext(s1);
 		return new NFAPair(s0, s1);
 	}
 
@@ -256,18 +256,18 @@ public class NFABuilder {
 	 * S0--ϵ-->S1-->S2--ϵ-->S3
 	 *  +-----------------------↑
 	 * 其中 S0 为开始状态，S3 为结束状态
-	 * @param s
+	 * @param acceptor
 	 * @return
 	 */
-	private static NFAPair noneOrOneNFA(Set<Character> inputSet) {
+	private static NFAPair noneOrOneNFA(CharAcceptor acceptor) {
 		NFAStatus s0 = new NFAStatus();
 		NFAStatus s1 = new NFAStatus();
 		NFAStatus s2 = new NFAStatus();
 		NFAStatus s3 = new NFAStatus();
-		s0.addEdge(s1);
-		s0.addEdge(s3);
-		s1.addEdge(inputSet, s2);
-		s2.addEdge(s3);
+		s0.addEpsilonNext(s1);
+		s0.addEpsilonNext(s3);
+		s1.addNext(acceptor, s2);
+		s2.addEpsilonNext(s3);
 		return new NFAPair(s0, s3);
 	}
 
@@ -281,9 +281,9 @@ public class NFABuilder {
 	private static NFAPair noneOrOneNFA(NFAPair pair) {
 		NFAStatus s0 = new NFAStatus();
 		NFAStatus s1 = new NFAStatus();
-		s0.addEdge(pair.getFirst());
-		pair.getLast().addEdge(s1);
-		s0.addEdge(s1);
+		s0.addEpsilonNext(pair.getFirst());
+		pair.getLast().addEpsilonNext(s1);
+		s0.addEpsilonNext(s1);
 		return new NFAPair(s0, s1);
 	}
 
@@ -293,34 +293,22 @@ public class NFABuilder {
 	 * @param endBracket
 	 * @return
 	 */
-	private static Set<Character> dealInputSet(CharInput input) {
-		boolean invert = false;
-		if (input.getNext() == Char.INVERT) {
-			input.next();
-			invert = true;
-		}
-		Set<Character> set = Sets.newHashSet();
+	private static CharAcceptor dealInputSet(CharInput input) {
+		boolean lastSlash = false;
+		StringBuilder regex = new StringBuilder();
 		while (input.hasNext()) {
 			char ch = input.next();
-			if (ch == Char.SET_RIGHT_CHAR) {
-				return invert ? Char.invert(set) : set;
+			if (ch == Char.SET_RIGHT_CHAR && !lastSlash) {
+				return new RECharAcceptor(regex.toString());
 			}
+			regex.append(ch);
 			if (ch == Char.SLASH) {
-				set.addAll(Char.slash(input.next()));
-				continue;
-			}
-			if (input.getNext() != Char.RANGE) {
-				set.add(ch);
+				lastSlash = !lastSlash;
 			} else {
-				input.next();
-				char nxt = input.next();
-				if (nxt == Char.SET_RIGHT_CHAR) {
-					throw new IBCompilerException(String.format("非法范围符号：%c-", nxt));
-				}
-				set.addAll(Char.range(ch, nxt));
+				lastSlash = false;
 			}
 		}
-		throw new IBCompilerException("未匹配到右括号：" + Char.SET_RIGHT_CHAR);
+		throw new IBCompilerException("正则表达式未匹配到右括号：regex = " + Char.SET_RIGHT_CHAR);
 	}
 
 }

@@ -78,25 +78,28 @@ public class DramaSpace {
 	 */
 	public void callClip(String clipCode, Map<String, String> params) throws DramaFileNotFoundException {
 		Clip clip = new Clip(DramaFileLoader.loadDrama(clipCode));
-		copyParams(clip, params);
-		pushClip(clip);
+		Frame frame = pushClip(clip);
+		copyParams(frame, params);
 	}
 
 	/**
-	 * 构造一个对应 Clip 的新帧并压入栈顶
+	 * 构造一个对应 Clip 的新帧并压入栈顶，返回创建的新栈
 	 * @param clip
+	 * @return
 	 */
-	private void pushClip(Clip clip) {
-		stack.pushFrame(new Frame(clip, this));
+	private Frame pushClip(Clip clip) {
+		Frame frame = new Frame(clip, this);
+		stack.pushFrame(frame);
+		return frame;
 	}
 
 	/**
-	 * 检查并复制 params 中属性到 clip
-	 * @param clip
+	 * 检查并复制 params 中属性到 {@link Frame}
+	 * @param frame
 	 * @param params 需要复制的参数 map ，若为 null 表示不需要复制
 	 * @return
 	 */
-	private static final void copyParams(Clip clip, Map<String, String> params) {
+	private static final void copyParams(Frame frame, Map<String, String> params) {
 		if (params == null) {
 			return;
 		}
@@ -105,7 +108,7 @@ public class DramaSpace {
 			if (value == null) {
 				throw new ClipParamInvalidExcecption(key, value);
 			}
-			clip.setVariable(key, value);
+			frame.setVariable(key, value);
 		}
 	}
 

@@ -1,7 +1,5 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
-import java.util.Set;
-
 /**
  * 两个 NFA 节点的组合，用于表示 NFA 的中间状态
  * @author milai
@@ -19,13 +17,13 @@ public class NFAPair {
 	}
 
 	/**
-	 * 构建一个以 ch 为边连接的两个节点的 NFA
-	 * @param ch
+	 * 构建一个以 acceptor 为边连接的两个节点的 NFA
+	 * @param acceptor
 	 */
-	NFAPair(Set<Character> set) {
+	NFAPair(CharAcceptor acceptor) {
 		this.first = new NFAStatus();
 		this.last = new NFAStatus();
-		first.addEdge(set, last);
+		first.addNext(acceptor, last);
 	}
 
 	public NFAStatus getFirst() {
@@ -49,7 +47,7 @@ public class NFAPair {
 		if (nfa2 == null) {
 			return nfa1;
 		}
-		nfa1.last.addEdge(nfa2.first);
+		nfa1.last.addEpsilonNext(nfa2.first);
 		return new NFAPair(nfa1.first, nfa2.last);
 	}
 
@@ -68,10 +66,10 @@ public class NFAPair {
 		}
 		NFAStatus first = new NFAStatus();
 		NFAStatus last = new NFAStatus();
-		first.addEdge(nfa2.first);
-		first.addEdge(nfa1.first);
-		nfa2.last.addEdge(last);
-		nfa1.last.addEdge(last);
+		first.addEpsilonNext(nfa2.first);
+		first.addEpsilonNext(nfa1.first);
+		nfa2.last.addEpsilonNext(last);
+		nfa1.last.addEpsilonNext(last);
 		return new NFAPair(first, last);
 	}
 

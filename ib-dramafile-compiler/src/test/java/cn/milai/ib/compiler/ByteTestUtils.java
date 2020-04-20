@@ -10,7 +10,7 @@ public class ByteTestUtils {
 
 	@Test
 	public void printUTF8Bytes() {
-		for (byte b : getBytes("测试用的剧本")) {
+		for (byte b : getBytes("cn.milai.ib.demo.drama.Hello")) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
@@ -19,7 +19,7 @@ public class ByteTestUtils {
 
 	@Test
 	public void printIntBytes() {
-		for (byte b : getBytes(1)) {
+		for (byte b : getBytes(-67)) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
@@ -28,7 +28,7 @@ public class ByteTestUtils {
 
 	@Test
 	public void printShortBytes() {
-		for (byte b : getShortBytes(20)) {
+		for (byte b : getShortBytes(85)) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
@@ -46,7 +46,7 @@ public class ByteTestUtils {
 
 	@Test
 	public void printFloatBytes() {
-		for (byte b : getBytes(-0.1f)) {
+		for (byte b : getBytes(-0.2f)) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");

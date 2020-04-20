@@ -31,4 +31,9 @@ public abstract class Constant<T> {
 	 */
 	public abstract byte[] getBytes();
 
+	@Override
+	public String toString() {
+		return getType() + " " + value;
+	}
+
 }

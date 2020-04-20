@@ -60,17 +60,6 @@ public class Char {
 	}
 
 	/**
-	 * 所有字符的集合
-	 * @return
-	 */
-	public static Set<Character> all() {
-		Set<Character> set = Sets.newHashSet();
-		set.addAll(visible());
-		set.addAll(unvisible());
-		return set;
-	}
-
-	/**
 	 * 0~9 的字符集合
 	 * @return
 	 */
@@ -156,23 +145,6 @@ public class Char {
 	}
 
 	/**
-	 * 获取 set 的补集
-	 * @param set
-	 * @return
-	 */
-	public static Set<Character> invert(Set<Character> set) {
-		return Sets.difference(all(), set);
-	}
-
-	/**
-	 * 全集去掉 \n \r 的字符集
-	 * @return
-	 */
-	public static Set<Character> invertCRLF() {
-		return invert(Sets.newHashSet(CARRIAGE_RETURN, LINEFEED));
-	}
-
-	/**
 	 * 是否为普通字符
 	 * @param ch
 	 * @return
@@ -186,29 +158,29 @@ public class Char {
 	 * @param ch
 	 * @return
 	 */
-	public static Set<Character> slash(char ch) {
+	public static CharAcceptor slash(char ch) {
 		if (CAN_SLASH.contains(ch)) {
-			return Sets.newHashSet(ch);
+			return new SetCharAcceptor(Sets.newHashSet(ch));
 		}
 		switch (ch) {
-			case 't':
-				return Sets.newHashSet(TAB);
-			case 'n':
-				return Sets.newHashSet(LINEFEED);
-			case 'r':
-				return Sets.newHashSet(CARRIAGE_RETURN);
-			case 's':
-				return Char.unvisible();
-			case 'S':
-				return Char.invert(Char.unvisible());
-			case 'w':
-				return Char.normals();
-			case 'W':
-				return Char.invert(Char.normals());
-			case 'd':
-				return Char.numbers();
-			case 'D':
-				return Char.invert(Char.numbers());
+			case 't' :
+				return new SetCharAcceptor(Sets.newHashSet(TAB));
+			case 'n' :
+				return new SetCharAcceptor(Sets.newHashSet(LINEFEED));
+			case 'r' :
+				return new SetCharAcceptor(Sets.newHashSet(CARRIAGE_RETURN));
+			case 's' :
+				return new SetCharAcceptor(Char.unvisible());
+			case 'S' :
+				return new NotSetCharAcceptor(Char.unvisible());
+			case 'w' :
+				return new SetCharAcceptor(normals());
+			case 'W' :
+				return new NotSetCharAcceptor(normals());
+			case 'd' :
+				return new SetCharAcceptor(numbers());
+			case 'D' :
+				return new NotSetCharAcceptor(numbers());
 		}
 		throw new IllegalArgumentException("未知转义字符：" + SLASH + ch);
 	}

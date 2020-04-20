@@ -1,7 +1,7 @@
 package cn.milai.ib.drama.dramafile.interpreter;
 
 import cn.milai.ib.container.Container;
-import cn.milai.ib.drama.Drama;
+import cn.milai.ib.drama.AbstractDrama;
 import cn.milai.ib.drama.dramafile.interpreter.act.Act;
 import cn.milai.ib.drama.dramafile.interpreter.act.ActFactory;
 import cn.milai.ib.drama.dramafile.interpreter.act.ByteReader;
@@ -14,8 +14,9 @@ import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
  * 2019.12.08
  * @author milai
  */
-public class DramaFileDrama implements Drama {
+public class DramaFileDrama extends AbstractDrama {
 
+	private static final String BACKGROUND_IMG = "/img/background.jpg";
 	private DramaSpace dramaSpace;
 	private ByteReader reader;
 
@@ -30,6 +31,7 @@ public class DramaFileDrama implements Drama {
 
 	@Override
 	public void run(Container container) {
+		container.setBackgroud(image(BACKGROUND_IMG));
 		while (!dramaSpace.isFinished() && !Thread.currentThread().isInterrupted()) {
 			Frame frame = dramaSpace.currentFrame();
 			Clip clip = frame.getClip();

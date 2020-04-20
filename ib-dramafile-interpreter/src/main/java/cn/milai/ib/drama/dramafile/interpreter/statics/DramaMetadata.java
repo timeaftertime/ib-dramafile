@@ -51,9 +51,9 @@ public class DramaMetadata {
 		try {
 			readMagicNumber(reader);
 			readVerions(reader);
-			readDramaCodeAndName(reader);
 			readConstantPool(reader);
-			readClipBytes(reader);
+			readDramaCodeAndName(reader);
+			readMethods(reader);
 		} catch (NumberFormatException e) {
 			throw new IBIOException(e);
 		} catch (IOException e) {
@@ -81,8 +81,17 @@ public class DramaMetadata {
 		this.pool = new ConstantPool(reader);
 	}
 
-	private void readClipBytes(DataInputStream reader) throws IOException {
-		clipBytes = IOUtil.toBytes(reader);
+	private void readMethods(DataInputStream reader) throws IOException {
+		// 剧本片段个数，现固定为 1
+		reader.readUnsignedShort();
+		// 剧本片段名序号，现固定为 1
+		reader.readUnsignedShort();
+		// 剧本片段描述符序号，现固定为 2
+		reader.readUnsignedShort();
+		// 剧本片段长度
+		int len = reader.readUnsignedShort();
+		clipBytes = new byte[len];
+		IOUtil.toBytes(reader, clipBytes);
 	}
 
 	/**
@@ -127,6 +136,15 @@ public class DramaMetadata {
 	 */
 	public String getUTF8Const(int index) {
 		return pool.getUTF8(index).getValue();
+	}
+
+	/**
+	 * 获取下标为 index 的值类型(int/float/String)常量 
+	 * @param index
+	 * @return
+	 */
+	public Object getValueConst(int index) {
+		return pool.getValue(index).getValue();
 	}
 
 	public int getMajorVersion() {

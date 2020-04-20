@@ -1,10 +1,10 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 
 /**
  * 词法分析时的 NFA 中间状态
@@ -21,9 +21,11 @@ public class NFAStatus {
 	private int id;
 
 	/**
-	 * 接受一个字符集中某个字符能转移到的状态
+	 * 能接受的字符，以及对应的下一个状态
 	 */
-	private List<Edge> edges = Lists.newArrayList();
+	private Map<CharAcceptor, NFAStatus> nexts = Maps.newHashMap();
+
+	private List<NFAStatus> epsilonNexts = Lists.newArrayList();
 
 	private String token = null;
 
@@ -36,27 +38,42 @@ public class NFAStatus {
 	}
 
 	/**
-	 * 添加一条接受字符集为 inputSet 、通往状态 status 的出边
+	 * 添加一条接受字符集为 acceptor 、通往状态 status 的出边
 	 * @param edge
 	 */
-	public void addEdge(Set<Character> inputSet, NFAStatus status) {
-		edges.add(new Edge(inputSet, status));
+	public void addNext(CharAcceptor acceptor, NFAStatus status) {
+		nexts.put(acceptor, status);
 	}
 
 	/**
 	 * 添加一条接受空串 、通往状态 status 的出边
 	 * @param edge
 	 */
-	public void addEdge(NFAStatus status) {
-		edges.add(new Edge(status));
+	public void addEpsilonNext(NFAStatus status) {
+		epsilonNexts.add(status);
 	}
 
 	/**
-	 * 获取状态所有出边的列表
+	 * 获取当前状态接受空串可以到达的所有状态
 	 * @return
 	 */
-	public List<Edge> getEdges() {
-		return Lists.newArrayList(edges);
+	public List<NFAStatus> getEpsilonNexts() {
+		return Lists.newArrayList(epsilonNexts);
+	}
+
+	/**
+	 * 获取当前状态接受指定字符到达的状态
+	 * 若不能接受指定字符，将返回 null
+	 * @param ch
+	 * @return
+	 */
+	public NFAStatus nextOf(char ch) {
+		for (CharAcceptor acceptor : nexts.keySet()) {
+			if (acceptor.accept(ch)) {
+				return nexts.get(acceptor);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -84,21 +101,6 @@ public class NFAStatus {
 	 */
 	public void setToken(String token) {
 		this.token = token;
-	}
-
-	/**
-	 * 当前状态能接受的字符集合
-	 * @return
-	 */
-	public Set<Character> accepts() {
-		Set<Character> result = Sets.newHashSet();
-		for (Edge e : edges) {
-			if (e.isEpsilon()) {
-				continue;
-			}
-			result.addAll(e.getAccepts());
-		}
-		return result;
 	}
 
 	@Override

@@ -1,18 +1,18 @@
 package cn.milai.ib.drama.dramafile.interpreter.act;
 
-import java.awt.Image;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 
+import cn.milai.ib.component.IBComponent;
 import cn.milai.ib.container.Container;
+import cn.milai.ib.container.Image;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
 import cn.milai.ib.loader.DramaStringLoader;
 import cn.milai.ib.loader.ImageLoader;
-import cn.milai.ib.obj.IBComponent;
-import cn.milai.ib.util.TimeUtil;
+import cn.milai.ib.util.WaitUtil;
 
 public class DialogAct extends AbstractAct {
 
@@ -60,7 +60,7 @@ public class DialogAct extends AbstractAct {
 		String text = DramaStringLoader.get(clip.getCode(), clip.getUTF8Const(textIndex));
 		container.addObject(createInstance(dialogClass, x, y, speaker, text, container));
 		// 等待一帧以暂停后续的剧情
-		TimeUtil.wait(container, 1L);
+		WaitUtil.wait(container, 1L);
 	}
 
 	private Image resolveSpeaker(Clip clip) throws ClassNotFoundException {

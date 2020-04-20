@@ -1,13 +1,10 @@
 package cn.milai.ib.drama.dramafile.interpreter.act;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import cn.milai.ib.container.Container;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
-import cn.milai.ib.loader.DramaResLoader;
-import cn.milai.ib.util.ImageUtil;
 
 /**
  * 设置背景图片的指令
@@ -16,8 +13,6 @@ import cn.milai.ib.util.ImageUtil;
  */
 public class BGIAct extends AbstractAct {
 
-	private int resourceIndex;
-
 	@Override
 	public ActType getCode() {
 		return ActType.BGI;
@@ -25,14 +20,11 @@ public class BGIAct extends AbstractAct {
 
 	@Override
 	protected void action(Frame frame, Container container) throws Exception {
-		String resource = frame.getClip().getUTF8Const(resourceIndex);
-		InputStream in = DramaResLoader.load(frame.getClip().getCode(), resource);
-		container.setBackgroud(ImageUtil.loadImage(in));
+		throw new UnsupportedOperationException("暂未实现");
 	}
 
 	@Override
 	protected void readOperands(ByteReader reader) throws IOException {
-		resourceIndex = reader.readUint16();
 	}
 
 }

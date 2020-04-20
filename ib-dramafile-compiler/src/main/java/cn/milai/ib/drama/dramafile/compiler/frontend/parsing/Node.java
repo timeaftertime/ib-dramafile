@@ -50,6 +50,15 @@ public class Node {
 		return productionIndex;
 	}
 
+	/**
+	 * 获取当前非终结符结点所使用的产生式
+	 * 若当前结点不是非终结符结点或尚未使用产生式将抛出异常
+	 * @return
+	 */
+	public Production getNowProduction() {
+		return ((NonTerminalSymbol) symbol).getProductions().get(getProductionIndex());
+	}
+
 	public void setProductionIndex(int productionIndex) {
 		if (!symbol.isNonTerminal()) {
 			throw new UnsupportedOperationException("终结符结点没有子节点");
@@ -74,7 +83,7 @@ public class Node {
 
 	public List<Node> getChildren() {
 		if (!symbol.isNonTerminal()) {
-			throw new UnsupportedOperationException("终结符结点没有子节点");
+			throw new UnsupportedOperationException("终结符结点没有子节点：symbol = " + symbol);
 		}
 		return children;
 	}
@@ -85,6 +94,29 @@ public class Node {
 
 	public void setPre(Node pre) {
 		this.pre = pre;
+	}
+
+	/**
+	 * 获取当前结点及子节点所匹配的原始字符串
+	 * @return
+	 */
+	public String getOrigin() {
+		StringBuilder sb = new StringBuilder();
+		parseOrigin(sb, this);
+		return sb.toString();
+	}
+
+	private static void parseOrigin(StringBuilder sb, Node node) {
+		if (Symbol.isEpsilon(node.symbol)) {
+			return;
+		}
+		if (node.symbol.isNonTerminal()) {
+			for (Node c : node.children) {
+				parseOrigin(sb, c);
+			}
+		} else {
+			sb.append(node.token.getOrigin());
+		}
 	}
 
 	@Override
