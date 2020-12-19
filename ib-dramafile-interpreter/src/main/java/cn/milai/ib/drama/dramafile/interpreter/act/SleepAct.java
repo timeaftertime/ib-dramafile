@@ -2,7 +2,7 @@ package cn.milai.ib.drama.dramafile.interpreter.act;
 
 import java.io.IOException;
 
-import cn.milai.ib.container.Container;
+import cn.milai.ib.container.DramaContainer;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
 import cn.milai.ib.util.WaitUtil;
@@ -27,7 +27,7 @@ public class SleepAct extends AbstractAct {
 	}
 
 	@Override
-	protected void action(Frame frame, Container container) throws Exception {
+	protected void action(Frame frame, DramaContainer container) throws Exception {
 		long sleepFrame = frame.getClip().getLongConst(sleepFrameIndex);
 		WaitUtil.wait(container, sleepFrame);
 	}

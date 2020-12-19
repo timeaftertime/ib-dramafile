@@ -6,7 +6,8 @@ import java.lang.reflect.Type;
 
 import cn.milai.ib.component.IBComponent;
 import cn.milai.ib.container.Container;
-import cn.milai.ib.container.Image;
+import cn.milai.ib.container.DramaContainer;
+import cn.milai.ib.container.ui.Image;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
@@ -51,11 +52,11 @@ public class DialogAct extends AbstractAct {
 	}
 
 	@Override
-	protected void action(Frame frame, Container container) throws Exception {
+	protected void action(Frame frame, DramaContainer container) throws Exception {
 		Clip clip = frame.getClip();
 		String dialogClass = clip.getUTF8Const(characteClassIndex);
 		int x = (int) (clip.getFloatConst(xRateIndex) * container.getWidth());
-		int y = (int) (clip.getFloatConst(yRateIndex) * container.getContentHeight());
+		int y = (int) (clip.getFloatConst(yRateIndex) * container.getHeight());
 		Image speaker = resolveSpeaker(clip);
 		String text = DramaStringLoader.get(clip.getCode(), clip.getUTF8Const(textIndex));
 		container.addObject(createInstance(dialogClass, x, y, speaker, text, container));

@@ -5,7 +5,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import cn.milai.ib.IBObject;
-import cn.milai.ib.container.Container;
+import cn.milai.ib.container.DramaContainer;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.act.ex.IllegalOperandsException;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
@@ -30,7 +30,7 @@ public class AddAct extends AbstractAct {
 	private int descriptorIndex;
 
 	@Override
-	protected void action(Frame frame, Container container) throws Exception {
+	protected void action(Frame frame, DramaContainer container) throws Exception {
 		OperandsStack operands = frame.getOperands();
 		Clip clip = frame.getClip();
 		String className = clip.getUTF8Const(characteClassIndex);
@@ -38,13 +38,18 @@ public class AddAct extends AbstractAct {
 		container.addObject(createInstance(operands, className, descriptor, container));
 	}
 
-	private IBObject createInstance(OperandsStack operands, String className, String descriptor, Container container)
+	private IBObject createInstance(OperandsStack operands, String className, String descriptor,
+		DramaContainer container)
 		throws Exception {
 		Class<?> clazz = Class.forName(className);
 		if (!IBObject.class.isAssignableFrom(clazz)) {
-			throw new IllegalOperandsException(this,
-				String.format("ADD 指令的参数必须为 %s 子类的全类名, characterClass = %s", IBObject.class.getName(), clazz
-					.getName()));
+			throw new IllegalOperandsException(
+				this,
+				String.format(
+					"ADD 指令的参数必须为 %s 子类的全类名, characterClass = %s", IBObject.class.getName(), clazz
+						.getName()
+				)
+			);
 		}
 		int paramCnt = countsParam(descriptor);
 		Object[] params = new Object[paramCnt];
@@ -58,8 +63,12 @@ public class AddAct extends AbstractAct {
 				return obj;
 			}
 		}
-		throw new IllegalOperandsException(this, String.format("找不到指定类型构造方法：class = %s, descriptor = %s", clazz
-			.getName(), descriptor));
+		throw new IllegalOperandsException(
+			this, String.format(
+				"找不到指定类型构造方法：class = %s, descriptor = %s", clazz
+					.getName(), descriptor
+			)
+		);
 	}
 
 	/**
@@ -74,7 +83,8 @@ public class AddAct extends AbstractAct {
 	 * @throws IllegalArgumentException
 	 * @throws InvocationTargetException
 	 */
-	private IBObject createIfFit(Object[] params, Container container, Constructor<?> c) throws InstantiationException,
+	private IBObject createIfFit(Object[] params, DramaContainer container, Constructor<?> c)
+		throws InstantiationException,
 		IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Class<?>[] types = c.getParameterTypes();
 		// 实际参数列表应该比 paramCnt 多一个 Container
@@ -85,7 +95,7 @@ public class AddAct extends AbstractAct {
 		int inputIndex = 0;
 		int typeIndex = 0;
 		while (typeIndex < types.length) {
-			if (types[typeIndex] == Container.class) {
+			if (types[typeIndex].isAssignableFrom(DramaContainer.class)) {
 				args[typeIndex++] = container;
 				continue;
 			}

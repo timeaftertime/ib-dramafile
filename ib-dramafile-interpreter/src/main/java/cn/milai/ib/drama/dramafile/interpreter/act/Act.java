@@ -1,6 +1,6 @@
 package cn.milai.ib.drama.dramafile.interpreter.act;
 
-import cn.milai.ib.container.Container;
+import cn.milai.ib.container.DramaContainer;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
 
@@ -26,7 +26,7 @@ public interface Act {
 	 * @param frame 执行命令时所在帧
 	 * @param container 执行命令的对象容器
 	 */
-	void execute(Frame frame, Container container);
+	void execute(Frame frame, DramaContainer container);
 
 	/**
 	 * 初始化 Act ，例如从 reader 中读取操作数

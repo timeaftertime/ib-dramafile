@@ -2,8 +2,8 @@ package cn.milai.ib.drama.dramafile.interpreter.act;
 
 import java.io.IOException;
 
-import cn.milai.ib.container.Container;
-import cn.milai.ib.container.Image;
+import cn.milai.ib.container.DramaContainer;
+import cn.milai.ib.container.ui.Image;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
@@ -24,7 +24,7 @@ public class IMGAct extends AbstractAct {
 	}
 
 	@Override
-	protected void action(Frame frame, Container container) throws Exception {
+	protected void action(Frame frame, DramaContainer container) throws Exception {
 		Clip clip = frame.getClip();
 		Image img = ImageLoader.load(clip.getCode(), clip.getUTF8Const(resourceIndex));
 		frame.getOperands().push(img);

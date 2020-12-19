@@ -2,8 +2,8 @@ package cn.milai.ib.drama.dramafile.interpreter.act;
 
 import java.io.IOException;
 
-import cn.milai.ib.container.Audio;
-import cn.milai.ib.container.Container;
+import cn.milai.ib.container.DramaContainer;
+import cn.milai.ib.container.ui.Audio;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
@@ -25,7 +25,7 @@ public class AudioAct extends AbstractAct {
 	}
 
 	@Override
-	protected void action(Frame frame, Container container) throws Exception {
+	protected void action(Frame frame, DramaContainer container) throws Exception {
 		Clip clip = frame.getClip();
 		String audioCode = clip.getUTF8Const(codeIndex);
 		String resource = clip.getUTF8Const(resourceIndex);

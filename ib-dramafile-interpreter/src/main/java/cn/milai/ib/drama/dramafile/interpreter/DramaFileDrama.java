@@ -1,6 +1,6 @@
 package cn.milai.ib.drama.dramafile.interpreter;
 
-import cn.milai.ib.container.Container;
+import cn.milai.ib.container.DramaContainer;
 import cn.milai.ib.drama.AbstractDrama;
 import cn.milai.ib.drama.dramafile.interpreter.act.Act;
 import cn.milai.ib.drama.dramafile.interpreter.act.ActFactory;
@@ -16,6 +16,9 @@ import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
  */
 public class DramaFileDrama extends AbstractDrama {
 
+	private static final int DEF_INIT_WIDTH = 560;
+	private static final int DEF_INIT_HEIGHT = 700;
+
 	private static final String BACKGROUND_IMG = "/img/background.jpg";
 	private DramaSpace dramaSpace;
 	private ByteReader reader;
@@ -30,7 +33,7 @@ public class DramaFileDrama extends AbstractDrama {
 	}
 
 	@Override
-	public void run(Container container) {
+	public void doRun(DramaContainer container) {
 		container.setBackgroud(image(BACKGROUND_IMG));
 		while (!dramaSpace.isFinished() && !Thread.currentThread().isInterrupted()) {
 			Frame frame = dramaSpace.currentFrame();
@@ -57,6 +60,16 @@ public class DramaFileDrama extends AbstractDrama {
 	@Override
 	public String getCode() {
 		return dramaSpace.getDramaCode();
+	}
+
+	@Override
+	protected int initWidth() {
+		return DEF_INIT_WIDTH;
+	}
+
+	@Override
+	protected int initHeight() {
+		return DEF_INIT_HEIGHT;
 	}
 
 }
