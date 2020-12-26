@@ -3,10 +3,10 @@ package cn.milai.ib.drama.dramafile.compiler.backend;
 import java.util.List;
 import java.util.Map;
 
+import cn.milai.common.util.Strings;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.compiler.ConstantTable;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;
-import cn.milai.ib.util.StringUtil;
 
 /**
  * Stmd 语法树
@@ -103,7 +103,7 @@ public class Stmd {
 			// FirstParam -> STR
 			case STR : {
 				bb.appendByte(ActType.LDC.getCode());
-				bb.appendUInt16(table.utf8Index(StringUtil.slice(first.getOrigin(), 1, -1)));
+				bb.appendUInt16(table.utf8Index(Strings.slice(first.getOrigin(), 1, -1)));
 				return ValueType.STR.getCanonical();
 			}
 			case ADD : {
@@ -112,14 +112,14 @@ public class Stmd {
 			// FirstParam -> IMG ( STR )
 			case IMG : {
 				bb.appendByte(ActType.IMG.getCode());
-				bb.appendUInt16(table.utf8Index(StringUtil.slice(children.get(2).getOrigin(), 1, -1)));
+				bb.appendUInt16(table.utf8Index(Strings.slice(children.get(2).getOrigin(), 1, -1)));
 				return ValueType.IMG.getCanonical();
 			}
 			// FirstParam -> AUDIO ( STR , STR )
 			case AUDIO : {
 				bb.appendByte(ActType.AUDIO.getCode());
-				bb.appendUInt16(table.utf8Index(StringUtil.slice(children.get(2).getOrigin(), 1, -1)));
-				bb.appendUInt16(table.utf8Index(StringUtil.slice(children.get(4).getOrigin(), 1, -1)));
+				bb.appendUInt16(table.utf8Index(Strings.slice(children.get(2).getOrigin(), 1, -1)));
+				bb.appendUInt16(table.utf8Index(Strings.slice(children.get(4).getOrigin(), 1, -1)));
 				return ValueType.AUDIO.getCanonical();
 			}
 			default:

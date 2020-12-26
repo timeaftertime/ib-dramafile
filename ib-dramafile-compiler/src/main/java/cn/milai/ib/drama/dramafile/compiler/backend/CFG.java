@@ -7,8 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Maps;
 
+import cn.milai.common.util.Strings;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;
-import cn.milai.ib.util.StringUtil;
 
 /**
  * 语法树根节点
@@ -33,7 +33,7 @@ public abstract class CFG {
 	}
 
 	private static String parseDramaName(Node dramaNameNode, String dramaCode) {
-		String name = StringUtil.slice(dramaNameNode.getOrigin(), 2, -2);
+		String name = Strings.slice(dramaNameNode.getOrigin(), 2, -2);
 		return StringUtils.isEmpty(name) ? dramaCode : name;
 	}
 

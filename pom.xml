@@ -13,6 +13,7 @@
 	</modules>
 
 	<properties>
+		<beginning.version>0.0.1-SNAPSHOT</beginning.version>
 		<ib.version>1.0.1-SNAPSHOT</ib.version>
 		<ib.dramafile.version>1.0.1-SNAPSHOT</ib.dramafile.version>
 	</properties>
@@ -52,6 +53,11 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>cn.milai</groupId>
+				<artifactId>beginning-util</artifactId>
+				<version>${beginning.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>cn.milai</groupId>
 				<artifactId>ib-dramafile-api</artifactId>

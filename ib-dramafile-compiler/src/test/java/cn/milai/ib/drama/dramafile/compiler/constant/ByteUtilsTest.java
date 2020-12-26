@@ -1,4 +1,4 @@
-package cn.milai.ib.compiler.constant;
+package cn.milai.ib.drama.dramafile.compiler.constant;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.fail;
@@ -9,7 +9,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import cn.milai.ib.compiler.ByteTestUtils;
+import cn.milai.ib.drama.dramafile.compiler.ByteTestUtils;
 import cn.milai.ib.drama.dramafile.compiler.constant.ByteUtils;
 
 public class ByteUtilsTest {

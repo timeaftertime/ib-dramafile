@@ -1,4 +1,4 @@
-package cn.milai.ib.compiler.frontend.parsing;
+package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;

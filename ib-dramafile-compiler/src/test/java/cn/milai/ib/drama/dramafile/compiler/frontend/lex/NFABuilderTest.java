@@ -1,4 +1,4 @@
-package cn.milai.ib.compiler.frontend.lex;
+package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

@@ -1,4 +1,4 @@
-package cn.milai.ib.compiler;
+package cn.milai.ib.drama.dramafile.compiler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;

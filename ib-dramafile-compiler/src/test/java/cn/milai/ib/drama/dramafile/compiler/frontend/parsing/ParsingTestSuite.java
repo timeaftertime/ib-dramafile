@@ -1,4 +1,4 @@
-package cn.milai.ib.compiler.frontend.parsing;
+package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
