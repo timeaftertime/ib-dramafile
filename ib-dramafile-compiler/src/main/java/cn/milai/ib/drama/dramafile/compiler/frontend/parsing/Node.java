@@ -2,7 +2,7 @@ package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
 import java.util.List;
 
-import org.apache.commons.compress.utils.Lists;
+import com.google.common.collect.Lists;
 
 /**
  * 语法分析树的节点

@@ -10,6 +10,7 @@
 		<module>ib-dramafile-api</module>
 		<module>ib-dramafile-compiler</module>
 		<module>ib-dramafile-interpreter</module>
+		<module>ib-dramafile-compiler-start</module>
 	</modules>
 
 	<properties>
@@ -70,6 +71,11 @@
 			</dependency>
 			<dependency>
 				<groupId>cn.milai</groupId>
+				<artifactId>ib-dramafile-compiler-start</artifactId>
+				<version>${ib.dramafile.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cn.milai</groupId>
 				<artifactId>ib-dramafile-interpreter</artifactId>
 				<version>${ib.dramafile.version}</version>
 			</dependency>
@@ -87,6 +93,7 @@
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.13.1</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>

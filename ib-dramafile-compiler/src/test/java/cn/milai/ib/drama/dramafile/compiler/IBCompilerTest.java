@@ -6,8 +6,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import cn.milai.ib.drama.dramafile.compiler.IBCompiler;
-
 public class IBCompilerTest {
 	private final byte[] expectedBytes = {
 		// IFNTBT

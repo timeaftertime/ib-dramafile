@@ -2,7 +2,7 @@ package cn.milai.ib.drama.dramafile.compiler.backend;
 
 import java.util.List;
 
-import org.apache.commons.compress.utils.Lists;
+import com.google.common.collect.Lists;
 
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;
 
@@ -30,10 +30,13 @@ public abstract class Methods {
 		}
 		List<Node> children = methodsNode.getChildren();
 		// Methods -> TYPE_VOID IDENTIFIER ( ParamDeclares ) { Stmds } Methods
-		methods.add(new Method(
-			children.get(1).getOrigin(),
-			parseDescriptor(methodsNode),
-			Stmds.parse(children.get(6))));
+		methods.add(
+			new Method(
+				children.get(1).getOrigin(),
+				parseDescriptor(methodsNode),
+				Stmds.parse(children.get(6))
+			)
+		);
 		parseMethods(methods, children.get(8));
 	}
 

@@ -15,12 +15,6 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Grammer;
-import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.GrammerReader;
-import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.NonTerminalSymbol;
-import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Production;
-import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Symbol;
-
 public class GrammerTest {
 
 	private static final String FILE = "/parsing/testParseProductions.txt";
@@ -31,40 +25,61 @@ public class GrammerTest {
 	@Test
 	public void testSelectSet() {
 		// Expr
-		checkSelects(grammer.findSymbol(codes[0]), Arrays.asList(
-			Lists.newArrayList("IDENTIFIER"),
-			Lists.newArrayList("IDENTIFIER", "BRACKET_LEFT", "INT", "FLOAT")));
+		checkSelects(
+			grammer.findSymbol(codes[0]), Arrays.asList(
+				Lists.newArrayList("IDENTIFIER"),
+				Lists.newArrayList("IDENTIFIER", "BRACKET_LEFT", "INT", "FLOAT")
+			)
+		);
 		// CFG
-		checkSelects(grammer.findSymbol(codes[1]), Arrays.asList(
-			Lists.newArrayList("IDENTIFIER", "BRACKET_LEFT", "INT", "FLOAT"),
-			Lists.newArrayList("IDENTIFIER"),
-			Lists.newArrayList("IDENTIFIER", "BRACKET_LEFT", "INT", "FLOAT")));
+		checkSelects(
+			grammer.findSymbol(codes[1]), Arrays.asList(
+				Lists.newArrayList("IDENTIFIER", "BRACKET_LEFT", "INT", "FLOAT"),
+				Lists.newArrayList("IDENTIFIER"),
+				Lists.newArrayList("IDENTIFIER", "BRACKET_LEFT", "INT", "FLOAT")
+			)
+		);
 		// Factor
-		checkSelects(grammer.findSymbol(codes[2]), Arrays.asList(
-			Lists.newArrayList("IDENTIFIER"),
-			Lists.newArrayList("BRACKET_LEFT"),
-			Lists.newArrayList("INT"),
-			Lists.newArrayList("FLOAT")));
+		checkSelects(
+			grammer.findSymbol(codes[2]), Arrays.asList(
+				Lists.newArrayList("IDENTIFIER"),
+				Lists.newArrayList("BRACKET_LEFT"),
+				Lists.newArrayList("INT"),
+				Lists.newArrayList("FLOAT")
+			)
+		);
 		// Term
-		checkSelects(grammer.findSymbol(codes[3]), Arrays.asList(
-			Lists.newArrayList("BRACKET_LEFT"),
-			Lists.newArrayList("INT"),
-			Lists.newArrayList("FLOAT"),
-			Lists.newArrayList("IDENTIFIER")));
+		checkSelects(
+			grammer.findSymbol(codes[3]), Arrays.asList(
+				Lists.newArrayList("BRACKET_LEFT"),
+				Lists.newArrayList("INT"),
+				Lists.newArrayList("FLOAT"),
+				Lists.newArrayList("IDENTIFIER")
+			)
+		);
 		// Expr'
-		checkSelects(grammer.findSymbol(codes[4]), Arrays.asList(
-			Lists.newArrayList("ϵ", "$", "PLUS", "MINUS", "BRACKET_RIGHT"),
-			Lists.newArrayList("PLUS"),
-			Lists.newArrayList("MINUS")));
+		checkSelects(
+			grammer.findSymbol(codes[4]), Arrays.asList(
+				Lists.newArrayList("ϵ", "$", "PLUS", "MINUS", "BRACKET_RIGHT"),
+				Lists.newArrayList("PLUS"),
+				Lists.newArrayList("MINUS")
+			)
+		);
 		// Term'
-		checkSelects(grammer.findSymbol(codes[5]), Arrays.asList(
-			Lists.newArrayList("ϵ", "$", "PLUS", "MINUS", "BRACKET_RIGHT"),
-			Lists.newArrayList("TIMES"),
-			Lists.newArrayList("DIVISION")));
+		checkSelects(
+			grammer.findSymbol(codes[5]), Arrays.asList(
+				Lists.newArrayList("ϵ", "$", "PLUS", "MINUS", "BRACKET_RIGHT"),
+				Lists.newArrayList("TIMES"),
+				Lists.newArrayList("DIVISION")
+			)
+		);
 		// CFG'
-		checkSelects(grammer.findSymbol(codes[6]), Arrays.asList(
-			Lists.newArrayList("PLUS"),
-			Lists.newArrayList("MINUS")));
+		checkSelects(
+			grammer.findSymbol(codes[6]), Arrays.asList(
+				Lists.newArrayList("PLUS"),
+				Lists.newArrayList("MINUS")
+			)
+		);
 	}
 
 	private void checkSelects(Symbol s, List<List<String>> selectsCodes) {
@@ -122,40 +137,61 @@ public class GrammerTest {
 	public void testParseProductions() {
 		assertEquals(codes.length, grammer.getNonTerminals().size());
 		// Expr
-		checkNonTerminal(grammer.findSymbol(codes[0]), Arrays.asList(
-			Lists.newArrayList("IDENTIFIER", "ASSIGN", "Expr"),
-			Lists.newArrayList("Term", "Expr\'")));
+		checkNonTerminal(
+			grammer.findSymbol(codes[0]), Arrays.asList(
+				Lists.newArrayList("IDENTIFIER", "ASSIGN", "Expr"),
+				Lists.newArrayList("Term", "Expr\'")
+			)
+		);
 		// CFG
-		checkNonTerminal(grammer.findSymbol(codes[1]), Arrays.asList(
-			Lists.newArrayList("Term"),
-			Lists.newArrayList("IDENTIFIER", "ASSIGN", "Expr"),
-			Lists.newArrayList("Expr", "CFG\'")));
+		checkNonTerminal(
+			grammer.findSymbol(codes[1]), Arrays.asList(
+				Lists.newArrayList("Term"),
+				Lists.newArrayList("IDENTIFIER", "ASSIGN", "Expr"),
+				Lists.newArrayList("Expr", "CFG\'")
+			)
+		);
 		// Factor
-		checkNonTerminal(grammer.findSymbol(codes[2]), Arrays.asList(
-			Lists.newArrayList("IDENTIFIER"),
-			Lists.newArrayList("BRACKET_LEFT", "Expr", "BRACKET_RIGHT"),
-			Lists.newArrayList("INT"),
-			Lists.newArrayList("FLOAT")));
+		checkNonTerminal(
+			grammer.findSymbol(codes[2]), Arrays.asList(
+				Lists.newArrayList("IDENTIFIER"),
+				Lists.newArrayList("BRACKET_LEFT", "Expr", "BRACKET_RIGHT"),
+				Lists.newArrayList("INT"),
+				Lists.newArrayList("FLOAT")
+			)
+		);
 		// Term
-		checkNonTerminal(grammer.findSymbol(codes[3]), Arrays.asList(
-			Lists.newArrayList("BRACKET_LEFT", "Expr", "BRACKET_RIGHT"),
-			Lists.newArrayList("INT"),
-			Lists.newArrayList("FLOAT"),
-			Lists.newArrayList("IDENTIFIER", "Term\'")));
+		checkNonTerminal(
+			grammer.findSymbol(codes[3]), Arrays.asList(
+				Lists.newArrayList("BRACKET_LEFT", "Expr", "BRACKET_RIGHT"),
+				Lists.newArrayList("INT"),
+				Lists.newArrayList("FLOAT"),
+				Lists.newArrayList("IDENTIFIER", "Term\'")
+			)
+		);
 		// Expr'
-		checkNonTerminal(grammer.findSymbol(codes[4]), Arrays.asList(
-			Lists.newArrayList(),
-			Lists.newArrayList("PLUS", "Term", "Expr\'"),
-			Lists.newArrayList("MINUS", "Term", "Expr\'")));
+		checkNonTerminal(
+			grammer.findSymbol(codes[4]), Arrays.asList(
+				Lists.newArrayList(),
+				Lists.newArrayList("PLUS", "Term", "Expr\'"),
+				Lists.newArrayList("MINUS", "Term", "Expr\'")
+			)
+		);
 		// Term'
-		checkNonTerminal(grammer.findSymbol(codes[5]), Arrays.asList(
-			Lists.newArrayList(),
-			Lists.newArrayList("TIMES", "Factor", "Term\'"),
-			Lists.newArrayList("DIVISION", "Factor", "Term\'")));
+		checkNonTerminal(
+			grammer.findSymbol(codes[5]), Arrays.asList(
+				Lists.newArrayList(),
+				Lists.newArrayList("TIMES", "Factor", "Term\'"),
+				Lists.newArrayList("DIVISION", "Factor", "Term\'")
+			)
+		);
 		// CFG'
-		checkNonTerminal(grammer.findSymbol(codes[6]), Arrays.asList(
-			Lists.newArrayList("PLUS", "Term"),
-			Lists.newArrayList("MINUS", "Term")));
+		checkNonTerminal(
+			grammer.findSymbol(codes[6]), Arrays.asList(
+				Lists.newArrayList("PLUS", "Term"),
+				Lists.newArrayList("MINUS", "Term")
+			)
+		);
 	}
 
 	/**

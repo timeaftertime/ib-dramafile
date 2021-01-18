@@ -11,10 +11,6 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import cn.milai.ib.drama.dramafile.compiler.frontend.lex.NFABuilder;
-import cn.milai.ib.drama.dramafile.compiler.frontend.lex.NFAStatus;
-import cn.milai.ib.drama.dramafile.compiler.frontend.lex.TokenDef;
-
 /**
  * 测试 NFA 构造算法
  * @author milai
@@ -202,9 +198,12 @@ public class NFABuilderTest {
 	public void testMultipleRe() {
 		//             +-->s0---a---->s1
 		// s4--ϵ--+-->s2--[cd]-->s3
-		NFAStatus s4 = NFABuilder.newNFA(Sets.newHashSet(
-			new TokenDef("a", TEST_TOKEN_CODE1),
-			new TokenDef("[cd]", TEST_TOKEN_CODE2)));
+		NFAStatus s4 = NFABuilder.newNFA(
+			Sets.newHashSet(
+				new TokenDef("a", TEST_TOKEN_CODE1),
+				new TokenDef("[cd]", TEST_TOKEN_CODE2)
+			)
+		);
 		assertFalse(s4.isAccept());
 		assertEquals(2, s4.getEpsilonNexts().size());
 		NFAStatus s0 = s4.getEpsilonNexts().get(0);

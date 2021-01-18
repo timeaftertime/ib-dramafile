@@ -6,8 +6,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import cn.milai.ib.drama.dramafile.compiler.SimpleCompiler;
-
 public class SimpleCompilerTest {
 
 	private final byte[] testSimpleCompilerTxt = {
@@ -88,8 +86,10 @@ public class SimpleCompilerTest {
 
 	@Test
 	public void testCompiler() throws IOException {
-		byte[] bytes = SimpleCompiler.compile(SimpleCompilerTest.class.getResource("/testSimpleCompiler.drama")
-			.openStream());
+		byte[] bytes = SimpleCompiler.compile(
+			SimpleCompilerTest.class.getResource("/testSimpleCompiler.drama")
+				.openStream()
+		);
 		assertArrayEquals(testSimpleCompilerTxt, bytes);
 	}
 

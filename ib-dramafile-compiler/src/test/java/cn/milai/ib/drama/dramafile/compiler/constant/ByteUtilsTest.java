@@ -10,7 +10,6 @@ import java.io.IOException;
 import org.junit.Test;
 
 import cn.milai.ib.drama.dramafile.compiler.ByteTestUtils;
-import cn.milai.ib.drama.dramafile.compiler.constant.ByteUtils;
 
 public class ByteUtilsTest {
 

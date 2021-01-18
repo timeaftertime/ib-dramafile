@@ -2,7 +2,7 @@ package cn.milai.ib.drama.dramafile.compiler.backend;
 
 import java.util.List;
 
-import org.apache.commons.compress.utils.Lists;
+import com.google.common.collect.Lists;
 
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;
 

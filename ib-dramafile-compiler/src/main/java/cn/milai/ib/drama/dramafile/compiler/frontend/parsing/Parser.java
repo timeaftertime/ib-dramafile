@@ -3,7 +3,7 @@ package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 import java.util.List;
 import java.util.Stack;
 
-import org.apache.commons.compress.utils.Lists;
+import com.google.common.collect.Lists;
 
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 

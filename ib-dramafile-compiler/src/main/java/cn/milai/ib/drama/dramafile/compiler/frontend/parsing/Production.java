@@ -2,7 +2,7 @@ package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
 import java.util.List;
 
-import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.util.CollectionUtils;
 
 import com.google.common.collect.Lists;
 
