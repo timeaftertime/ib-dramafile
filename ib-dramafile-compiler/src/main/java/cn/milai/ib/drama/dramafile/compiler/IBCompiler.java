@@ -5,8 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
+import cn.milai.common.io.InputStreams;
 import cn.milai.ib.drama.dramafile.compiler.backend.CFG;
 import cn.milai.ib.drama.dramafile.compiler.backend.CompilerData;
 import cn.milai.ib.drama.dramafile.compiler.backend.Method;
@@ -18,7 +20,6 @@ import cn.milai.ib.drama.dramafile.compiler.frontend.lex.TokenDef;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.GrammerReader;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Parser;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenType;
-import cn.milai.ib.util.IOUtil;
 
 /**
  * 剧本编译器
@@ -37,15 +38,30 @@ public class IBCompiler {
 
 	public static byte[] compile(InputStream in) {
 		try {
-			CharInput input = new CharInput(IOUtil.toStringFilter(in, line -> !line.trim().startsWith("#")));
+			CharInput input = new CharInput(filterCommentLines(InputStreams.readLines(in)));
 			return build(
 				CFG.parse(
 					newParser().parse(
 						newLexer().lex(
-							input))));
+							input
+						)
+					)
+				)
+			);
 		} catch (IOException e) {
 			throw new IBCompilerException(e);
 		}
+	}
+
+	private static String filterCommentLines(List<String> lines) {
+		StringBuilder sb = new StringBuilder();
+		for (String line : lines) {
+			if (line.trim().startsWith("#")) {
+				continue;
+			}
+			sb.append(line + "\n");
+		}
+		return sb.toString();
 	}
 
 	private static Parser newParser() {
@@ -53,8 +69,10 @@ public class IBCompiler {
 	}
 
 	private static Lexer newLexer() {
-		return new Lexer(Arrays.stream(TokenType.values())
-			.map(t -> new TokenDef(t.getRE(), t.getCode())).collect(Collectors.toSet()));
+		return new Lexer(
+			Arrays.stream(TokenType.values())
+				.map(t -> new TokenDef(t.getRE(), t.getCode())).collect(Collectors.toSet())
+		);
 	}
 
 	private static byte[] build(CompilerData data) throws IOException {

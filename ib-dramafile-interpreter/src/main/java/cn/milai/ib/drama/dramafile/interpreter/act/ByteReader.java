@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import cn.milai.common.io.InputStreams;
 import cn.milai.ib.ex.IBIOException;
-import cn.milai.ib.util.IOUtil;
 
 /**
  * 字节码读取器
@@ -29,7 +29,7 @@ public class ByteReader {
 	}
 
 	public ByteReader(InputStream in) {
-		this(IOUtil.toBytes(in));
+		this(InputStreams.toBytes(in));
 	}
 
 	/**
@@ -143,9 +143,7 @@ public class ByteReader {
 	 * 获取当前读指针位置
 	 * @return
 	 */
-	public int getPC() {
-		return pc;
-	}
+	public int getPC() { return pc; }
 
 	/**
 	 * 返回剩余的所有字节的数组

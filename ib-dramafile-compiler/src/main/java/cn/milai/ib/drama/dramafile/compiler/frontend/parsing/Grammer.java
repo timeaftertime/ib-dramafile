@@ -14,8 +14,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import cn.milai.common.util.Collections;
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
-import cn.milai.ib.drama.dramafile.compiler.util.CollectionUtil;
 
 /**
  * 语法分析的语法
@@ -258,7 +258,7 @@ public class Grammer {
 						}
 						changed |= follows.get(now).addAll(tails);
 						if (firsts.get(now).contains(Symbol.EPSILON)) {
-							tails.addAll(CollectionUtil.unfilter(firsts.get(now), Symbol::isEpsilon));
+							tails.addAll(Collections.unfilter(firsts.get(now), Symbol::isEpsilon));
 						} else {
 							tails = getFirst(now);
 						}
@@ -288,7 +288,7 @@ public class Grammer {
 		Set<Symbol> first = Sets.newHashSet();
 		Symbol pre = Symbol.EPSILON;
 		for (Symbol now : rights) {
-			first.addAll(CollectionUtil.unfilter(firsts.get(now), Symbol::isEpsilon));
+			first.addAll(Collections.unfilter(firsts.get(now), Symbol::isEpsilon));
 			if (!firsts.get(now).contains(Symbol.EPSILON)) {
 				break;
 			}
@@ -315,17 +315,11 @@ public class Grammer {
 		return symbol;
 	}
 
-	public NonTerminalSymbol getStartSymbol() {
-		return startSymbol;
-	}
+	public NonTerminalSymbol getStartSymbol() { return startSymbol; }
 
-	public List<NonTerminalSymbol> getNonTerminals() {
-		return Lists.newArrayList(nonTerminals);
-	}
+	public List<NonTerminalSymbol> getNonTerminals() { return Lists.newArrayList(nonTerminals); }
 
-	public List<TerminalSymbol> getTerminals() {
-		return Lists.newArrayList(terminals);
-	}
+	public List<TerminalSymbol> getTerminals() { return Lists.newArrayList(terminals); }
 
 	/**
 	 * 获取指定 code 对应符号的 FIRST 集合
@@ -382,9 +376,7 @@ public class Grammer {
 		throw new IBCompilerException(String.format("符号 %s 不存在", code));
 	}
 
-	private List<Symbol> getSymbols() {
-		return CollectionUtil.union(getNonTerminals(), getTerminals());
-	}
+	private List<Symbol> getSymbols() { return Collections.union(getNonTerminals(), getTerminals()); }
 
 	public static class Builder {
 

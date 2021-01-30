@@ -4,8 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import cn.milai.common.io.InputStreams;
 import cn.milai.ib.ex.IBIOException;
-import cn.milai.ib.util.IOUtil;
 
 /**
  * 剧本元数据，对应 .drama 文件
@@ -91,16 +91,14 @@ public class DramaMetadata {
 		// 剧本片段长度
 		int len = reader.readUnsignedShort();
 		clipBytes = new byte[len];
-		IOUtil.toBytes(reader, clipBytes);
+		InputStreams.toBytes(reader, clipBytes);
 	}
 
 	/**
 	 * 获取剧情的字节数组
 	 * @return
 	 */
-	public byte[] getClipBytes() {
-		return clipBytes;
-	}
+	public byte[] getClipBytes() { return clipBytes; }
 
 	/**
 	 * 获取下标为 index 的 int 类型常量
@@ -147,28 +145,20 @@ public class DramaMetadata {
 		return pool.getValue(index).getValue();
 	}
 
-	public int getMajorVersion() {
-		return majorVersion;
-	}
+	public int getMajorVersion() { return majorVersion; }
 
-	public int getMinorVersion() {
-		return minorVersion;
-	}
+	public int getMinorVersion() { return minorVersion; }
 
 	/**
 	 * 获取剧本对应的 Code
 	 * @return
 	 */
-	public String getCode() {
-		return pool.getUTF8(dramaCodeIndex).getValue();
-	}
+	public String getCode() { return pool.getUTF8(dramaCodeIndex).getValue(); }
 
 	/**
 	 * 获取剧本对应的 Name
 	 * @return
 	 */
-	public String getName() {
-		return pool.getUTF8(dramaNameIndex).getValue();
-	}
+	public String getName() { return pool.getUTF8(dramaNameIndex).getValue(); }
 
 }
