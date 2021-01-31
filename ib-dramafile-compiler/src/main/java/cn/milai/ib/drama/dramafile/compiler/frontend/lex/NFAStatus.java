@@ -33,9 +33,7 @@ public class NFAStatus {
 		id = auto_increment_id++;
 	}
 
-	public int getId() {
-		return id;
-	}
+	public int getId() { return id; }
 
 	/**
 	 * 添加一条接受字符集为 acceptor 、通往状态 status 的出边
@@ -57,9 +55,7 @@ public class NFAStatus {
 	 * 获取当前状态接受空串可以到达的所有状态
 	 * @return
 	 */
-	public List<NFAStatus> getEpsilonNexts() {
-		return Lists.newArrayList(epsilonNexts);
-	}
+	public List<NFAStatus> getEpsilonNexts() { return Lists.newArrayList(epsilonNexts); }
 
 	/**
 	 * 获取当前状态接受指定字符到达的状态
@@ -80,9 +76,7 @@ public class NFAStatus {
 	 * 当前结点是否为接收状态
 	 * @return
 	 */
-	public boolean isAccept() {
-		return token != null;
-	}
+	public boolean isAccept() { return token != null; }
 
 	/**
 	 * 当前状态为接受状态时返回接受的 Token 的 code
@@ -99,9 +93,7 @@ public class NFAStatus {
 	 * 设置当前状态为接收状态且接收的 Token 类型 code 为 tokenCode
 	 * @param token
 	 */
-	public void setToken(String token) {
-		this.token = token;
-	}
+	public void setToken(String token) { this.token = token; }
 
 	@Override
 	public String toString() {

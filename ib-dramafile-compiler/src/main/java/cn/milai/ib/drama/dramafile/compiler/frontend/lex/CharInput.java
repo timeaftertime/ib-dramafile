@@ -2,10 +2,10 @@ package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
+import cn.milai.common.base.Collects;
 import cn.milai.ib.drama.dramafile.compiler.frontend.Input;
 
 /**
@@ -33,6 +33,6 @@ public class CharInput extends Input<Character> {
 
 	@Override
 	public CharInput filter(Predicate<Character> p) {
-		return new CharInput((elements.stream().filter(p).collect(Collectors.toList())));
+		return new CharInput(Collects.filter(elements, p));
 	}
 }

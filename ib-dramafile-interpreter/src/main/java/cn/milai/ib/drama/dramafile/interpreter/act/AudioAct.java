@@ -20,9 +20,7 @@ public class AudioAct extends AbstractAct {
 	private int resourceIndex;
 
 	@Override
-	public ActType getCode() {
-		return ActType.AUDIO;
-	}
+	public ActType getCode() { return ActType.AUDIO; }
 
 	@Override
 	protected void action(Frame frame, DramaContainer container) throws Exception {

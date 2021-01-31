@@ -16,9 +16,7 @@ public class LDCAct extends AbstractAct {
 	private int constIndex;
 
 	@Override
-	public ActType getCode() {
-		return ActType.LDC;
-	}
+	public ActType getCode() { return ActType.LDC; }
 
 	@Override
 	protected void action(Frame frame, DramaContainer container) throws Exception {

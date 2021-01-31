@@ -17,9 +17,7 @@ public abstract class Symbol implements Comparable<Symbol> {
 	 * 语法定义中唯一表示该符号的字符串
 	 * @return
 	 */
-	public String getCode() {
-		return code;
-	}
+	public String getCode() { return code; }
 
 	@Override
 	public String toString() {
@@ -59,16 +57,12 @@ public abstract class Symbol implements Comparable<Symbol> {
 
 	public static final Symbol EOF = new Symbol("$") {
 		@Override
-		public boolean isNonTerminal() {
-			return false;
-		}
+		public boolean isNonTerminal() { return false; }
 	};
 
 	public static final Symbol EPSILON = new Symbol("ϵ") {
 		@Override
-		public boolean isNonTerminal() {
-			return false;
-		}
+		public boolean isNonTerminal() { return false; }
 	};
 
 	/**

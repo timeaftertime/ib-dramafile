@@ -5,6 +5,8 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+import cn.milai.common.base.Chars;
+
 /**
  * 词法分析字符集相关类
  * @author milai
@@ -17,9 +19,9 @@ public class Char {
 	 */
 	public static final char EOF = 0;
 
-	private static final Set<Character> NUMBERS = toSet("0123456789");
-	private static final Set<Character> UPPER_LETTERS = toSet("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-	private static final Set<Character> LOWER_LETTERS = toSet("abcdefghijklmnopqrstuvwxyz");
+	private static final Set<Character> NUMBERS = toSet(Chars.DIGITS);
+	private static final Set<Character> UPPER_LETTERS = toSet(Chars.UPPERS);
+	private static final Set<Character> LOWER_LETTERS = toSet(Chars.LOWERS);
 
 	/**
 	 * 可以用过转义字符 \ 来表示原字符的特殊字符

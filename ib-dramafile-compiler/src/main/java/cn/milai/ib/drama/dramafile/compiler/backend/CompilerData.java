@@ -34,13 +34,9 @@ public class CompilerData {
 	 */
 	private List<Method> methods;
 
-	public Map<String, String> getImports() {
-		return imports;
-	}
+	public Map<String, String> getImports() { return imports; }
 
-	public void setImports(Map<String, String> imports) {
-		this.imports = imports;
-	}
+	public void setImports(Map<String, String> imports) { this.imports = imports; }
 
 	public String getDramaCode() {
 		if (StringUtils.isEmpty(dramaCode)) {
@@ -50,9 +46,7 @@ public class CompilerData {
 		return dramaCode;
 	}
 
-	public void setDramaCode(String dramaCode) {
-		this.dramaCode = dramaCode;
-	}
+	public void setDramaCode(String dramaCode) { this.dramaCode = dramaCode; }
 
 	/**
 	 * 获取剧本名，若未定义，将返回 dramaCode
@@ -65,16 +59,10 @@ public class CompilerData {
 		return dramaName;
 	}
 
-	public void setDramaName(String dramaName) {
-		this.dramaName = dramaName;
-	}
+	public void setDramaName(String dramaName) { this.dramaName = dramaName; }
 
-	public List<Method> getMethods() {
-		return methods;
-	}
+	public List<Method> getMethods() { return methods; }
 
-	public void setMethods(List<Method> methods) {
-		this.methods = methods;
-	}
+	public void setMethods(List<Method> methods) { this.methods = methods; }
 
 }

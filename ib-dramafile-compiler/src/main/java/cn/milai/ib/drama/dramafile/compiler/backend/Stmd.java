@@ -3,7 +3,7 @@ package cn.milai.ib.drama.dramafile.compiler.backend;
 import java.util.List;
 import java.util.Map;
 
-import cn.milai.common.util.Strings;
+import cn.milai.common.base.Strings;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.compiler.ConstantTable;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;

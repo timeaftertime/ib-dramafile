@@ -26,13 +26,9 @@ public class NFAPair {
 		first.addNext(acceptor, last);
 	}
 
-	public NFAStatus getFirst() {
-		return first;
-	}
+	public NFAStatus getFirst() { return first; }
 
-	public NFAStatus getLast() {
-		return last;
-	}
+	public NFAStatus getLast() { return last; }
 
 	/**
 	 * 连接两个 NFAPair

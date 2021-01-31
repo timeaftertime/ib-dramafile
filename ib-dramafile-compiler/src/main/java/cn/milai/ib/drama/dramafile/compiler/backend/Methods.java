@@ -13,9 +13,7 @@ import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;
  */
 public abstract class Methods {
 
-	private Methods() {
-
-	}
+	private Methods() {}
 
 	public static List<Method> parse(Node methodsNode) {
 		List<Method> methods = Lists.newArrayList();

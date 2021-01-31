@@ -63,12 +63,12 @@ public class DramaFileDrama extends AbstractDrama {
 	}
 
 	@Override
-	protected int initWidth() {
+	protected int initW() {
 		return DEF_INIT_WIDTH;
 	}
 
 	@Override
-	protected int initHeight() {
+	protected int initH() {
 		return DEF_INIT_HEIGHT;
 	}
 

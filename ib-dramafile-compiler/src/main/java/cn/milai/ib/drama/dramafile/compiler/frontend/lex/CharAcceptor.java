@@ -10,7 +10,7 @@ public interface CharAcceptor {
 	/**
 	 * 接受所有字符的 CharAcceptor
 	 */
-	CharAcceptor ANY = acceptor -> true;
+	final CharAcceptor ANY = acceptor -> true;
 
 	/**
 	 * 是否能接受指定字符

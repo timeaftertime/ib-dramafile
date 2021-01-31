@@ -2,9 +2,8 @@ package cn.milai.ib.drama.dramafile.compiler.backend;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 
-import cn.milai.ib.ex.IBIOException;
+import cn.milai.common.ex.unchecked.Uncheckeds;
 
 /**
  * 类似于 StringBuilder 的字节数组构造器
@@ -27,13 +26,16 @@ public class ByteArrayBuilder {
 		return this;
 	}
 
+	/**
+	 * 添加指定字节数组到最后
+	 * @param data
+	 * @return
+	 */
 	public ByteArrayBuilder append(byte[] data) {
-		try {
+		return Uncheckeds.rethrow(() -> {
 			out.write(data);
-		} catch (IOException e) {
-			throw new IBIOException("构造字节数组发生未知错误", e);
-		}
-		return this;
+			return this;
+		}, "构造字节数组错误");
 	}
 
 	/**
@@ -42,12 +44,10 @@ public class ByteArrayBuilder {
 	 * @return
 	 */
 	public ByteArrayBuilder append(String data) {
-		try {
+		return Uncheckeds.rethrow(() -> {
 			dataOut.writeUTF(data);
-		} catch (IOException e) {
-			throw new IBIOException("构造字节数组发生未知错误", e);
-		}
-		return this;
+			return this;
+		}, "构造字节数组错误");
 	}
 
 	/**
@@ -56,21 +56,17 @@ public class ByteArrayBuilder {
 	 * @return
 	 */
 	public ByteArrayBuilder appendUInt16(int data) {
-		try {
+		return Uncheckeds.rethrow(() -> {
 			dataOut.writeShort(data);
-		} catch (IOException e) {
-			throw new IBIOException("构造字节数组发生未知错误", e);
-		}
-		return this;
+			return this;
+		}, "构造字节数组错误");
 	}
 
 	public ByteArrayBuilder append(ByteArrayBuilder bb) {
-		try {
+		return Uncheckeds.rethrow(() -> {
 			out.write(bb.toBytes());
-		} catch (IOException e) {
-			throw new IBIOException("构造字节数组发生未知错误", e);
-		}
-		return this;
+			return this;
+		}, "构造字节数组错误");
 	}
 
 	public byte[] toBytes() {

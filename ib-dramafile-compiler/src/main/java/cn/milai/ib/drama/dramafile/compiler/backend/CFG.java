@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Maps;
 
-import cn.milai.common.util.Strings;
+import cn.milai.common.base.Strings;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;
 
 /**

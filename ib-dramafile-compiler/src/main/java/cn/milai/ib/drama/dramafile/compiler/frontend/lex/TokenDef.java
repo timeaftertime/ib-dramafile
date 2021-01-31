@@ -23,13 +23,9 @@ public class TokenDef {
 		this.code = code;
 	}
 
-	public String getRE() {
-		return re;
-	}
+	public String getRE() { return re; }
 
-	public String getCode() {
-		return code;
-	}
+	public String getCode() { return code; }
 
 	@Override
 	public int hashCode() {

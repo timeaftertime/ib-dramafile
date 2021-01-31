@@ -20,7 +20,7 @@ import cn.milai.ib.drama.dramafile.interpreter.statics.DramaMetadata;
  */
 public class DramaFileLoader {
 
-	private static final Logger log = LoggerFactory.getLogger(DramaFileLoader.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DramaFileLoader.class);
 
 	/**
 	 * 加载指定的剧本片段
@@ -33,7 +33,7 @@ public class DramaFileLoader {
 		try {
 			dramaBytes = readDramaFile(dramaCode);
 		} catch (Exception e) {
-			log.error("获取剧本定义文件失败，dramaCode = {}, error = {}", dramaCode, ExceptionUtils.getStackTrace(e));
+			LOG.error("获取剧本定义文件失败，dramaCode = {}, error = {}", dramaCode, ExceptionUtils.getStackTrace(e));
 			throw new DramaFileNotFoundException(dramaCode, e);
 		}
 		return new DramaMetadata(dramaBytes);
@@ -44,7 +44,7 @@ public class DramaFileLoader {
 		String path = PathConf.dramaPath(clipCode);
 		File file = new File(path);
 		if (!file.exists()) {
-			log.info("剧本文件 {} 不存在，尝试从远程服务器获取……", path);
+			LOG.info("剧本文件 {} 不存在，尝试从远程服务器获取……", path);
 			dramaBytes = Https.getFile(PathConf.dramaRepo(clipCode));
 			Files.saveRethrow(path, dramaBytes);
 		} else {

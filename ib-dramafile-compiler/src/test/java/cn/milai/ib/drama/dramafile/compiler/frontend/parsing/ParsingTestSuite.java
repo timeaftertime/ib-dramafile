@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ GrammerTest.class, ParserTest.class })
+@SuiteClasses({ GrammerTest.class, ParserTest.class, TokenTypeTest.class })
 public class ParsingTestSuite {
 
 }

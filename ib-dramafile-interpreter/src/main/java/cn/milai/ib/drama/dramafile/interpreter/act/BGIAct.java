@@ -14,9 +14,7 @@ import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
 public class BGIAct extends AbstractAct {
 
 	@Override
-	public ActType getCode() {
-		return ActType.BGI;
-	}
+	public ActType getCode() { return ActType.BGI; }
 
 	@Override
 	protected void action(Frame frame, DramaContainer container) throws Exception {
@@ -24,7 +22,6 @@ public class BGIAct extends AbstractAct {
 	}
 
 	@Override
-	protected void readOperands(ByteReader reader) throws IOException {
-	}
+	protected void readOperands(ByteReader reader) throws IOException {}
 
 }

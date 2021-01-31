@@ -19,9 +19,7 @@ public class IMGAct extends AbstractAct {
 	private int resourceIndex;
 
 	@Override
-	public ActType getCode() {
-		return ActType.IMG;
-	}
+	public ActType getCode() { return ActType.IMG; }
 
 	@Override
 	protected void action(Frame frame, DramaContainer container) throws Exception {

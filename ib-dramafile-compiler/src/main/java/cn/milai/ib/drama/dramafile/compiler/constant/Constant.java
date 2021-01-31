@@ -21,9 +21,7 @@ public abstract class Constant<T> {
 	 * 获取常量所代表的值
 	 * @return
 	 */
-	public T getValue() {
-		return value;
-	}
+	public T getValue() { return value; }
 
 	/**
 	 * 获取常量值的字节数组形式

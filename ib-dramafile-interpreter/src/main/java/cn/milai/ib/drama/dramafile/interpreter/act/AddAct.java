@@ -115,11 +115,20 @@ public class AddAct extends AbstractAct {
 
 	private boolean fit(Object obj, Class<?> clazz) {
 		try {
-			if (obj.getClass() == Integer.class && clazz == int.class) {
-				return true;
+			if (obj.getClass() == Integer.class) {
+				if (clazz == int.class || clazz == long.class || clazz == float.class || clazz == double.class) {
+					return true;
+				}
 			}
-			if (obj.getClass() == Float.class && clazz == float.class) {
-				return true;
+			if (obj.getClass() == Long.class) {
+				if (clazz == long.class || clazz == float.class || clazz == double.class) {
+					return true;
+				}
+			}
+			if (obj.getClass() == Float.class) {
+				if (clazz == float.class || clazz == double.class) {
+					return true;
+				}
 			}
 			clazz.cast(obj);
 		} catch (ClassCastException e) {
@@ -159,8 +168,6 @@ public class AddAct extends AbstractAct {
 	}
 
 	@Override
-	public ActType getCode() {
-		return ActType.ADD;
-	}
+	public ActType getCode() { return ActType.ADD; }
 
 }

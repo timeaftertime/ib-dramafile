@@ -33,17 +33,13 @@ public class Production {
 	 * 获取产生式左非终结符
 	 * @return
 	 */
-	public NonTerminalSymbol getLeft() {
-		return left;
-	}
+	public NonTerminalSymbol getLeft() { return left; }
 
 	/**
 	 * 获取产生式右式符号列表，若为空产生式，返回一个只包含 Symbol.EPSILON 的列表
 	 * @return
 	 */
-	public List<Symbol> getRights() {
-		return Lists.newArrayList(rights);
-	}
+	public List<Symbol> getRights() { return Lists.newArrayList(rights); }
 
 	@Override
 	public String toString() {
@@ -62,9 +58,7 @@ public class Production {
 	 * 是否为空产生式
 	 * @return
 	 */
-	public boolean isEpsilon() {
-		return rights.size() == 1 && Symbol.isEpsilon(rights.get(0));
-	}
+	public boolean isEpsilon() { return rights.size() == 1 && Symbol.isEpsilon(rights.get(0)); }
 
 	@Override
 	public boolean equals(Object obj) {

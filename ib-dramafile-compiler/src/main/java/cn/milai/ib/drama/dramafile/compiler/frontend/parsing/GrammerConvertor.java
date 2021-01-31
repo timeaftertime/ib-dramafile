@@ -61,7 +61,8 @@ public class GrammerConvertor {
 
 	private static NonTerminalSymbol readCFG() {
 		return GrammerReader.parseGrammer(
-			GrammerConvertor.class.getResourceAsStream(GRAMMER_DEFINITION))
+			GrammerConvertor.class.getResourceAsStream(GRAMMER_DEFINITION)
+		)
 			.getNonTerminals().stream().filter(s -> s.getCode().equals(CFG)).findFirst().get();
 	}
 

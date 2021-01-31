@@ -1,5 +1,6 @@
 package cn.milai.ib.drama.dramafile.compiler.constant;
 
+import cn.milai.common.base.Bytes;
 import cn.milai.ib.drama.dramafile.constant.ConstantType;
 
 /**
@@ -14,13 +15,9 @@ public class LongConstant extends Constant<Long> {
 	}
 
 	@Override
-	public ConstantType getType() {
-		return ConstantType.LONG;
-	}
+	public ConstantType getType() { return ConstantType.LONG; }
 
 	@Override
-	public byte[] getBytes() {
-		return ByteUtils.longToBytes(value);
-	}
+	public byte[] getBytes() { return Bytes.fromLong(value); }
 
 }

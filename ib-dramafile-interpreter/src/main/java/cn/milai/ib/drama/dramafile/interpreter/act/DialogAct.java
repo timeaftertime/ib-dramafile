@@ -47,16 +47,14 @@ public class DialogAct extends AbstractAct {
 	private int textIndex;
 
 	@Override
-	public ActType getCode() {
-		return ActType.DIALOG;
-	}
+	public ActType getCode() { return ActType.DIALOG; }
 
 	@Override
 	protected void action(Frame frame, DramaContainer container) throws Exception {
 		Clip clip = frame.getClip();
 		String dialogClass = clip.getUTF8Const(characteClassIndex);
-		int x = (int) (clip.getFloatConst(xRateIndex) * container.getWidth());
-		int y = (int) (clip.getFloatConst(yRateIndex) * container.getHeight());
+		int x = (int) (clip.getFloatConst(xRateIndex) * container.getW());
+		int y = (int) (clip.getFloatConst(yRateIndex) * container.getH());
 		Image speaker = resolveSpeaker(clip);
 		String text = DramaStringLoader.get(clip.getCode(), clip.getUTF8Const(textIndex));
 		container.addObject(createInstance(dialogClass, x, y, speaker, text, container));

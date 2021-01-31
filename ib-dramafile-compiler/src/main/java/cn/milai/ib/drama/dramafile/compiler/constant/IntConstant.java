@@ -1,5 +1,6 @@
 package cn.milai.ib.drama.dramafile.compiler.constant;
 
+import cn.milai.common.base.Bytes;
 import cn.milai.ib.drama.dramafile.constant.ConstantType;
 
 /**
@@ -14,12 +15,8 @@ public class IntConstant extends Constant<Integer> {
 	}
 
 	@Override
-	public byte[] getBytes() {
-		return ByteUtils.intToBytes(value);
-	}
+	public byte[] getBytes() { return Bytes.fromInt(value); }
 
 	@Override
-	public ConstantType getType() {
-		return ConstantType.INT;
-	}
+	public ConstantType getType() { return ConstantType.INT; }
 }

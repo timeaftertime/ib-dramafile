@@ -49,9 +49,7 @@ public class DFAStatus {
 	 * 当前状态是否为接收状态
 	 * @return
 	 */
-	public boolean isAccept() {
-		return tokens.size() > 0;
-	}
+	public boolean isAccept() { return tokens.size() > 0; }
 
 	/**
 	 * 当前状态时接受状态是返回所接受的 Token 的 code

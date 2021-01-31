@@ -6,6 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+/**
+ * 命令行启动类
+ * @author milai
+ */
 public class Main {
 
 	private static final String INPUT_EXT = ".drama";

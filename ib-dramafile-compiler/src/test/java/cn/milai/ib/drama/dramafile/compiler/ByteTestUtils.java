@@ -1,16 +1,19 @@
 package cn.milai.ib.drama.dramafile.compiler;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import org.junit.Test;
 
+import cn.milai.common.base.Bytes;
+
+/**
+ * 协助单元测试的类
+ * @author milai
+ * @date 2021.01.31
+ */
 public class ByteTestUtils {
 
 	@Test
 	public void printUTF8Bytes() {
-		for (byte b : getBytes("cn.milai.ib.demo.drama.Hello")) {
+		for (byte b : Bytes.fromStr("cn.milai.ib.demo.drama.Hello")) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
@@ -19,7 +22,7 @@ public class ByteTestUtils {
 
 	@Test
 	public void printIntBytes() {
-		for (byte b : getBytes(-67)) {
+		for (byte b : Bytes.fromInt(-67)) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
@@ -28,7 +31,7 @@ public class ByteTestUtils {
 
 	@Test
 	public void printShortBytes() {
-		for (byte b : getShortBytes(85)) {
+		for (byte b : Bytes.fromShort(85)) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
@@ -37,7 +40,7 @@ public class ByteTestUtils {
 
 	@Test
 	public void printLongBytes() {
-		for (byte b : getBytes(20L)) {
+		for (byte b : Bytes.fromLong(20L)) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
@@ -46,65 +49,11 @@ public class ByteTestUtils {
 
 	@Test
 	public void printFloatBytes() {
-		for (byte b : getBytes(-0.2f)) {
+		for (byte b : Bytes.fromFloat(-0.2f)) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
 		}
 	}
 
-	public static byte[] getBytes(String value) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		DataOutputStream writer = new DataOutputStream(out);
-		try {
-			writer.writeUTF(value);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return out.toByteArray();
-	}
-
-	public static byte[] getBytes(int value) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		DataOutputStream writer = new DataOutputStream(out);
-		try {
-			writer.writeInt(value);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return out.toByteArray();
-	}
-
-	public static byte[] getBytes(long value) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		DataOutputStream writer = new DataOutputStream(out);
-		try {
-			writer.writeLong(value);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return out.toByteArray();
-	}
-
-	public static byte[] getShortBytes(int value) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		DataOutputStream writer = new DataOutputStream(out);
-		try {
-			writer.writeShort(value);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return out.toByteArray();
-	}
-
-	public static byte[] getBytes(float value) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		DataOutputStream writer = new DataOutputStream(out);
-		try {
-			writer.writeFloat(value);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return out.toByteArray();
-	}
 }

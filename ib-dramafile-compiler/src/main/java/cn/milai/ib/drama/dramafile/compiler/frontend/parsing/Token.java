@@ -14,21 +14,13 @@ public class Token {
 
 	private TokenType type;
 
-	public String getOrigin() {
-		return origin;
-	}
+	public String getOrigin() { return origin; }
 
-	public void setOrigin(String origin) {
-		this.origin = origin;
-	}
+	public void setOrigin(String origin) { this.origin = origin; }
 
-	public TokenType getType() {
-		return type;
-	}
+	public TokenType getType() { return type; }
 
-	public void setType(TokenType type) {
-		this.type = type;
-	}
+	public void setType(TokenType type) { this.type = type; }
 
 	public Token(String orgin, TokenType type) {
 		this.origin = orgin;

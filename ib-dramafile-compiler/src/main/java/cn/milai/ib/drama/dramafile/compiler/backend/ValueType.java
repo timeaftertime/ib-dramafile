@@ -25,25 +25,20 @@ public class ValueType {
 	public static final ValueType IMG = of("img");
 	public static final ValueType AUDIO = of("audio");
 
-	private ValueType() {
-	}
+	private ValueType() {}
 
 	/**
 	 * 获取类型名
 	 * @return
 	 */
-	public String getName() {
-		return name;
-	}
+	public String getName() { return name; }
 
 	/**
 	/**
 	 * 获取最简表示的字符串
 	 * @return
 	 */
-	public String getCanonical() {
-		return canonical;
-	}
+	public String getCanonical() { return canonical; }
 
 	/**
 	 * 获取指定 Token 类型对应的值类型

@@ -19,24 +19,18 @@ public class Clip {
 	 * 获取剧本唯一标识
 	 * @return
 	 */
-	public String getCode() {
-		return drama.getCode();
-	}
+	public String getCode() { return drama.getCode(); }
 
 	/**
 	 * 获取剧本可读名字
 	 */
-	public String getName() {
-		return drama.getName();
-	}
+	public String getName() { return drama.getName(); }
 
 	/**
 	 * 获取剧本的字节数据
 	 * @return
 	 */
-	public byte[] getBytes() {
-		return drama.getClipBytes();
-	}
+	public byte[] getBytes() { return drama.getClipBytes(); }
 
 	/**
 	 * 获取常量池中序号为 index 的 int 类型常量

@@ -43,13 +43,9 @@ public class NonTerminalSymbol extends Symbol {
 		return productions.remove(p);
 	}
 
-	public List<Production> getProductions() {
-		return Lists.newArrayList(productions);
-	}
+	public List<Production> getProductions() { return Lists.newArrayList(productions); }
 
 	@Override
-	public boolean isNonTerminal() {
-		return true;
-	}
+	public boolean isNonTerminal() { return true; }
 
 }

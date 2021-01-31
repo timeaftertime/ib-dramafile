@@ -12,7 +12,5 @@ public class TerminalSymbol extends Symbol {
 	}
 
 	@Override
-	public boolean isNonTerminal() {
-		return false;
-	}
+	public boolean isNonTerminal() { return false; }
 }

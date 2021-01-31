@@ -1,8 +1,8 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
+import cn.milai.common.base.Collects;
 import cn.milai.ib.drama.dramafile.compiler.frontend.Input;
 
 public class TokenInput extends Input<Token> {
@@ -21,6 +21,6 @@ public class TokenInput extends Input<Token> {
 
 	@Override
 	public TokenInput filter(Predicate<Token> p) {
-		return new TokenInput(elements.stream().filter(p).collect(Collectors.toList()).toArray(new Token[0]));
+		return new TokenInput(Collects.filter(elements, p).toArray(new Token[0]));
 	}
 }

@@ -37,9 +37,7 @@ public class ConstantTable {
 	 * 获取常量表中的常量
 	 * @return
 	 */
-	public Constant<?>[] getConstants() {
-		return consts.toArray(new Constant<?>[0]);
-	}
+	public Constant<?>[] getConstants() { return consts.toArray(new Constant<?>[0]); }
 
 	/**
 	 * 获取一个 int 常量的序号

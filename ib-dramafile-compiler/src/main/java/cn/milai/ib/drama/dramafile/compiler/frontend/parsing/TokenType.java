@@ -20,7 +20,7 @@ public enum TokenType {
 	// 标识符
 	IDENTIFIER("[_a-zA-Z]\\w*", 3),
 	// 常量
-	INT("[+\\-]?0|([1-9][0-9]*)", 4), FLOAT("[+\\-]?0|([1-9][0-9]*)\\.[0-9]+", 4), STR("\"[^\"]*\"", 4),
+	INT("[+\\-]?0|([1-9][0-9]*)", 4), FLOAT("[+\\-]?(0|([1-9][0-9]*))\\.[0-9]+", 4), STR("\"[^\"]*\"", 4),
 	;
 
 	/**
@@ -38,17 +38,19 @@ public enum TokenType {
 		this.order = order;
 	}
 
-	public String getRE() {
-		return re;
-	}
+	/**
+	 * 获取正则表达式
+	 * @return
+	 */
+	public String getRE() { return re; }
 
-	public int getOrder() {
-		return order;
-	}
+	public int getOrder() { return order; }
 
-	public String getCode() {
-		return name();
-	}
+	/**
+	 * 获取唯一标识
+	 * @return
+	 */
+	public String getCode() { return name(); }
 
 	/**
 	 * 获取 code 对应的 TokenType ，若不存在，返回 null

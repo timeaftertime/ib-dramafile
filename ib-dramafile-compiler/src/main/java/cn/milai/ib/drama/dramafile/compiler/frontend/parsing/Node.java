@@ -66,9 +66,7 @@ public class Node {
 		this.productionIndex = productionIndex;
 	}
 
-	public Symbol getSymbol() {
-		return symbol;
-	}
+	public Symbol getSymbol() { return symbol; }
 
 	/**
 	 * 设置子节点列表
@@ -88,13 +86,9 @@ public class Node {
 		return children;
 	}
 
-	public Node getPre() {
-		return pre;
-	}
+	public Node getPre() { return pre; }
 
-	public void setPre(Node pre) {
-		this.pre = pre;
-	}
+	public void setPre(Node pre) { this.pre = pre; }
 
 	/**
 	 * 获取当前结点及子节点所匹配的原始字符串

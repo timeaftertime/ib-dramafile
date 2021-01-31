@@ -22,9 +22,7 @@ public class SleepAct extends AbstractAct {
 	private int sleepFrameIndex;
 
 	@Override
-	public ActType getCode() {
-		return ActType.SLEEP;
-	}
+	public ActType getCode() { return ActType.SLEEP; }
 
 	@Override
 	protected void action(Frame frame, DramaContainer container) throws Exception {

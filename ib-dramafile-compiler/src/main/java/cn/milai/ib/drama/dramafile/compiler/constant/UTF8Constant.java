@@ -1,5 +1,6 @@
 package cn.milai.ib.drama.dramafile.compiler.constant;
 
+import cn.milai.common.base.Bytes;
 import cn.milai.ib.drama.dramafile.constant.ConstantType;
 
 /**
@@ -14,13 +15,9 @@ public class UTF8Constant extends Constant<String> {
 	}
 
 	@Override
-	public ConstantType getType() {
-		return ConstantType.UTF8;
-	}
+	public ConstantType getType() { return ConstantType.UTF8; }
 
 	@Override
-	public byte[] getBytes() {
-		return ByteUtils.strToBytes(value);
-	}
+	public byte[] getBytes() { return Bytes.fromStr(value); }
 
 }
