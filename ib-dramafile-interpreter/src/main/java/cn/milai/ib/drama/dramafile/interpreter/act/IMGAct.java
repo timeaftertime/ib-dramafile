@@ -3,7 +3,7 @@ package cn.milai.ib.drama.dramafile.interpreter.act;
 import java.io.IOException;
 
 import cn.milai.ib.container.DramaContainer;
-import cn.milai.ib.container.ui.Image;
+import cn.milai.ib.container.plugin.ui.Image;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;

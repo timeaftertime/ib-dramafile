@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
 import cn.milai.ib.component.IBComponent;
 import cn.milai.ib.container.Container;
 import cn.milai.ib.container.DramaContainer;
-import cn.milai.ib.container.ui.Image;
+import cn.milai.ib.container.plugin.ui.Image;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
