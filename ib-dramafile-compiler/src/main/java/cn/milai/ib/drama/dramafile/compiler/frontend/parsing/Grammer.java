@@ -376,7 +376,7 @@ public class Grammer {
 		throw new IBCompilerException(String.format("符号 %s 不存在", code));
 	}
 
-	private List<Symbol> getSymbols() { return Collects.union(getNonTerminals(), getTerminals()); }
+	private List<Symbol> getSymbols() { return Collects.merge(getNonTerminals(), getTerminals()); }
 
 	public static class Builder {
 
