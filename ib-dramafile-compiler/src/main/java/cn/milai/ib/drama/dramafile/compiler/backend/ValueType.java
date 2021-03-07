@@ -1,8 +1,7 @@
 package cn.milai.ib.drama.dramafile.compiler.backend;
 
+import java.util.HashMap;
 import java.util.Map;
-
-import com.google.common.collect.Maps;
 
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenType;
 
@@ -16,7 +15,7 @@ public class ValueType {
 	private String name;
 	private String canonical;
 
-	private static Map<String, ValueType> types = Maps.newHashMap();
+	private static Map<String, ValueType> types = new HashMap<>();
 
 	public static final ValueType VOID = of("void");
 	public static final ValueType INT = of("int");

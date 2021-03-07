@@ -21,6 +21,6 @@ public class TokenInput extends Input<Token> {
 
 	@Override
 	public TokenInput filter(Predicate<Token> p) {
-		return new TokenInput(Collects.filter(elements, p).toArray(new Token[0]));
+		return new TokenInput(Collects.filterList(elements, p).toArray(new Token[0]));
 	}
 }

@@ -3,14 +3,13 @@ package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-
-import com.google.common.base.Charsets;
-import com.google.common.collect.Maps;
 
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 
@@ -27,8 +26,8 @@ public class GrammerReader {
 	 * @return
 	 */
 	public static Grammer parseGrammer(InputStream input) {
-		BufferedReader in = new BufferedReader(new InputStreamReader(input, Charsets.UTF_8));
-		Map<String, String> punctualToCode = Maps.newHashMap();
+		BufferedReader in = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
+		Map<String, String> punctualToCode = new HashMap<>();
 		int lineNumber = 0;
 		Grammer.Builder builder = new Grammer.Builder();
 		for (String line : in.lines().collect(Collectors.toList())) {

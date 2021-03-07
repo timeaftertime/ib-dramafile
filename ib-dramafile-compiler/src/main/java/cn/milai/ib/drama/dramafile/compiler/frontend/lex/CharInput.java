@@ -1,9 +1,8 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-
-import com.google.common.collect.Lists;
 
 import cn.milai.common.base.Collects;
 import cn.milai.ib.drama.dramafile.compiler.frontend.Input;
@@ -24,7 +23,7 @@ public class CharInput extends Input<Character> {
 	}
 
 	private static Character[] toChracterArray(String str) {
-		List<Character> list = Lists.newArrayList();
+		List<Character> list = new ArrayList<>();
 		for (char ch : str.toCharArray()) {
 			list.add(ch);
 		}
@@ -33,6 +32,6 @@ public class CharInput extends Input<Character> {
 
 	@Override
 	public CharInput filter(Predicate<Character> p) {
-		return new CharInput(Collects.filter(elements, p));
+		return new CharInput(Collects.filterList(elements, p));
 	}
 }

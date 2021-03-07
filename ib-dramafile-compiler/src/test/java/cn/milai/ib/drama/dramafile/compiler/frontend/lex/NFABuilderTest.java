@@ -7,9 +7,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
+import java.util.Arrays;
+import java.util.HashSet;
 
-import com.google.common.collect.Sets;
+import org.junit.Test;
 
 /**
  * 测试 NFA 构造算法
@@ -23,7 +24,7 @@ public class NFABuilderTest {
 
 	@Test
 	public void testLineNFA() {
-		NFAStatus s = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("abcde", TEST_TOKEN_CODE1)));
+		NFAStatus s = NFABuilder.newNFA(new HashSet<>(Arrays.asList(new TokenDef("abcde", TEST_TOKEN_CODE1))));
 		s = addEmptyHead(s);
 		// nfa = head--ϵ-->s0--a-->s1--ϵ-->s2--b-->s3--ϵ-->s4--c-->s5--ϵ-->s6--d-->s7--ϵ-->s8--e-->s9
 		for (int i = 0; i < 5; i++) {
@@ -41,7 +42,7 @@ public class NFABuilderTest {
 
 	@Test
 	public void testSimpleComposeNFA() {
-		NFAStatus s = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("a(b)c(de)", TEST_TOKEN_CODE1)));
+		NFAStatus s = NFABuilder.newNFA(new HashSet<>(Arrays.asList(new TokenDef("a(b)c(de)", TEST_TOKEN_CODE1))));
 		s = addEmptyHead(s);
 		// nfa = head--ϵ-->s0--a-->s1--ϵ-->s2--b-->s3--ϵ-->s4--c-->s5--ϵ-->s6--d-->s7--ϵ-->s8--e-->s9
 		for (int i = 0; i < 5; i++) {
@@ -73,7 +74,7 @@ public class NFABuilderTest {
 		//                                              ↓----ϵ---+                                         ↓----ϵ----+
 		// s0--a-->s1--ϵ-->s2--ϵ-->s3--b-->s4--ϵ-->s5--ϵ-->s6--ϵ-->s7--c-->s8--ϵ-->s9
 		//                               +-----------ϵ--------------↑
-		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("ab*c+", TEST_TOKEN_CODE1)));
+		NFAStatus s0 = NFABuilder.newNFA(new HashSet<>(Arrays.asList(new TokenDef("ab*c+", TEST_TOKEN_CODE1))));
 		assertFalse(s0.isAccept());
 		NFAStatus s1 = s0.nextOf('a');
 		assertNotNull(s1);
@@ -111,7 +112,9 @@ public class NFABuilderTest {
 		//                                                                                     ↓------ϵ-----+
 		// s0--a-->s1--ϵ-->s2--[xy0-9]-->s3--ϵ-->s4--ϵ-->s5--[a-z]-->s6--ϵ-->s7
 		//                                                                      +---------------ϵ--------------↑
-		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("a[xy\\d][a-z]*", TEST_TOKEN_CODE1)));
+		NFAStatus s0 = NFABuilder.newNFA(
+			new HashSet<>(Arrays.asList(new TokenDef("a[xy\\d][a-z]*", TEST_TOKEN_CODE1)))
+		);
 		assertFalse(s0.isAccept());
 		NFAStatus s1 = s0.nextOf('a');
 		assertNotNull(s1);
@@ -150,7 +153,7 @@ public class NFABuilderTest {
 		// s0--a-->s1--ϵ-->s12--ϵ-->s10--ϵ--+---------------->s2--[bc]-->s3-------------------+--ϵ-->s11--ϵ-->s13
 		//                                 +             ↑--------------------------------ϵ------------------------------------+              ↑
 		//                                 +-----------------------------------------ϵ-----------------------------------------------+
-		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("a([bc]|d|e)*", TEST_TOKEN_CODE1)));
+		NFAStatus s0 = NFABuilder.newNFA(new HashSet<>(Arrays.asList(new TokenDef("a([bc]|d|e)*", TEST_TOKEN_CODE1))));
 		assertFalse(s0.isAccept());
 		NFAStatus s1 = s0.nextOf('a');
 		assertNotNull(s1);
@@ -199,9 +202,11 @@ public class NFABuilderTest {
 		//             +-->s0---a---->s1
 		// s4--ϵ--+-->s2--[cd]-->s3
 		NFAStatus s4 = NFABuilder.newNFA(
-			Sets.newHashSet(
-				new TokenDef("a", TEST_TOKEN_CODE1),
-				new TokenDef("[cd]", TEST_TOKEN_CODE2)
+			new HashSet<>(
+				Arrays.asList(
+					new TokenDef("a", TEST_TOKEN_CODE1),
+					new TokenDef("[cd]", TEST_TOKEN_CODE2)
+				)
 			)
 		);
 		assertFalse(s4.isAccept());
@@ -223,7 +228,7 @@ public class NFABuilderTest {
 	public void testNoneOrOne() {
 		// s0--a-->s1--ϵ-->s2--ϵ-->s3--b--s4--ϵ-->s5--ϵ-->s6-->c-->s7
 		//                               +------------------------↑
-		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("ab?c", TEST_TOKEN_CODE1)));
+		NFAStatus s0 = NFABuilder.newNFA(new HashSet<>(Arrays.asList(new TokenDef("ab?c", TEST_TOKEN_CODE1))));
 		assertFalse(s0.isAccept());
 		NFAStatus s1 = s0.nextOf('a');
 		assertNotNull(s1);
@@ -251,7 +256,7 @@ public class NFABuilderTest {
 	@Test
 	public void testInvertCRLF() {
 		// s0--x-->s1--ϵ-->s2 -->(.)-->s3
-		NFAStatus s0 = NFABuilder.newNFA(Sets.newHashSet(new TokenDef("x.", TEST_TOKEN_CODE1)));
+		NFAStatus s0 = NFABuilder.newNFA(new HashSet<>(Arrays.asList(new TokenDef("x.", TEST_TOKEN_CODE1))));
 		assertFalse(s0.isAccept());
 		NFAStatus s1 = s0.nextOf('x');
 		assertNotNull(s1);

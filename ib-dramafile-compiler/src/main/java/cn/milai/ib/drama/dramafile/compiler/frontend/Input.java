@@ -1,9 +1,8 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-
-import com.google.common.collect.Lists;
 
 public abstract class Input<T> {
 
@@ -12,7 +11,7 @@ public abstract class Input<T> {
 
 	public Input(T[] array) {
 		this.index = 0;
-		this.elements = Lists.newArrayList();
+		this.elements = new ArrayList<>();
 		for (T e : array) {
 			this.elements.add(e);
 		}

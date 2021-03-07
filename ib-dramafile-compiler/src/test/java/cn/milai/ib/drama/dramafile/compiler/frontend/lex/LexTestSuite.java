@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses(value = { NFABuilderTest.class, DFABuilderTest.class, LexerTest.class })
+@SuiteClasses(value = { NFABuilderTest.class, DFABuilderTest.class, LexerTest.class, CharTest.class })
 public class LexTestSuite {
 
 }

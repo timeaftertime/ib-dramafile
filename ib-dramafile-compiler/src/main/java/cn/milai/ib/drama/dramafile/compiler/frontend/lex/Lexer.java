@@ -1,13 +1,12 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import com.google.common.collect.Lists;
 
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Token;
@@ -33,7 +32,7 @@ public class Lexer {
 	 * @return
 	 */
 	public TokenInput lex(CharInput input) {
-		List<Token> tokens = Lists.newArrayList();
+		List<Token> tokens = new ArrayList<>();
 		while (input.hasNext()) {
 			tokens.add(nextToken(input));
 		}

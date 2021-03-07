@@ -1,8 +1,7 @@
 package cn.milai.ib.drama.dramafile.compiler;
 
+import java.util.HashMap;
 import java.util.Map;
-
-import com.google.common.collect.Maps;
 
 /**
  * 保存一次简单编译过程中的数据
@@ -12,7 +11,7 @@ import com.google.common.collect.Maps;
 public class SimpleCompilerData {
 
 	private ConstantTable consts = new ConstantTable();
-	private Map<String, String> defined = Maps.newHashMap();
+	private Map<String, String> defined = new HashMap<>();
 	private byte[] actionBytes;
 
 	/**
@@ -47,21 +46,13 @@ public class SimpleCompilerData {
 	 * 获取常量表
 	 * @return
 	 */
-	public ConstantTable getConstTable() {
-		return consts;
-	}
+	public ConstantTable getConstTable() { return consts; }
 
-	public byte[] getActionBytes() {
-		return actionBytes;
-	}
+	public byte[] getActionBytes() { return actionBytes; }
 
-	public void setActionBytes(byte[] actionBytes) {
-		this.actionBytes = actionBytes;
-	}
+	public void setActionBytes(byte[] actionBytes) { this.actionBytes = actionBytes; }
 
-	public String getDramaCode() {
-		return dramaCode;
-	}
+	public String getDramaCode() { return dramaCode; }
 
 	public void setDramaCode(String dramaCode) {
 		if (this.dramaCode != null) {
@@ -70,9 +61,7 @@ public class SimpleCompilerData {
 		this.dramaCode = dramaCode;
 	}
 
-	public String getDramaName() {
-		return dramaName;
-	}
+	public String getDramaName() { return dramaName; }
 
 	public void setDramaName(String dramaName) {
 		if (this.dramaName != null) {

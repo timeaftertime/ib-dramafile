@@ -1,9 +1,8 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-
-import com.google.common.collect.Lists;
 
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 
@@ -114,7 +113,7 @@ public class Parser {
 				if (p.isEpsilon()) {
 					return true;
 				}
-				List<Node> children = Lists.newArrayList();
+				List<Node> children = new ArrayList<>();
 				for (Symbol child : p.getRights()) {
 					children.add(new Node(child));
 				}

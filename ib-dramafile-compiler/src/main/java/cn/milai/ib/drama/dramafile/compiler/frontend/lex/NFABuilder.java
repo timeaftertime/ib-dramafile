@@ -1,10 +1,10 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
-
+import cn.milai.common.base.Chars;
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 
 /**
@@ -24,7 +24,7 @@ public class NFABuilder {
 		if (tokens.isEmpty()) {
 			throw new IllegalArgumentException("tokens 不能为空");
 		}
-		List<NFAStatus> firsts = Lists.newArrayList();
+		List<NFAStatus> firsts = new ArrayList<>();
 		for (TokenDef token : tokens) {
 			NFAPair pair = null;
 			try {
@@ -120,8 +120,12 @@ public class NFABuilder {
 			}
 			default: {
 				char ch = input.next();
-				nfa = dealRepeat(input, ch == Char.INVERT_CRLF ? new NotSetCharAcceptor(Char.LINEFEED,
-					Char.CARRIAGE_RETURN) : new SetCharAcceptor(ch));
+				nfa = dealRepeat(
+					input, ch == Char.INVERT_CRLF ? new ExcludeAcceptor(
+						Chars.C_LF,
+						Chars.C_CR
+					) : new IncludeAcceptor(ch)
+				);
 				break;
 			}
 		}
@@ -299,7 +303,7 @@ public class NFABuilder {
 		while (input.hasNext()) {
 			char ch = input.next();
 			if (ch == Char.SET_RIGHT_CHAR && !lastSlash) {
-				return new RECharAcceptor(regex.toString());
+				return new RegexAcceptor(regex.toString());
 			}
 			regex.append(ch);
 			if (ch == Char.SLASH) {

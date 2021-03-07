@@ -6,12 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import com.google.common.base.Charsets;
-import com.google.common.collect.Sets;
 
 /**
  * 语法产生式转换器
@@ -22,7 +22,7 @@ public class GrammerConvertor {
 
 	private static final String CFG = "CFG";
 
-	private static final Charset ENCODING = Charsets.UTF_8;
+	private static final Charset ENCODING = StandardCharsets.UTF_8;
 
 	private static final String GRAMMER_DEFINITION = "/grammer.txt";
 
@@ -30,7 +30,7 @@ public class GrammerConvertor {
 
 	public static void main(String[] args) throws IOException {
 		NonTerminalSymbol cfg = readCFG();
-		Set<Symbol> visited = Sets.newHashSet(cfg);
+		Set<Symbol> visited = new HashSet<>(Arrays.asList(cfg));
 		try (OutputStream out = getOutputStream()) {
 			writeNode(visited, out, cfg);
 		}

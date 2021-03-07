@@ -6,15 +6,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
 
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.compiler.constant.Constant;
@@ -44,8 +43,10 @@ public class SimpleCompiler {
 	private static final String DEFINE_DRAMA_NAME = "dramaname";
 
 	public static byte[] compile(InputStream in) {
-		BufferedReader input = new BufferedReader(new InputStreamReader(new BOMInputStream(in), Charsets.UTF_8));
-		List<String> actions = Lists.newArrayList();
+		BufferedReader input = new BufferedReader(
+			new InputStreamReader(new BOMInputStream(in), StandardCharsets.UTF_8)
+		);
+		List<String> actions = new ArrayList<>();
 		String line = null;
 		try {
 			while ((line = input.readLine()) != null) {

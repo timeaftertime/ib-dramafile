@@ -1,8 +1,7 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.collect.Lists;
 
 /**
  * 语法分析的非终结符
@@ -11,7 +10,7 @@ import com.google.common.collect.Lists;
  */
 public class NonTerminalSymbol extends Symbol {
 
-	private List<Production> productions = Lists.newArrayList();
+	private List<Production> productions = new ArrayList<>();
 
 	public NonTerminalSymbol(String code) {
 		super(code);
@@ -43,7 +42,7 @@ public class NonTerminalSymbol extends Symbol {
 		return productions.remove(p);
 	}
 
-	public List<Production> getProductions() { return Lists.newArrayList(productions); }
+	public List<Production> getProductions() { return new ArrayList<>(productions); }
 
 	@Override
 	public boolean isNonTerminal() { return true; }

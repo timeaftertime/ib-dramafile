@@ -1,8 +1,7 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.collect.Lists;
 
 /**
  * 语法分析树的节点
@@ -22,7 +21,7 @@ public class Node {
 	public Node(Symbol symbol) {
 		this.symbol = symbol;
 		this.productionIndex = -1;
-		this.children = Lists.newArrayList();
+		this.children = new ArrayList<>();
 	}
 
 	public Token getToken() {

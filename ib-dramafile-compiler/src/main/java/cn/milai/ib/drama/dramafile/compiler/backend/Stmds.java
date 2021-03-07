@@ -1,8 +1,7 @@
 package cn.milai.ib.drama.dramafile.compiler.backend;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.collect.Lists;
 
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;
 
@@ -14,7 +13,7 @@ import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;
 public abstract class Stmds {
 
 	public static List<Stmd> parse(Node stmdsNode) {
-		List<Stmd> stmds = Lists.newArrayList();
+		List<Stmd> stmds = new ArrayList<>();
 		parseStmds(stmds, stmdsNode);
 		return stmds;
 	}

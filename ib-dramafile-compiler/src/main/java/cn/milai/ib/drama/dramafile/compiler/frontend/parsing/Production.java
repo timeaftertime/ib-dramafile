@@ -1,10 +1,10 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.util.CollectionUtils;
-
-import com.google.common.collect.Lists;
 
 /**
  * 语法分析产生式
@@ -19,7 +19,7 @@ public class Production {
 
 	public Production(NonTerminalSymbol left, List<Symbol> rights) {
 		if (CollectionUtils.isEmpty(rights)) {
-			rights = Lists.newArrayList(Symbol.EPSILON);
+			rights = new ArrayList<>(Arrays.asList(Symbol.EPSILON));
 		}
 		this.left = left;
 		this.rights = rights;
@@ -39,7 +39,7 @@ public class Production {
 	 * 获取产生式右式符号列表，若为空产生式，返回一个只包含 Symbol.EPSILON 的列表
 	 * @return
 	 */
-	public List<Symbol> getRights() { return Lists.newArrayList(rights); }
+	public List<Symbol> getRights() { return new ArrayList<>(rights); }
 
 	@Override
 	public String toString() {

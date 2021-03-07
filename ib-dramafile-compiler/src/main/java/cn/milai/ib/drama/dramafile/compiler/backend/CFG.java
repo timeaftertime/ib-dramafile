@@ -1,11 +1,10 @@
 package cn.milai.ib.drama.dramafile.compiler.backend;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-
-import com.google.common.collect.Maps;
 
 import cn.milai.common.base.Strings;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;
@@ -42,7 +41,7 @@ public abstract class CFG {
 	}
 
 	private static Map<String, String> parseImports(Node importsNode) {
-		Map<String, String> imports = Maps.newHashMap();
+		Map<String, String> imports = new HashMap<>();
 		parseImports(imports, importsNode);
 		return imports;
 	}

@@ -1,8 +1,7 @@
 package cn.milai.ib.drama.dramafile.compiler.backend;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.collect.Lists;
 
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;
 
@@ -16,7 +15,7 @@ public abstract class Methods {
 	private Methods() {}
 
 	public static List<Method> parse(Node methodsNode) {
-		List<Method> methods = Lists.newArrayList();
+		List<Method> methods = new ArrayList<>();
 		parseMethods(methods, methodsNode);
 		return methods;
 	}

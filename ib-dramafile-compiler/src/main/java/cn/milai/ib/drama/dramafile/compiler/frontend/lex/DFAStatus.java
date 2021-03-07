@@ -1,10 +1,9 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * 词法分析过程中 DFA 的状态
@@ -16,12 +15,12 @@ public class DFAStatus {
 	/**
 	 * 边 -> 通往的状态
 	 */
-	private Map<Character, DFAStatus> edges = Maps.newHashMap();
+	private Map<Character, DFAStatus> edges = new HashMap<>();
 
 	/**
 	 * 表示接受状态时所接受的 Token 的 code
 	 */
-	private Set<String> tokens = Sets.newHashSet();
+	private Set<String> tokens = new HashSet<>();
 
 	/**
 	 * 设置通过某个字符通往的状态

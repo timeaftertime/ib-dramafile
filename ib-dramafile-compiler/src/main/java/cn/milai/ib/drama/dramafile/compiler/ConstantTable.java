@@ -1,9 +1,10 @@
 package cn.milai.ib.drama.dramafile.compiler;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
+import cn.milai.common.base.Collects;
 import cn.milai.ib.drama.dramafile.compiler.constant.Constant;
 import cn.milai.ib.drama.dramafile.compiler.constant.FloatConstant;
 import cn.milai.ib.drama.dramafile.compiler.constant.IntConstant;
@@ -26,12 +27,12 @@ public class ConstantTable {
 	/**
 	 * 加入一个 null 使得序号从 1 开始
 	 */
-	private List<Constant<?>> consts = Lists.newArrayList((Constant<?>) null);
+	private List<Constant<?>> consts = Collects.add(Collections.emptyList(), (Constant<?>) null);
 
-	private List<IntConstant> ints = Lists.newArrayList();
-	private List<LongConstant> longs = Lists.newArrayList();
-	private List<FloatConstant> floats = Lists.newArrayList();
-	private List<UTF8Constant> utf8s = Lists.newArrayList();
+	private List<IntConstant> ints = new ArrayList<>();
+	private List<LongConstant> longs = new ArrayList<>();
+	private List<FloatConstant> floats = new ArrayList<>();
+	private List<UTF8Constant> utf8s = new ArrayList<>();
 
 	/**
 	 * 获取常量表中的常量

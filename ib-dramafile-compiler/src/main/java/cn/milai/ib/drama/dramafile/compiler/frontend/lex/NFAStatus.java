@@ -1,10 +1,9 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * 词法分析时的 NFA 中间状态
@@ -23,9 +22,9 @@ public class NFAStatus {
 	/**
 	 * 能接受的字符，以及对应的下一个状态
 	 */
-	private Map<CharAcceptor, NFAStatus> nexts = Maps.newHashMap();
+	private Map<CharAcceptor, NFAStatus> nexts = new HashMap<>();
 
-	private List<NFAStatus> epsilonNexts = Lists.newArrayList();
+	private List<NFAStatus> epsilonNexts = new ArrayList<>();
 
 	private String token = null;
 
@@ -55,7 +54,7 @@ public class NFAStatus {
 	 * 获取当前状态接受空串可以到达的所有状态
 	 * @return
 	 */
-	public List<NFAStatus> getEpsilonNexts() { return Lists.newArrayList(epsilonNexts); }
+	public List<NFAStatus> getEpsilonNexts() { return new ArrayList<>(epsilonNexts); }
 
 	/**
 	 * 获取当前状态接受指定字符到达的状态
@@ -97,7 +96,7 @@ public class NFAStatus {
 
 	@Override
 	public String toString() {
-		return "" + id;
+		return nexts.toString();
 	}
 
 }

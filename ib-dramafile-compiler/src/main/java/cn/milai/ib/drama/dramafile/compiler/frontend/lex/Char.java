@@ -1,9 +1,8 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.google.common.collect.Sets;
 
 import cn.milai.common.base.Chars;
 
@@ -50,11 +49,9 @@ public class Char {
 
 	public static final char BLANK = ' ';
 	public static final char TAB = '\t';
-	public static final char LINEFEED = '\n';
-	public static final char CARRIAGE_RETURN = '\r';
 
 	private static Set<Character> toSet(String str) {
-		Set<Character> set = Sets.newHashSet();
+		Set<Character> set = new HashSet<>();
 		for (char ch : str.toCharArray()) {
 			set.add(ch);
 		}
@@ -66,7 +63,7 @@ public class Char {
 	 * @return
 	 */
 	public static Set<Character> numbers() {
-		return Sets.newHashSet(NUMBERS);
+		return new HashSet<>(NUMBERS);
 	}
 
 	/**
@@ -74,7 +71,7 @@ public class Char {
 	 * @return
 	 */
 	public static Set<Character> lowers() {
-		return Sets.newHashSet(LOWER_LETTERS);
+		return new HashSet<>(LOWER_LETTERS);
 	}
 
 	/**
@@ -82,14 +79,14 @@ public class Char {
 	 * @return
 	 */
 	public static Set<Character> uppers() {
-		return Sets.newHashSet(UPPER_LETTERS);
+		return new HashSet<>(UPPER_LETTERS);
 	}
 
 	public static Set<Character> range(char start, char end) {
 		if (start > end) {
 			throw new IllegalArgumentException(String.format("非法范围表达式 %c-%c", start, end));
 		}
-		HashSet<Character> set = Sets.newHashSet();
+		HashSet<Character> set = new HashSet<>();
 		for (char i = start; i <= end; i++) {
 			set.add(i);
 		}
@@ -101,7 +98,7 @@ public class Char {
 	 * @return
 	 */
 	public static Set<Character> normals() {
-		Set<Character> set = Sets.newHashSet();
+		Set<Character> set = new HashSet<>();
 		set.addAll(NUMBERS);
 		set.addAll(UPPER_LETTERS);
 		set.addAll(LOWER_LETTERS);
@@ -114,7 +111,7 @@ public class Char {
 	 * @return
 	 */
 	public static Set<Character> visible() {
-		Set<Character> set = Sets.newHashSet();
+		Set<Character> set = new HashSet<>();
 		set.addAll(normals());
 		set.add(INVERT_CRLF);
 		set.add(INVERT);
@@ -138,11 +135,11 @@ public class Char {
 	 * @return
 	 */
 	public static Set<Character> unvisible() {
-		Set<Character> set = Sets.newHashSet();
+		Set<Character> set = new HashSet<>();
 		set.add(BLANK);
 		set.add(TAB);
-		set.add(LINEFEED);
-		set.add(CARRIAGE_RETURN);
+		set.add(Chars.C_LF);
+		set.add(Chars.C_CR);
 		return set;
 	}
 
@@ -162,27 +159,27 @@ public class Char {
 	 */
 	public static CharAcceptor slash(char ch) {
 		if (CAN_SLASH.contains(ch)) {
-			return new SetCharAcceptor(Sets.newHashSet(ch));
+			return new IncludeAcceptor(new HashSet<>(Arrays.asList(ch)));
 		}
 		switch (ch) {
 			case 't' :
-				return new SetCharAcceptor(Sets.newHashSet(TAB));
+				return new IncludeAcceptor(new HashSet<>(Arrays.asList(TAB)));
 			case 'n' :
-				return new SetCharAcceptor(Sets.newHashSet(LINEFEED));
+				return new IncludeAcceptor(new HashSet<>(Arrays.asList(Chars.C_LF)));
 			case 'r' :
-				return new SetCharAcceptor(Sets.newHashSet(CARRIAGE_RETURN));
+				return new IncludeAcceptor(new HashSet<>(Arrays.asList(Chars.C_CR)));
 			case 's' :
-				return new SetCharAcceptor(Char.unvisible());
+				return new IncludeAcceptor(Char.unvisible());
 			case 'S' :
-				return new NotSetCharAcceptor(Char.unvisible());
+				return new ExcludeAcceptor(Char.unvisible());
 			case 'w' :
-				return new SetCharAcceptor(normals());
+				return new IncludeAcceptor(normals());
 			case 'W' :
-				return new NotSetCharAcceptor(normals());
+				return new ExcludeAcceptor(normals());
 			case 'd' :
-				return new SetCharAcceptor(numbers());
+				return new IncludeAcceptor(numbers());
 			case 'D' :
-				return new NotSetCharAcceptor(numbers());
+				return new ExcludeAcceptor(numbers());
 		}
 		throw new IllegalArgumentException("未知转义字符：" + SLASH + ch);
 	}

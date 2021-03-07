@@ -1,7 +1,10 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,10 +12,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import cn.milai.common.base.Collects;
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
@@ -36,21 +35,21 @@ public class Grammer {
 	/**
 	 * 非终结符的 FOLLOW 集合，可以为 [ 终结符、EOF ]
 	 */
-	private Map<NonTerminalSymbol, Set<Symbol>> follows = Maps.newHashMap();
+	private Map<NonTerminalSymbol, Set<Symbol>> follows = new HashMap<>();
 
 	/**
 	 * [ 终结符、非终结符、EOF、EPSILON ] 的 FIRST 集合，可以为 [ 终结符、EOF、EPSILON ]
 	 */
-	private Map<Symbol, Set<Symbol>> firsts = Maps.newHashMap();
+	private Map<Symbol, Set<Symbol>> firsts = new HashMap<>();
 
 	/**
 	 * 展开式的 SELECT 集合，即当待展开符号为该产生式左式，输入符号为哪些时可以选择当前产生式，可以为 [ 终结符、EPSILON ]
 	 */
-	private Map<Production, Set<Symbol>> selects = Maps.newHashMap();
+	private Map<Production, Set<Symbol>> selects = new HashMap<>();
 
 	private Grammer(Collection<NonTerminalSymbol> nonTerminals, Collection<TerminalSymbol> terminals) {
-		this.nonTerminals = Lists.newArrayList(nonTerminals);
-		this.terminals = Lists.newArrayList(terminals);
+		this.nonTerminals = new ArrayList<>(nonTerminals);
+		this.terminals = new ArrayList<>(terminals);
 		initStartSymbol();
 		eliminateLeftRecursion();
 		extractCommonLefts();
@@ -75,7 +74,7 @@ public class Grammer {
 				for (List<Production> productions : hasCommons) {
 					List<Symbol> prefix = maxCommonPrefixOf(productions);
 					NonTerminalSymbol newNonTerminal = newNonTerminal(nonTerminal.getCode());
-					List<Symbol> rights = Lists.newArrayList(prefix);
+					List<Symbol> rights = new ArrayList<>(prefix);
 					rights.add(newNonTerminal);
 					nonTerminal.addProduction(rights);
 					for (Production p : productions) {
@@ -97,7 +96,7 @@ public class Grammer {
 	 * @return
 	 */
 	private List<Symbol> maxCommonPrefixOf(List<Production> productions) {
-		List<Symbol> prefix = Lists.newArrayList();
+		List<Symbol> prefix = new ArrayList<>();
 		int minSize = productions.stream()
 			.map(Production::getRights)
 			.map(List::size)
@@ -138,7 +137,7 @@ public class Grammer {
 			if (notCursion == null) {
 				throw new IllegalStateException(String.format("找不到非左递归的产生式：symbol = %s", now));
 			}
-			List<Production> leftCursions = Lists.newArrayList();
+			List<Production> leftCursions = new ArrayList<>();
 			for (Production p : now.getProductions()) {
 				if (p.getRights().get(0) == now) {
 					leftCursions.add(p);
@@ -148,7 +147,7 @@ public class Grammer {
 				now.removeProduction(notCursion);
 				NonTerminalSymbol newSymbol = newNonTerminal(now.getCode());
 				{
-					List<Symbol> newRights = Lists.newArrayList();
+					List<Symbol> newRights = new ArrayList<>();
 					if (!notCursion.isEpsilon()) {
 						newRights.addAll(notCursion.getRights());
 					}
@@ -159,7 +158,7 @@ public class Grammer {
 				for (Production p : leftCursions) {
 					now.removeProduction(p);
 					{
-						List<Symbol> newRights = Lists.newArrayList();
+						List<Symbol> newRights = new ArrayList<>();
 						newRights.addAll(p.getRights().subList(1, p.getRights().size()));
 						newRights.add(newSymbol);
 						newSymbol.addProduction(newRights);
@@ -185,7 +184,7 @@ public class Grammer {
 						s1.removeProduction(p1);
 						List<Symbol> p1Rights = rights.subList(1, rights.size());
 						for (Production p2 : s2.getProductions()) {
-							List<Symbol> newRights = Lists.newArrayList();
+							List<Symbol> newRights = new ArrayList<>();
 							if (!p2.isEpsilon()) {
 								newRights.addAll(p2.getRights());
 							}
@@ -237,7 +236,7 @@ public class Grammer {
 	}
 
 	private void buildFollows() {
-		getNonTerminals().forEach(s -> follows.put(s, Sets.newHashSet()));
+		getNonTerminals().forEach(s -> follows.put(s, new HashSet<>()));
 		follows.get(startSymbol).add(Symbol.EOF);
 		boolean changed = true;
 		while (changed) {
@@ -258,7 +257,7 @@ public class Grammer {
 						}
 						changed |= follows.get(now).addAll(tails);
 						if (firsts.get(now).contains(Symbol.EPSILON)) {
-							tails.addAll(Collects.unfilter(firsts.get(now), Symbol::isEpsilon));
+							tails.addAll(Collects.unfilterSet(firsts.get(now), Symbol::isEpsilon));
 						} else {
 							tails = getFirst(now);
 						}
@@ -269,10 +268,10 @@ public class Grammer {
 	}
 
 	private void buildFirsts() {
-		getNonTerminals().forEach(s -> firsts.put(s, Sets.newHashSet()));
-		getTerminals().forEach(s -> firsts.put(s, Sets.newHashSet(s)));
-		firsts.put(Symbol.EOF, Sets.newHashSet(Symbol.EOF));
-		firsts.put(Symbol.EPSILON, Sets.newHashSet(Symbol.EPSILON));
+		getNonTerminals().forEach(s -> firsts.put(s, new HashSet<>()));
+		getTerminals().forEach(s -> firsts.put(s, new HashSet<>(Arrays.asList(s))));
+		firsts.put(Symbol.EOF, new HashSet<>(Arrays.asList(Symbol.EOF)));
+		firsts.put(Symbol.EPSILON, new HashSet<>(Arrays.asList(Symbol.EPSILON)));
 		boolean changed = true;
 		while (changed) {
 			changed = false;
@@ -285,10 +284,10 @@ public class Grammer {
 	}
 
 	private Set<Symbol> firstOf(List<Symbol> rights) {
-		Set<Symbol> first = Sets.newHashSet();
+		Set<Symbol> first = new HashSet<>();
 		Symbol pre = Symbol.EPSILON;
 		for (Symbol now : rights) {
-			first.addAll(Collects.unfilter(firsts.get(now), Symbol::isEpsilon));
+			first.addAll(Collects.unfilterSet(firsts.get(now), Symbol::isEpsilon));
 			if (!firsts.get(now).contains(Symbol.EPSILON)) {
 				break;
 			}
@@ -317,9 +316,9 @@ public class Grammer {
 
 	public NonTerminalSymbol getStartSymbol() { return startSymbol; }
 
-	public List<NonTerminalSymbol> getNonTerminals() { return Lists.newArrayList(nonTerminals); }
+	public List<NonTerminalSymbol> getNonTerminals() { return new ArrayList<>(nonTerminals); }
 
-	public List<TerminalSymbol> getTerminals() { return Lists.newArrayList(terminals); }
+	public List<TerminalSymbol> getTerminals() { return new ArrayList<>(terminals); }
 
 	/**
 	 * 获取指定 code 对应符号的 FIRST 集合
@@ -345,7 +344,7 @@ public class Grammer {
 	 * @return
 	 */
 	private Set<Symbol> getFirst(Symbol s) {
-		return Sets.newHashSet(firsts.get(s));
+		return new HashSet<>(firsts.get(s));
 	}
 
 	/**
@@ -354,7 +353,7 @@ public class Grammer {
 	 * @return
 	 */
 	private Set<Symbol> getFollow(Symbol s) {
-		return Sets.newHashSet(follows.get(s));
+		return new HashSet<>(follows.get(s));
 	}
 
 	public Set<Symbol> getSelect(Production p) {
@@ -380,9 +379,9 @@ public class Grammer {
 
 	public static class Builder {
 
-		private Map<String, NonTerminalSymbol> nonTerminals = Maps.newHashMap();
+		private Map<String, NonTerminalSymbol> nonTerminals = new HashMap<>();
 
-		private Map<String, TerminalSymbol> terminals = Maps.newHashMap();
+		private Map<String, TerminalSymbol> terminals = new HashMap<>();
 
 		/**
 		 * 新建并保存的或获取已经存在的、 code 为指定值的非终结符

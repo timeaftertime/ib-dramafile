@@ -1,16 +1,17 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
-
+import cn.milai.common.base.Collects;
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 
 /**
@@ -26,8 +27,8 @@ public class DFABuilder {
 	 * @return
 	 */
 	public static DFAStatus newDFA(NFAStatus first) {
-		Map<Set<NFAStatus>, DFAStatus> status = Maps.newHashMap();
-		Queue<Set<NFAStatus>> q = Queues.newConcurrentLinkedQueue();
+		Map<Set<NFAStatus>, DFAStatus> status = new HashMap<>();
+		Queue<Set<NFAStatus>> q = new ConcurrentLinkedQueue<>();
 		Set<NFAStatus> firstSet = closure(first);
 		status.put(firstSet, new DFAStatus());
 		q.add(firstSet);
@@ -52,7 +53,7 @@ public class DFABuilder {
 				status.get(fromSet).putEdge((char) ch, status.get(toSet));
 			}
 		}
-		return firstStatusOf(Lists.newArrayList(status.values()));
+		return firstStatusOf(new ArrayList<>(status.values()));
 	}
 
 	/**
@@ -62,18 +63,18 @@ public class DFABuilder {
 	public static DFAStatus minimize(DFAStatus first) {
 		Set<DFAStatus> status = allStatusOf(first);
 		Set<DFAStatus> acceptStatus = status.stream().filter(DFAStatus::isAccept).collect(Collectors.toSet());
-		Set<Set<DFAStatus>> nows = Sets.newHashSet();
-		nows.add(Sets.filter(status, s -> !s.isAccept()));
+		Set<Set<DFAStatus>> nows = new HashSet<>();
+		nows.add(Collects.filterSet(status, s -> !s.isAccept()));
 		nows.add(acceptStatus);
 		Set<Set<DFAStatus>> pres = null;
 		while (!nows.equals(pres)) {
 			pres = nows;
-			nows = Sets.newHashSet();
+			nows = new HashSet<>();
 			for (Set<DFAStatus> p : pres) {
 				nows.addAll(split(pres, p));
 			}
 		}
-		return rebuildDFA(Lists.newArrayList(nows));
+		return rebuildDFA(new ArrayList<>(nows));
 	}
 
 	/**
@@ -82,7 +83,7 @@ public class DFABuilder {
 	 * @return
 	 */
 	private static Set<DFAStatus> allStatusOf(DFAStatus first) {
-		return findStatus(first, Sets.newHashSet());
+		return findStatus(first, new HashSet<>());
 	}
 
 	private static Set<DFAStatus> findStatus(DFAStatus now, Set<DFAStatus> visited) {
@@ -105,20 +106,20 @@ public class DFABuilder {
 	private static Set<Set<DFAStatus>> split(Set<Set<DFAStatus>> pres, Set<DFAStatus> p) {
 		if (p.size() >= 2) {
 			for (int ch = 1; ch <= Character.MAX_VALUE; ch++) {
-				Map<Set<DFAStatus>, Set<DFAStatus>> map = Maps.newHashMap();
+				Map<Set<DFAStatus>, Set<DFAStatus>> map = new HashMap<>();
 				for (DFAStatus status : p) {
 					Set<DFAStatus> key = setOf(pres, status.next((char) ch));
 					if (!map.containsKey(key)) {
-						map.put(key, Sets.newHashSet());
+						map.put(key, new HashSet<>());
 					}
 					map.get(key).add(status);
 				}
 				if (map.size() >= 2) {
-					return Sets.newHashSet(map.values());
+					return new HashSet<>(map.values());
 				}
 			}
 		}
-		Set<Set<DFAStatus>> result = Sets.newHashSet();
+		Set<Set<DFAStatus>> result = new HashSet<>();
 		result.add(p);
 		return result;
 	}
@@ -147,7 +148,7 @@ public class DFABuilder {
 	 * @return
 	 */
 	private static DFAStatus rebuildDFA(List<Set<DFAStatus>> nows) {
-		List<DFAStatus> status = Lists.newArrayList();
+		List<DFAStatus> status = new ArrayList<>();
 		for (int i = 0; i < nows.size(); i++) {
 			DFAStatus newStatus = new DFAStatus();
 			status.add(newStatus);
@@ -217,7 +218,7 @@ public class DFABuilder {
 	 * @return
 	 */
 	private static Set<NFAStatus> nextsOf(Set<NFAStatus> status, char ch) {
-		Set<NFAStatus> result = Sets.newHashSet();
+		Set<NFAStatus> result = new HashSet<>();
 		for (NFAStatus s : status) {
 			NFAStatus next = s.nextOf(ch);
 			if (next != null) {
@@ -233,7 +234,7 @@ public class DFABuilder {
 	 * @return
 	 */
 	private static Set<NFAStatus> closure(Set<NFAStatus> set) {
-		Set<NFAStatus> result = Sets.newHashSet(set);
+		Set<NFAStatus> result = new HashSet<>(set);
 		for (NFAStatus s : set) {
 			result.addAll(closure(s));
 		}
@@ -246,7 +247,7 @@ public class DFABuilder {
 	 * @return
 	 */
 	private static Set<NFAStatus> closure(NFAStatus s) {
-		return closure(s, Sets.newHashSet(s));
+		return closure(s, new HashSet<>(Arrays.asList(s)));
 	}
 
 	/**
