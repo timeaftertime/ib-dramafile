@@ -13,7 +13,7 @@ import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
 import cn.milai.ib.loader.DramaStringLoader;
 import cn.milai.ib.loader.ImageLoader;
-import cn.milai.ib.util.WaitUtil;
+import cn.milai.ib.util.Waits;
 
 public class DialogAct extends AbstractAct {
 
@@ -59,7 +59,7 @@ public class DialogAct extends AbstractAct {
 		String text = DramaStringLoader.get(clip.getCode(), clip.getUTF8Const(textIndex));
 		container.addObject(createInstance(dialogClass, x, y, speaker, text, container));
 		// 等待一帧以暂停后续的剧情
-		WaitUtil.wait(container, 1L);
+		Waits.wait(container, 1L);
 	}
 
 	private Image resolveSpeaker(Clip clip) throws ClassNotFoundException {
