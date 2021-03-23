@@ -1,13 +1,13 @@
 package cn.milai.ib.drama.dramafile.interpreter;
 
 import cn.milai.ib.container.DramaContainer;
-import cn.milai.ib.drama.AbstractDrama;
 import cn.milai.ib.drama.dramafile.interpreter.act.Act;
 import cn.milai.ib.drama.dramafile.interpreter.act.ActFactory;
 import cn.milai.ib.drama.dramafile.interpreter.act.ByteReader;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.DramaSpace;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
+import cn.milai.ib.mode.drama.AbstractDrama;
 
 /**
  * 通过剧情文件定义的剧本
