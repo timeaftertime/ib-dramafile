@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 
-import cn.milai.ib.component.IBComponent;
 import cn.milai.ib.container.Container;
 import cn.milai.ib.container.DramaContainer;
 import cn.milai.ib.container.plugin.ui.Image;
+import cn.milai.ib.control.Control;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
@@ -69,7 +69,7 @@ public class DialogAct extends AbstractAct {
 		return ImageLoader.load(Class.forName(clip.getUTF8Const(speakerClassIndex)));
 	}
 
-	private IBComponent createInstance(String dialogClass, int x, int y, Image speaker, String text,
+	private Control createInstance(String dialogClass, int x, int y, Image speaker, String text,
 		Container container) throws Exception {
 		return getIIISCConstructot(dialogClass).newInstance(x, y, speaker, text, container);
 	}
@@ -83,12 +83,12 @@ public class DialogAct extends AbstractAct {
 	 * @throws ClassNotFoundException
 	 */
 	@SuppressWarnings("unchecked")
-	private Constructor<IBComponent> getIIISCConstructot(String dialogClass) throws NoSuchMethodException,
+	private Constructor<Control> getIIISCConstructot(String dialogClass) throws NoSuchMethodException,
 		SecurityException, ClassNotFoundException {
 		Class<?> clazz = Class.forName(dialogClass);
 		for (Constructor<?> c : clazz.getConstructors()) {
 			if (isIIISC(c.getGenericParameterTypes())) {
-				return (Constructor<IBComponent>) c;
+				return (Constructor<Control>) c;
 			}
 		}
 		throw new NoSuchMethodException();

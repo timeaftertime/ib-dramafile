@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>cn.milai</groupId>
-	<artifactId>ib-dramafile</artifactId>
+	<groupId>cn.milai.ibdramafile</groupId>
+	<artifactId>ib-dramafile-parent</artifactId>
 	<version>1.0.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
@@ -73,32 +73,32 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>cn.milai</groupId>
+				<groupId>cn.milai.beginning</groupId>
 				<artifactId>beginning-base</artifactId>
 				<version>${beginning.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.milai</groupId>
+				<groupId>cn.milai.ibdramafile</groupId>
 				<artifactId>ib-dramafile-api</artifactId>
 				<version>${ib.dramafile.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.milai</groupId>
+				<groupId>cn.milai.ibdramafile</groupId>
 				<artifactId>ib-dramafile-compiler</artifactId>
 				<version>${ib.dramafile.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.milai</groupId>
+				<groupId>cn.milai.ibdramafile</groupId>
 				<artifactId>ib-dramafile-compiler-start</artifactId>
 				<version>${ib.dramafile.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.milai</groupId>
+				<groupId>cn.milai.ibdramafile</groupId>
 				<artifactId>ib-dramafile-interpreter</artifactId>
 				<version>${ib.dramafile.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.milai</groupId>
+				<groupId>cn.milai.ib</groupId>
 				<artifactId>ib-core</artifactId>
 				<version>${ib.version}</version>
 			</dependency>

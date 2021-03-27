@@ -2,15 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>cn.milai</groupId>
-		<artifactId>ib-dramafile</artifactId>
+		<groupId>cn.milai.ibdramafile</groupId>
+		<artifactId>ib-dramafile-parent</artifactId>
 		<version>1.0.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>ib-dramafile-compiler-start</artifactId>
 
 	<dependencies>
 		<dependency>
-			<groupId>cn.milai</groupId>
+			<groupId>cn.milai.ibdramafile</groupId>
 			<artifactId>ib-dramafile-compiler</artifactId>
 		</dependency>
 	</dependencies>
