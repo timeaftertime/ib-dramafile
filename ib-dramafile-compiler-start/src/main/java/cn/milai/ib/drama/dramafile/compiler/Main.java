@@ -18,7 +18,7 @@ public class Main {
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		String inputFile = getInputFileName(args);
 		String outputFile = getOutputFileName(inputFile);
-		byte[] bytes = SimpleCompiler.compile(new FileInputStream(inputFile));
+		byte[] bytes = IBCompiler.compile(new FileInputStream(inputFile));
 		BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile));
 		output.write(bytes);
 		output.close();

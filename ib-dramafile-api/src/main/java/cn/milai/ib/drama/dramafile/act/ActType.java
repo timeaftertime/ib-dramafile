@@ -18,11 +18,6 @@ public enum ActType {
 	SLEEP(0x2, "sleep"),
 
 	/**
-	 * 显示对话框
-	 */
-	DIALOG(0x3, "dialog"),
-
-	/**
 	 * 设置当前 BGM
 	 */
 	BGM(0x4, "bgm"),
@@ -31,17 +26,17 @@ public enum ActType {
 	 * 设置背景图片
 	 */
 	BGI(0x5, "bgi"),
-	
+
 	/**
 	 * 读取一张图片并压入栈顶
 	 */
 	IMG(0x6, "img"),
-	
+
 	/**
 	 * 读取一个音频并压入栈顶
 	 */
 	AUDIO(0x7, "audio"),
-	
+
 	/**
 	 * 从常量池加载一个常量并压入栈顶
 	 */
@@ -63,13 +58,9 @@ public enum ActType {
 		this.name = name;
 	}
 
-	public int getCode() {
-		return code;
-	}
+	public int getCode() { return code; }
 
-	public String getName() {
-		return name;
-	}
+	public String getName() { return name; }
 
 	public static ActType findByCode(int code) {
 		for (ActType act : ActType.values()) {

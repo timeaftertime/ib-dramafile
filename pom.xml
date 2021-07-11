@@ -103,6 +103,11 @@
 				<version>${ib.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>cn.milai.ib</groupId>
+				<artifactId>ib-container</artifactId>
+				<version>${ib.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.13.1</version>

@@ -3,11 +3,11 @@ package cn.milai.ib.drama.dramafile.interpreter;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import cn.milai.ib.drama.Drama;
-import cn.milai.ib.drama.DramaResolver;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.DramaSpace;
 import cn.milai.ib.drama.dramafile.interpreter.statics.DramaMetadata;
+import cn.milai.ib.mode.drama.Drama;
+import cn.milai.ib.mode.drama.DramaResolver;
 
 /**
  * 解析剧本定义文件的剧本解析器

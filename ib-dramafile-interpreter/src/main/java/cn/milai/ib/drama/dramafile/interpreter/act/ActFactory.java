@@ -22,9 +22,6 @@ public class ActFactory {
 			case SLEEP : {
 				return new SleepAct();
 			}
-			case DIALOG : {
-				return new DialogAct();
-			}
 			case BGM : {
 				return new BGMAct();
 			}

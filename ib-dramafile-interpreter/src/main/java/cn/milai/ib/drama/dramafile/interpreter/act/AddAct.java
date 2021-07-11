@@ -4,20 +4,21 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import cn.milai.ib.IBObject;
+import cn.milai.ib.config.ItemConfigApplier;
 import cn.milai.ib.container.DramaContainer;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.act.ex.IllegalOperandsException;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.OperandsStack;
+import cn.milai.ib.item.Item;
 
 /**
  * 添加对象的动作
  * 2019.12.16
  * @author milai
  */
-public class AddAct extends AbstractAct {
+public class AddAct extends AbstractAct implements ItemConfigApplier {
 
 	/**
 	 * 需要生成角色的全类名， utf8 常量
@@ -38,44 +39,42 @@ public class AddAct extends AbstractAct {
 		container.addObject(createInstance(operands, className, descriptor, container));
 	}
 
-	private IBObject createInstance(OperandsStack operands, String className, String descriptor,
+	private Item createInstance(OperandsStack operands, String className, String descriptor,
 		DramaContainer container)
 		throws Exception {
 		Class<?> clazz = Class.forName(className);
-		if (!IBObject.class.isAssignableFrom(clazz)) {
+		if (!Item.class.isAssignableFrom(clazz)) {
 			throw new IllegalOperandsException(
-				this,
-				String.format(
-					"ADD 指令的参数必须为 %s 子类的全类名, characterClass = %s", IBObject.class.getName(), clazz
-						.getName()
-				)
+				this, String.format("ADD 指令的参数必须为 %s 子类的全类名: %s", Item.class.getName(), clazz.getName())
 			);
 		}
-		int paramCnt = countsParam(descriptor);
+		int paramCnt = countsParam(descriptor) - 2;
+		if (paramCnt < 0) {
+			throw new IllegalArgumentException("未指定 centerX, centerY");
+		}
 		Object[] params = new Object[paramCnt];
 		for (int i = paramCnt - 1; i >= 0; i--) {
 			params[i] = operands.pop();
 		}
 		Constructor<?>[] cs = clazz.getConstructors();
 		for (Constructor<?> c : cs) {
-			IBObject obj = createIfFit(params, container, c);
+			Item obj = createIfFit(params, c);
 			if (obj != null) {
-				return obj;
+				double centerY = operands.pop(Float.class);
+				double centerX = operands.pop(Float.class);
+				return applyCenter(obj, centerX, centerY);
 			}
 		}
 		throw new IllegalOperandsException(
 			this, String.format(
-				"找不到指定类型构造方法：class = %s, descriptor = %s", clazz
-					.getName(), descriptor
+				"找不到指定类型构造方法：class = %s, descriptor = %s", clazz.getName(), descriptor.substring(2)
 			)
 		);
 	}
 
 	/**
 	 * 尝试使用指定构造方法构造实例，若参数匹配，则返回构造的实例，否则返回 null
-	 * 其中 Container 类型参数可出现在任意位置 
 	 * @param params
-	 * @param container
 	 * @param c
 	 * @return
 	 * @throws InstantiationException
@@ -83,22 +82,17 @@ public class AddAct extends AbstractAct {
 	 * @throws IllegalArgumentException
 	 * @throws InvocationTargetException
 	 */
-	private IBObject createIfFit(Object[] params, DramaContainer container, Constructor<?> c)
+	private Item createIfFit(Object[] params, Constructor<?> c)
 		throws InstantiationException,
 		IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Class<?>[] types = c.getParameterTypes();
-		// 实际参数列表应该比 paramCnt 多一个 Container
-		if (types.length != params.length + 1) {
+		if (types.length != params.length) {
 			return null;
 		}
-		Object[] args = new Object[params.length + 1];
+		Object[] args = new Object[params.length];
 		int inputIndex = 0;
 		int typeIndex = 0;
 		while (typeIndex < types.length) {
-			if (types[typeIndex].isAssignableFrom(DramaContainer.class)) {
-				args[typeIndex++] = container;
-				continue;
-			}
 			if (inputIndex >= params.length) {
 				return null;
 			}
@@ -110,7 +104,7 @@ public class AddAct extends AbstractAct {
 		if (inputIndex < params.length) {
 			return null;
 		}
-		return (IBObject) c.newInstance(args);
+		return (Item) c.newInstance(args);
 	}
 
 	private boolean fit(Object obj, Class<?> clazz) {

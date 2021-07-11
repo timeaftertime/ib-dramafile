@@ -18,5 +18,9 @@
 			<groupId>cn.milai.ib</groupId>
 			<artifactId>ib-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>cn.milai.ib</groupId>
+			<artifactId>ib-container</artifactId>
+		</dependency>
 	</dependencies>
 </project>
