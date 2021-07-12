@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>cn.milai.ibdramafile</groupId>
 		<artifactId>ib-dramafile-parent</artifactId>
-		<version>1.0.4-SNAPSHOT</version>
+		<version>1.0.5</version>
 	</parent>
 	<artifactId>ib-dramafile-interpreter</artifactId>
 	<description>剧本解释执行</description>
