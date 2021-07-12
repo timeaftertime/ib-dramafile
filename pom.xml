@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.milai.ibdramafile</groupId>
 	<artifactId>ib-dramafile-parent</artifactId>
-	<version>1.0.5</version>
+	<version>1.0.6-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -14,9 +14,9 @@
 	</modules>
 
 	<properties>
-		<beginning.version>0.0.4</beginning.version>
-		<ib.version>1.0.5</ib.version>
-		<ib.dramafile.version>1.0.5</ib.dramafile.version>
+		<beginning.version>0.0.5-SNAPSHOT</beginning.version>
+		<ib.version>1.0.6-SNAPSHOT</ib.version>
+		<ib.dramafile.version>1.0.6-SNAPSHOT</ib.dramafile.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
