@@ -23,7 +23,7 @@ public class DFABuilderTest {
 	public void testLineDFA() {
 		// s0--a-->s1--b-->2--c-->s3--d-->s4--e-->s5
 		DFAStatus s = DFABuilder.newDFA(
-			NFABuilder.newNFA(new HashSet<>(Arrays.asList(new TokenDef("abcde", TEST_TOKEN_CODE1))))
+			NFABuilder.newNFA(new HashSet<>(Arrays.asList(new TokenDefinition("abcde", TEST_TOKEN_CODE1))))
 		);
 		for (int i = 0; i < 5; i++) {
 			char ch = (char) ('a' + i);
@@ -42,8 +42,8 @@ public class DFABuilderTest {
 			NFABuilder.newNFA(
 				new HashSet<>(
 					Arrays.asList(
-						new TokenDef("fee", TEST_TOKEN_CODE1),
-						new TokenDef("fie", TEST_TOKEN_CODE2)
+						new TokenDefinition("fee", TEST_TOKEN_CODE1),
+						new TokenDefinition("fie", TEST_TOKEN_CODE2)
 					)
 				)
 			)
@@ -72,8 +72,8 @@ public class DFABuilderTest {
 			NFABuilder.newNFA(
 				new HashSet<>(
 					Arrays.asList(
-						new TokenDef("fee", TEST_TOKEN_CODE1),
-						new TokenDef("fie", TEST_TOKEN_CODE2)
+						new TokenDefinition("fee", TEST_TOKEN_CODE1),
+						new TokenDefinition("fie", TEST_TOKEN_CODE2)
 					)
 				)
 			)

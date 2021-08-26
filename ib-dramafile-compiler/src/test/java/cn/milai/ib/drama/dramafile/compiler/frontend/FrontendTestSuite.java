@@ -8,7 +8,7 @@ import cn.milai.ib.drama.dramafile.compiler.frontend.lex.LexTestSuite;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.ParsingTestSuite;
 
 @RunWith(Suite.class)
-@SuiteClasses({ LexTestSuite.class, ParsingTestSuite.class })
+@SuiteClasses({ LexTestSuite.class, ParsingTestSuite.class, StringUtilTest.class })
 public class FrontendTestSuite {
 
 }

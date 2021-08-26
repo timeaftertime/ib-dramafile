@@ -19,8 +19,8 @@ public class Parser {
 		this.grammer = grammer;
 	}
 
-	public Node parse(TokenInput input) {
-		input = input.filter(t -> !t.getType().equals(TokenType.BLANK));
+	public Node parse(TokenScanner scanner) {
+		scanner = filterBlank(scanner);
 		Stack<Node> stack = new Stack<>();
 		Node root = new Node(grammer.getStartSymbol());
 		// null 表示匹配结束
@@ -28,11 +28,11 @@ public class Parser {
 		stack.push(root);
 		Node last = null;
 		while (!stack.isEmpty()) {
-			Token token = input.getNext();
+			Token token = scanner.now();
 			Node now = stack.pop();
 			if (now == null) {
 				if (token != null) {
-					last = rollback(input, now, stack);
+					last = rollback(scanner, now, stack);
 					continue;
 				}
 				return root;
@@ -41,30 +41,42 @@ public class Parser {
 			last = now;
 			Symbol symbol = now.getSymbol();
 			if (symbol.isNonTerminal()) {
-				if (selectNextProduction(input, stack, now)) {
+				if (selectNextProduction(scanner, stack, now)) {
 					continue;
 				}
-				last = rollback(input, now, stack);
+				last = rollback(scanner, now, stack);
 				continue;
 			}
 			if (match(symbol, token)) {
 				now.setToken(token);
-				input.next();
+				scanner.next();
 				continue;
 			}
-			last = rollback(input, now, stack);
+			last = rollback(scanner, now, stack);
 		}
 		throw new IllegalStateException("匹配完成前栈空");
 	}
 
+	private TokenScanner filterBlank(TokenScanner scanner) {
+		List<Token> tokens = new ArrayList<>();
+		while (scanner.hasMore()) {
+			Token next = scanner.next();
+			if (next.getType() == TokenType.BLANK) {
+				continue;
+			}
+			tokens.add(next);
+		}
+		return new TokenScanner(tokens);
+	}
+
 	/**
 	 * 回滚，若回滚成功，返回最后重新选择了产生式的结点
-	 * @param input
+	 * @param scanner
 	 * @param now
 	 * @param stack
 	 * @return
 	 */
-	private Node rollback(TokenInput input, Node now, Stack<Node> stack) {
+	private Node rollback(TokenScanner scanner, Node now, Stack<Node> stack) {
 		Node pre = now.getPre();
 		// 存在前一个结点 pre ，且 pre 是非终结符且使用的不是空产生式，则 pre 一定是 now 的父节点
 		if (pre != null && pre.getSymbol().isNonTerminal() && !pre.getNowProduction().isEpsilon()) {
@@ -85,11 +97,11 @@ public class Parser {
 			}
 			// 对于之前匹配的终结符，直接回退一个输入单词
 			if (!now.getSymbol().isNonTerminal()) {
-				input.seek(-1);
+				scanner.seek(-1);
 				continue;
 			}
 			// 如果是非终结符，则尝试选择下一个产生式
-			if (selectNextProduction(input, stack, now)) {
+			if (selectNextProduction(scanner, stack, now)) {
 				return now;
 			}
 		}
@@ -98,18 +110,18 @@ public class Parser {
 	/**
 	 * 选择当前结点能使用的下一个展开式
 	 * 返回是否成功选择下一个展开式
-	 * @param input
+	 * @param scanner
 	 * @param stack
 	 * @param now
 	 * @return
 	 */
-	private boolean selectNextProduction(TokenInput input, Stack<Node> stack, Node now) {
+	private boolean selectNextProduction(TokenScanner scanner, Stack<Node> stack, Node now) {
 		NonTerminalSymbol symbol = (NonTerminalSymbol) now.getSymbol();
 		List<Production> productions = symbol.getProductions();
 		for (int i = now.getProductionIndex() + 1; i < productions.size(); i++) {
 			Production p = productions.get(i);
 			now.setProductionIndex(i);
-			if (contains(p, input.getNext())) {
+			if (contains(p, scanner.now())) {
 				if (p.isEpsilon()) {
 					return true;
 				}

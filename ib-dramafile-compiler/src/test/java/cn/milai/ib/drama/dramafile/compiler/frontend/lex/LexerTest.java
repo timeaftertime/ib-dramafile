@@ -2,13 +2,16 @@ package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
 import static org.junit.Assert.assertArrayEquals;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
 
+import cn.milai.ib.drama.dramafile.compiler.frontend.Scanner;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Token;
-import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenInput;
+import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenScanner;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenType;
 
 public class LexerTest {
@@ -17,10 +20,10 @@ public class LexerTest {
 	public void testIfStatement() {
 		Lexer lexer = new Lexer(
 			Arrays.stream(TokenType.values())
-				.map(t -> new TokenDef(t.getRE(), t.getCode()))
+				.map(t -> new TokenDefinition(t.getRE(), t.getCode()))
 				.collect(Collectors.toSet())
 		);
-		TokenInput tokens = lexer.lex(new CharInput("if(player.getLife() == 0) { gameOver(); }"));
+		TokenScanner tokens = lexer.lex(new CharScanner("if(player.getLife() == 0) { gameOver(); }"));
 		assertArrayEquals(
 			new Token[] {
 				new Token("if", TokenType.IF),
@@ -44,7 +47,7 @@ public class LexerTest {
 				new Token(";", TokenType.STMD_END),
 				new Token(" ", TokenType.BLANK),
 				new Token("}", TokenType.BLOCK_RIGHT),
-			}, tokens.toArray()
+			}, leftTokens(tokens)
 		);
 	}
 
@@ -52,11 +55,11 @@ public class LexerTest {
 	public void testWhileAndNew() {
 		Lexer lexer = new Lexer(
 			Arrays.stream(TokenType.values())
-				.map(t -> new TokenDef(t.getRE(), t.getCode()))
+				.map(t -> new TokenDefinition(t.getRE(), t.getCode()))
 				.collect(Collectors.toSet())
 		);
-		TokenInput tokens = lexer.lex(
-			new CharInput(
+		TokenScanner tokens = lexer.lex(
+			new CharScanner(
 				"while(boss.isAlive()) { add(\"cn.milai.ib.character.plane.WelcomePlane\"); }"
 			)
 		);
@@ -80,8 +83,16 @@ public class LexerTest {
 				new Token(";", TokenType.STMD_END),
 				new Token(" ", TokenType.BLANK),
 				new Token("}", TokenType.BLOCK_RIGHT),
-			}, tokens.toArray()
+			}, leftTokens(tokens)
 		);
+	}
+
+	private Token[] leftTokens(Scanner<Token> tokens) {
+		List<Token> list = new ArrayList<>();
+		while (tokens.hasMore()) {
+			list.add(tokens.next());
+		}
+		return list.toArray(new Token[0]);
 	}
 
 }

@@ -14,9 +14,9 @@ import cn.milai.ib.drama.dramafile.compiler.backend.CompilerData;
 import cn.milai.ib.drama.dramafile.compiler.backend.Method;
 import cn.milai.ib.drama.dramafile.compiler.constant.Constant;
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
-import cn.milai.ib.drama.dramafile.compiler.frontend.lex.CharInput;
+import cn.milai.ib.drama.dramafile.compiler.frontend.lex.CharScanner;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.Lexer;
-import cn.milai.ib.drama.dramafile.compiler.frontend.lex.TokenDef;
+import cn.milai.ib.drama.dramafile.compiler.frontend.lex.TokenDefinition;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.GrammerReader;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Parser;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenType;
@@ -34,11 +34,11 @@ public class IBCompiler {
 
 	private static final int minorVersion = 0;
 
-	private static final String GRAMMER_DEFINITION = "/grammer.txt";
+	private static final String GRAMMER_FILE = "/grammer.txt";
 
 	public static byte[] compile(InputStream in) {
 		try {
-			CharInput input = new CharInput(filterCommentLines(InputStreams.readLines(in)));
+			CharScanner input = new CharScanner(filterCommentLines(InputStreams.readLines(in)));
 			return build(
 				CFG.parse(
 					newParser().parse(
@@ -65,13 +65,13 @@ public class IBCompiler {
 	}
 
 	private static Parser newParser() {
-		return new Parser(GrammerReader.parseGrammer(IBCompiler.class.getResourceAsStream(GRAMMER_DEFINITION)));
+		return new Parser(GrammerReader.parseGrammer(IBCompiler.class.getResourceAsStream(GRAMMER_FILE)));
 	}
 
 	private static Lexer newLexer() {
 		return new Lexer(
 			Arrays.stream(TokenType.values())
-				.map(t -> new TokenDef(t.getRE(), t.getCode())).collect(Collectors.toSet())
+				.map(t -> new TokenDefinition(t.getRE(), t.getCode())).collect(Collectors.toSet())
 		);
 	}
 

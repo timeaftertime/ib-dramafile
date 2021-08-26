@@ -1,7 +1,9 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
+import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.CharAcceptor;
+
 /**
- * 两个 NFA 节点的组合，用于表示 NFA 的中间状态
+ * NFA 节点组合，用于保存 NFA 中间状态
  * @author milai
  * @date 2020.02.04
  */
@@ -17,7 +19,7 @@ public class NFAPair {
 	}
 
 	/**
-	 * 构建一个以 acceptor 为边连接的两个节点的 NFA
+	 * 构建一个以指定 {@link CharAcceptor} 为边连接的两个节点的 NFA
 	 * @param acceptor
 	 */
 	NFAPair(CharAcceptor acceptor) {
@@ -31,7 +33,7 @@ public class NFAPair {
 	public NFAStatus getLast() { return last; }
 
 	/**
-	 * 连接两个 NFAPair
+	 * 串联两个 NFAPair
 	 * @param nfa1
 	 * @param nfa2
 	 * @return

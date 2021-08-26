@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Token;
-import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenInput;
+import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenScanner;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenType;
 
 /**
@@ -22,58 +22,58 @@ public class Lexer {
 
 	private DFAStatus start;
 
-	public Lexer(Set<TokenDef> tokens) {
+	public Lexer(Set<TokenDefinition> tokens) {
 		start = DFABuilder.newDFA(NFABuilder.newNFA(tokens));
 	}
 
 	/**
 	 * 将字符串序列解析为 Token 序列
-	 * @param input
+	 * @param scanner
 	 * @return
 	 */
-	public TokenInput lex(CharInput input) {
+	public TokenScanner lex(CharScanner scanner) {
 		List<Token> tokens = new ArrayList<>();
-		while (input.hasNext()) {
-			tokens.add(nextToken(input));
+		while (scanner.hasMore()) {
+			tokens.add(nextToken(scanner));
 		}
-		return new TokenInput(tokens.toArray(new Token[0]));
+		return new TokenScanner(tokens);
 	}
 
-	public Token nextToken(CharInput input) {
+	public Token nextToken(CharScanner scanner) {
 		DFAStatus now = start;
 		Stack<Token> accepted = new Stack<>();
 		StringBuilder lexeme = new StringBuilder();
-		while (input.hasNext()) {
-			DFAStatus next = now.next(input.getNext());
+		while (scanner.hasMore()) {
+			DFAStatus next = now.next(scanner.now());
 			if (next == null) {
 				if (accepted.isEmpty()) {
 					throw new IBCompilerException(String.format("匹配失败，已经输入字符：%s", lexeme.toString()));
 				}
-				return rollbacklastAcceptedToken(input, lexeme.toString(), accepted);
+				return rollbacklastAcceptedToken(scanner, lexeme.toString(), accepted);
 			}
-			lexeme.append(input.getNext());
+			lexeme.append(scanner.now());
 			if (next.isAccept()) {
 				accepted.push(createToken(lexeme.toString(), next));
 			}
 			now = next;
-			input.next();
+			scanner.next();
 		}
-		return rollbacklastAcceptedToken(input, lexeme.toString(), accepted);
+		return rollbacklastAcceptedToken(scanner, lexeme.toString(), accepted);
 	}
 
 	/**
 	 * 回滚到最后的接受状态，并返回当时匹配的 Token
 	 * @param lexeme 
-	 * @param input 
+	 * @param scanner 
 	 * @param accepted
 	 * @return
 	 */
-	private static Token rollbacklastAcceptedToken(CharInput input, String lexeme, Stack<Token> accepted) {
+	private static Token rollbacklastAcceptedToken(CharScanner scanner, String lexeme, Stack<Token> accepted) {
 		if (accepted.isEmpty()) {
 			throw new IBCompilerException("匹配失败");
 		}
 		Token token = accepted.pop();
-		input.seek(token.getOrigin().length() - lexeme.length());
+		scanner.seek(token.getOrigin().length() - lexeme.length());
 		return token;
 	}
 
@@ -97,9 +97,11 @@ public class Lexer {
 			throw new IBCompilerException(String.format("未知错误，找不到 %s 匹配的 Token 类型", lexeme));
 		}
 		if (types.size() > 1) {
-			Collections.sort(types, (t1, t2) -> {
-				return t1.getOrder() - t2.getOrder();
-			});
+			Collections.sort(
+				types, (t1, t2) -> {
+					return t1.getOrder() - t2.getOrder();
+				}
+			);
 		}
 		return new Token(lexeme, types.get(0));
 	}

@@ -220,7 +220,7 @@ public class DFABuilder {
 	private static Set<NFAStatus> nextsOf(Set<NFAStatus> status, char ch) {
 		Set<NFAStatus> result = new HashSet<>();
 		for (NFAStatus s : status) {
-			NFAStatus next = s.nextOf(ch);
+			NFAStatus next = s.getNext(ch);
 			if (next != null) {
 				result.add(next);
 			}

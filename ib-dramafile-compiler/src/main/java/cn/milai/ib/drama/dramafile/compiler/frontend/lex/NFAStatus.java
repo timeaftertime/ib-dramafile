@@ -5,22 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.util.Assert;
+
+import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.CharAcceptor;
+
 /**
- * 词法分析时的 NFA 中间状态
+ * {@link NFAPair} 节点
  * @author milai
  * @date 2020.02.04
  */
 public class NFAStatus {
 
-	private static int auto_increment_id = 0;
-
 	/**
-	 * 状态唯一标识
-	 */
-	private int id;
-
-	/**
-	 * 能接受的字符，以及对应的下一个状态
+	 * 出边
 	 */
 	private Map<CharAcceptor, NFAStatus> nexts = new HashMap<>();
 
@@ -28,14 +25,8 @@ public class NFAStatus {
 
 	private String token = null;
 
-	public NFAStatus() {
-		id = auto_increment_id++;
-	}
-
-	public int getId() { return id; }
-
 	/**
-	 * 添加一条接受字符集为 acceptor 、通往状态 status 的出边
+	 * 添加一条接受字符集为 {@code acceptor} 、通往状态 {@code status} 的出边
 	 * @param edge
 	 */
 	public void addNext(CharAcceptor acceptor, NFAStatus status) {
@@ -43,7 +34,7 @@ public class NFAStatus {
 	}
 
 	/**
-	 * 添加一条接受空串 、通往状态 status 的出边
+	 * 添加一条接受空串 、通往指定 {@link NFAStatus} 的出边
 	 * @param edge
 	 */
 	public void addEpsilonNext(NFAStatus status) {
@@ -57,12 +48,12 @@ public class NFAStatus {
 	public List<NFAStatus> getEpsilonNexts() { return new ArrayList<>(epsilonNexts); }
 
 	/**
-	 * 获取当前状态接受指定字符到达的状态
+	 * 获取当前状态接受指定字符到达的状态。
 	 * 若不能接受指定字符，将返回 null
 	 * @param ch
 	 * @return
 	 */
-	public NFAStatus nextOf(char ch) {
+	public NFAStatus getNext(char ch) {
 		for (CharAcceptor acceptor : nexts.keySet()) {
 			if (acceptor.accept(ch)) {
 				return nexts.get(acceptor);
@@ -82,9 +73,7 @@ public class NFAStatus {
 	 * @return
 	 */
 	public String token() {
-		if (!isAccept()) {
-			throw new UnsupportedOperationException("当前状态不是接收状态");
-		}
+		Assert.isTrue(isAccept(), "当前状态不是接收状态");
 		return token;
 	}
 

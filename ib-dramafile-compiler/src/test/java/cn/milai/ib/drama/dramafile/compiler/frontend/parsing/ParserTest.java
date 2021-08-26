@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
-import cn.milai.ib.drama.dramafile.compiler.frontend.lex.CharInput;
+import cn.milai.ib.drama.dramafile.compiler.frontend.lex.CharScanner;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.Lexer;
-import cn.milai.ib.drama.dramafile.compiler.frontend.lex.TokenDef;
+import cn.milai.ib.drama.dramafile.compiler.frontend.lex.TokenDefinition;
 
 /**
  * 解析器测试类
@@ -21,7 +21,7 @@ public class ParserTest {
 
 	private Lexer lexer = new Lexer(
 		Arrays.stream(TokenType.values())
-			.map(t -> new TokenDef(t.getRE(), t.getCode()))
+			.map(t -> new TokenDefinition(t.getRE(), t.getCode()))
 			.collect(Collectors.toSet())
 	);
 
@@ -41,7 +41,7 @@ public class ParserTest {
 		 */
 		String FILE = "/parsing/testParseIf.txt";
 		Grammer grammer = GrammerReader.parseGrammer(ParserTest.class.getResourceAsStream(FILE));
-		Node root = new Parser(grammer).parse(lexer.lex(new CharInput("if(isTest) {   doSomethingTest() ;   }")));
+		Node root = new Parser(grammer).parse(lexer.lex(new CharScanner("if(isTest) {   doSomethingTest() ;   }")));
 		List<Node> rootChildren = root.getChildren();
 		assertEquals(1, rootChildren.size());
 		Node cfg = rootChildren.get(0);
@@ -92,7 +92,7 @@ public class ParserTest {
 		Grammer grammer = GrammerReader.parseGrammer(ParserTest.class.getResourceAsStream(FILE));
 		Node root = new Parser(grammer).parse(
 			lexer.lex(
-				new CharInput(
+				new CharScanner(
 					"while(isTest) {  test1();test2();   }    doSomething();  ; if(isProd) ;"
 				)
 			)
