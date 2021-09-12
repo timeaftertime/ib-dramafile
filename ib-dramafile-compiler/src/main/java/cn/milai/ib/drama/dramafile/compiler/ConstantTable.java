@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import cn.milai.common.base.Collects;
+import cn.milai.beginning.collection.Merge;
 import cn.milai.ib.drama.dramafile.compiler.constant.Constant;
 import cn.milai.ib.drama.dramafile.compiler.constant.FloatConstant;
 import cn.milai.ib.drama.dramafile.compiler.constant.IntConstant;
@@ -27,7 +27,7 @@ public class ConstantTable {
 	/**
 	 * 加入一个 null 使得序号从 1 开始
 	 */
-	private List<Constant<?>> consts = Collects.add(Collections.emptyList(), (Constant<?>) null);
+	private List<Constant<?>> consts = Merge.list(Collections.emptyList(), (Constant<?>) null);
 
 	private List<IntConstant> ints = new ArrayList<>();
 	private List<LongConstant> longs = new ArrayList<>();

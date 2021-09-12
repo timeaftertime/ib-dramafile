@@ -3,12 +3,12 @@ package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 import static org.junit.Assert.assertArrayEquals;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import cn.milai.beginning.collection.Mapping;
 import cn.milai.ib.drama.dramafile.compiler.frontend.Scanner;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Token;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenScanner;
@@ -16,13 +16,15 @@ import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenType;
 
 public class LexerTest {
 
+	private static Lexer lexer;
+
+	@BeforeClass
+	public static void setUp() {
+		lexer = new Lexer(Mapping.set(TokenType.values(), t -> new TokenDefinition(t.getRE(), t.getCode())));
+	}
+
 	@Test
 	public void testIfStatement() {
-		Lexer lexer = new Lexer(
-			Arrays.stream(TokenType.values())
-				.map(t -> new TokenDefinition(t.getRE(), t.getCode()))
-				.collect(Collectors.toSet())
-		);
 		TokenScanner tokens = lexer.lex(new CharScanner("if(player.getLife() == 0) { gameOver(); }"));
 		assertArrayEquals(
 			new Token[] {
@@ -53,11 +55,6 @@ public class LexerTest {
 
 	@Test
 	public void testWhileAndNew() {
-		Lexer lexer = new Lexer(
-			Arrays.stream(TokenType.values())
-				.map(t -> new TokenDefinition(t.getRE(), t.getCode()))
-				.collect(Collectors.toSet())
-		);
 		TokenScanner tokens = lexer.lex(
 			new CharScanner(
 				"while(boss.isAlive()) { add(\"cn.milai.ib.character.plane.WelcomePlane\"); }"

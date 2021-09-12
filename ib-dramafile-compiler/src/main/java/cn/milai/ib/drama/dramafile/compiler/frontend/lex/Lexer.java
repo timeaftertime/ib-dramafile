@@ -20,7 +20,7 @@ import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenType;
  */
 public class Lexer {
 
-	private DFAStatus start;
+	private Node start;
 
 	public Lexer(Set<TokenDefinition> tokens) {
 		start = DFABuilder.newDFA(NFABuilder.newNFA(tokens));
@@ -40,11 +40,11 @@ public class Lexer {
 	}
 
 	public Token nextToken(CharScanner scanner) {
-		DFAStatus now = start;
+		Node now = start;
 		Stack<Token> accepted = new Stack<>();
 		StringBuilder lexeme = new StringBuilder();
 		while (scanner.hasMore()) {
-			DFAStatus next = now.next(scanner.now());
+			Node next = now.next(scanner.now());
 			if (next == null) {
 				if (accepted.isEmpty()) {
 					throw new IBCompilerException(String.format("匹配失败，已经输入字符：%s", lexeme.toString()));
@@ -83,7 +83,7 @@ public class Lexer {
 	 * @param status
 	 * @return
 	 */
-	private static Token createToken(String lexeme, DFAStatus status) {
+	private static Token createToken(String lexeme, Node status) {
 		Set<String> tokens = status.tokens();
 		if (tokens.size() < 2) {
 			String token = tokens.toArray(new String[1])[0];

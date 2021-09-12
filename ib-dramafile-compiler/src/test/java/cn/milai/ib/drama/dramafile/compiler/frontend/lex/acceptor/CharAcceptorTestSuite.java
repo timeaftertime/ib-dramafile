@@ -7,7 +7,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
 	{
-		IncludeAcceptorTest.class, ExcludeAcceptorTest.class, RegexAcceptorTest.class
+		IncludeAcceptorTest.class, ExcludeAcceptorTest.class, RegexAcceptorTest.class, CharAcceptorTest.class
 	}
 )
 public class CharAcceptorTestSuite {

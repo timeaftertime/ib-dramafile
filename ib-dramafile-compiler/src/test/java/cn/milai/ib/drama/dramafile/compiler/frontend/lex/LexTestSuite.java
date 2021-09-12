@@ -8,7 +8,8 @@ import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.CharAcceptorTe
 
 @RunWith(Suite.class)
 @SuiteClasses(
-	{ NFABuilderTest.class, DFABuilderTest.class, LexerTest.class, CharSetsTest.class, CharAcceptorTestSuite.class }
+	{ NFABuilderTest.class, DFABuilderTest.class, LexerTest.class, CharSetsTest.class, CharAcceptorTestSuite.class,
+		NodeUtilTest.class }
 )
 public class LexTestSuite {
 

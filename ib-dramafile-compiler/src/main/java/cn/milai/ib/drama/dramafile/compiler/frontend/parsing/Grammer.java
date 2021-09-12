@@ -13,7 +13,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import cn.milai.common.base.Collects;
+import cn.milai.beginning.collection.Filter;
+import cn.milai.beginning.collection.Merge;
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 
 /**
@@ -257,7 +258,7 @@ public class Grammer {
 						}
 						changed |= follows.get(now).addAll(tails);
 						if (firsts.get(now).contains(Symbol.EPSILON)) {
-							tails.addAll(Collects.unfilterSet(firsts.get(now), Symbol::isEpsilon));
+							tails.addAll(Filter.nset(firsts.get(now), Symbol::isEpsilon));
 						} else {
 							tails = getFirst(now);
 						}
@@ -287,7 +288,7 @@ public class Grammer {
 		Set<Symbol> first = new HashSet<>();
 		Symbol pre = Symbol.EPSILON;
 		for (Symbol now : rights) {
-			first.addAll(Collects.unfilterSet(firsts.get(now), Symbol::isEpsilon));
+			first.addAll(Filter.nset(firsts.get(now), Symbol::isEpsilon));
 			if (!firsts.get(now).contains(Symbol.EPSILON)) {
 				break;
 			}
@@ -375,7 +376,7 @@ public class Grammer {
 		throw new IBCompilerException(String.format("符号 %s 不存在", code));
 	}
 
-	private List<Symbol> getSymbols() { return Collects.merge(getNonTerminals(), getTerminals()); }
+	private List<Symbol> getSymbols() { return Merge.list(getNonTerminals(), getTerminals()); }
 
 	public static class Builder {
 

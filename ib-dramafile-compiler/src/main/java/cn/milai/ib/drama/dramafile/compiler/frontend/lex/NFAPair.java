@@ -9,11 +9,11 @@ import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.CharAcceptor;
  */
 public class NFAPair {
 
-	private NFAStatus first;
+	private NFANode first;
 
-	private NFAStatus last;
+	private NFANode last;
 
-	NFAPair(NFAStatus first, NFAStatus last) {
+	NFAPair(NFANode first, NFANode last) {
 		this.first = first;
 		this.last = last;
 	}
@@ -23,14 +23,14 @@ public class NFAPair {
 	 * @param acceptor
 	 */
 	NFAPair(CharAcceptor acceptor) {
-		this.first = new NFAStatus();
-		this.last = new NFAStatus();
+		this.first = new NFANode();
+		this.last = new NFANode();
 		first.addNext(acceptor, last);
 	}
 
-	public NFAStatus getFirst() { return first; }
+	public NFANode getFirst() { return first; }
 
-	public NFAStatus getLast() { return last; }
+	public NFANode getLast() { return last; }
 
 	/**
 	 * 串联两个 NFAPair
@@ -62,8 +62,8 @@ public class NFAPair {
 		if (nfa2 == null) {
 			return nfa1;
 		}
-		NFAStatus first = new NFAStatus();
-		NFAStatus last = new NFAStatus();
+		NFANode first = new NFANode();
+		NFANode last = new NFANode();
 		first.addEpsilonNext(nfa2.first);
 		first.addEpsilonNext(nfa1.first);
 		nfa2.last.addEpsilonNext(last);

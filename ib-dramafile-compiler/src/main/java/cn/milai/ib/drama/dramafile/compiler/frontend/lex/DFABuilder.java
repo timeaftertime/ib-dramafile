@@ -1,18 +1,13 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
-import cn.milai.common.base.Collects;
-import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
+import cn.milai.beginning.collection.Mapping;
 
 /**
  * DFA 构造器
@@ -26,242 +21,27 @@ public class DFABuilder {
 	 * @param first
 	 * @return
 	 */
-	public static DFAStatus newDFA(NFAStatus first) {
-		Map<Set<NFAStatus>, DFAStatus> status = new HashMap<>();
-		Queue<Set<NFAStatus>> q = new ConcurrentLinkedQueue<>();
-		Set<NFAStatus> firstSet = closure(first);
-		status.put(firstSet, new DFAStatus());
+	public static Node newDFA(Node first) {
+		Map<Set<Node>, Node> nfaToDFA = new HashMap<>();
+		Queue<Set<Node>> q = new ConcurrentLinkedQueue<>();
+		Set<Node> firstSet = NodeUtil.closure(first);
+		nfaToDFA.put(firstSet, new DFANode());
 		q.add(firstSet);
 		while (!q.isEmpty()) {
-			Set<NFAStatus> fromSet = q.poll();
-			for (int ch = 1; ch <= Character.MAX_VALUE; ch++) {
-				Set<NFAStatus> toSet = closure(nextsOf(fromSet, (char) ch));
-				if (toSet.isEmpty()) {
+			Set<Node> froms = q.poll();
+			for (char ch : Mapping.reduceSet(froms, Node::accepts)) {
+				Set<Node> tos = NodeUtil.nextsOf(froms, ch);
+				if (tos.isEmpty()) {
 					continue;
 				}
-				if (!status.containsKey(toSet)) {
-					q.add(toSet);
-					DFAStatus newStatus = new DFAStatus();
-					status.put(toSet, newStatus);
-					for (NFAStatus s : toSet) {
-						if (!s.isAccept()) {
-							continue;
-						}
-						newStatus.addToken(s.token());
-					}
+				if (!nfaToDFA.containsKey(tos)) {
+					q.add(tos);
+					nfaToDFA.put(tos, new DFANode(tos));
 				}
-				status.get(fromSet).putEdge((char) ch, status.get(toSet));
+				nfaToDFA.get(froms).addNext(ch, nfaToDFA.get(tos));
 			}
 		}
-		return firstStatusOf(new ArrayList<>(status.values()));
+		return NodeUtil.firstStatusOf(new ArrayList<>(nfaToDFA.values()));
 	}
 
-	/**
-	 * 使用 Hopcroft 算法最小化 DFA
-	 * @param first
-	 */
-	public static DFAStatus minimize(DFAStatus first) {
-		Set<DFAStatus> status = allStatusOf(first);
-		Set<DFAStatus> acceptStatus = status.stream().filter(DFAStatus::isAccept).collect(Collectors.toSet());
-		Set<Set<DFAStatus>> nows = new HashSet<>();
-		nows.add(Collects.filterSet(status, s -> !s.isAccept()));
-		nows.add(acceptStatus);
-		Set<Set<DFAStatus>> pres = null;
-		while (!nows.equals(pres)) {
-			pres = nows;
-			nows = new HashSet<>();
-			for (Set<DFAStatus> p : pres) {
-				nows.addAll(split(pres, p));
-			}
-		}
-		return rebuildDFA(new ArrayList<>(nows));
-	}
-
-	/**
-	 * 遍历整个 DFA 返回所有结点的集合
-	 * @param first
-	 * @return
-	 */
-	private static Set<DFAStatus> allStatusOf(DFAStatus first) {
-		return findStatus(first, new HashSet<>());
-	}
-
-	private static Set<DFAStatus> findStatus(DFAStatus now, Set<DFAStatus> visited) {
-		visited.add(now);
-		for (Character ch : now.accepts()) {
-			DFAStatus next = now.next(ch);
-			if (!visited.contains(next)) {
-				findStatus(next, visited);
-			}
-		}
-		return visited;
-	}
-
-	/**
-	 * 尝试根据某个字符将 p 中状态分为多份
-	 * @param pres
-	 * @param p
-	 * @return
-	 */
-	private static Set<Set<DFAStatus>> split(Set<Set<DFAStatus>> pres, Set<DFAStatus> p) {
-		if (p.size() >= 2) {
-			for (int ch = 1; ch <= Character.MAX_VALUE; ch++) {
-				Map<Set<DFAStatus>, Set<DFAStatus>> map = new HashMap<>();
-				for (DFAStatus status : p) {
-					Set<DFAStatus> key = setOf(pres, status.next((char) ch));
-					if (!map.containsKey(key)) {
-						map.put(key, new HashSet<>());
-					}
-					map.get(key).add(status);
-				}
-				if (map.size() >= 2) {
-					return new HashSet<>(map.values());
-				}
-			}
-		}
-		Set<Set<DFAStatus>> result = new HashSet<>();
-		result.add(p);
-		return result;
-	}
-
-	/**
-	 * 获取 s 所属的 set
-	 * @param pres
-	 * @param s
-	 * @return
-	 */
-	private static Set<DFAStatus> setOf(Set<Set<DFAStatus>> pres, DFAStatus s) {
-		if (s == null) {
-			return null;
-		}
-		for (Set<DFAStatus> pre : pres) {
-			if (pre.contains(s)) {
-				return pre;
-			}
-		}
-		throw new IBCompilerException(String.format("没有找到 %s 所属 set", s));
-	}
-
-	/**
-	 * 将 List 中每个 Set 中的状态合并，形成一个新的 DFA，并返回头结点
-	 * @param nows
-	 * @return
-	 */
-	private static DFAStatus rebuildDFA(List<Set<DFAStatus>> nows) {
-		List<DFAStatus> status = new ArrayList<>();
-		for (int i = 0; i < nows.size(); i++) {
-			DFAStatus newStatus = new DFAStatus();
-			status.add(newStatus);
-			for (DFAStatus old : nows.get(i)) {
-				if (!old.isAccept()) {
-					continue;
-				}
-				newStatus.addTokens(old.tokens());
-			}
-		}
-		for (int i = 0; i < nows.size(); i++) {
-			DFAStatus from = status.get(i);
-			for (DFAStatus s : nows.get(i)) {
-				for (Character ch : s.accepts()) {
-					// 同一个 Set 的其他结点已经设置过，不需要重复设置
-					if (from.next(ch) != null) {
-						continue;
-					}
-					DFAStatus to = s.next(ch);
-					from.putEdge(ch, status.get(indexOf(nows, to)));
-				}
-			}
-		}
-		return firstStatusOf(status);
-	}
-
-	/**
-	 * 使用拓扑排序找到 DFA 的头结点
-	 * @param status
-	 * @return
-	 */
-	private static DFAStatus firstStatusOf(List<DFAStatus> status) {
-		int[] in = new int[status.size()];
-		for (DFAStatus s : status) {
-			for (Character ch : s.accepts()) {
-				int index = status.indexOf(s.next(ch));
-				in[index]++;
-			}
-		}
-		for (int i = 0; i < in.length; i++) {
-			if (in[i] == 0) {
-				return status.get(i);
-			}
-		}
-		throw new IBCompilerException("找不到 DFA 头结点");
-	}
-
-	/**
-	 * 获取 status 所属 Set 在 nows 中的下标，若不存在，返回 -1
-	 * @param nows
-	 * @param status
-	 * @return
-	 */
-	private static int indexOf(List<Set<DFAStatus>> nows, DFAStatus status) {
-		for (int i = 0; i < nows.size(); i++) {
-			if (nows.get(i).contains(status)) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	/**
-	 * 返回状态 status 通过 ch 能到达的所有状态的集合
-	 * @param status
-	 * @param ch
-	 * @return
-	 */
-	private static Set<NFAStatus> nextsOf(Set<NFAStatus> status, char ch) {
-		Set<NFAStatus> result = new HashSet<>();
-		for (NFAStatus s : status) {
-			NFAStatus next = s.getNext(ch);
-			if (next != null) {
-				result.add(next);
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * 返回 set 中所有状态的闭包的并集
-	 * @param set
-	 * @return
-	 */
-	private static Set<NFAStatus> closure(Set<NFAStatus> set) {
-		Set<NFAStatus> result = new HashSet<>(set);
-		for (NFAStatus s : set) {
-			result.addAll(closure(s));
-		}
-		return result;
-	}
-
-	/**
-	 * 返回 s 的闭包（s 及与 s 通过 epsilon 边相连的所有状态）
-	 * @param s
-	 * @return
-	 */
-	private static Set<NFAStatus> closure(NFAStatus s) {
-		return closure(s, new HashSet<>(Arrays.asList(s)));
-	}
-
-	/**
-	 * 将 found 中不存在的、s 闭包中的状态添加到 found
-	 * @param s
-	 * @param found 已经添加的状态
-	 * @return
-	 */
-	private static Set<NFAStatus> closure(NFAStatus s, Set<NFAStatus> found) {
-		for (NFAStatus next : s.getEpsilonNexts()) {
-			if (found.add(next)) {
-				found.addAll(closure(next, found));
-			}
-		}
-		return found;
-	}
 }

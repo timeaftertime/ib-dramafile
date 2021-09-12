@@ -7,7 +7,11 @@ import org.junit.runners.Suite.SuiteClasses;
 import cn.milai.ib.drama.dramafile.compiler.frontend.FrontendTestSuite;
 
 @RunWith(Suite.class)
-@SuiteClasses({ IBCompilerTest.class, FrontendTestSuite.class })
+@SuiteClasses(
+	{
+		FrontendTestSuite.class, IBCompilerTest.class
+	}
+)
 public class AllTestSuite {
 
 }

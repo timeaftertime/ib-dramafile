@@ -1,11 +1,11 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.util.Assert;
 
+import cn.milai.beginning.collection.Mapping;
 import cn.milai.common.base.Chars;
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.CharAcceptor;
@@ -26,13 +26,9 @@ public class NFABuilder {
 	 * @param tokens
 	 * @return
 	 */
-	public static NFAStatus newNFA(Set<TokenDefinition> tokens) {
+	public static Node newNFA(Set<TokenDefinition> tokens) {
 		Assert.notEmpty(tokens, "token 定义不能为空");
-		List<NFAStatus> firsts = new ArrayList<>();
-		for (TokenDefinition token : tokens) {
-			firsts.add(fromRegex(token.getRegex(), token.getCode()));
-		}
-		return combine(firsts);
+		return combine(Mapping.list(tokens, t -> fromRegex(t.getRegex(), t.getCode())));
 	}
 
 	/**
@@ -40,12 +36,12 @@ public class NFABuilder {
 	 * @param firsts
 	 * @return
 	 */
-	public static NFAStatus combine(List<NFAStatus> firsts) {
+	public static Node combine(List<Node> firsts) {
 		if (firsts.size() == 1) {
 			return firsts.get(0);
 		}
-		NFAStatus head = new NFAStatus();
-		for (NFAStatus s : firsts) {
+		Node head = new NFANode();
+		for (Node s : firsts) {
 			head.addEpsilonNext(s);
 		}
 		return head;
@@ -57,14 +53,14 @@ public class NFABuilder {
 	 * @param 匹配成功时的 token 名
 	 * @return
 	 */
-	private static NFAStatus fromRegex(String regex, String token) {
+	private static Node fromRegex(String regex, String token) {
 		CharScanner scanner = new CharScanner(regex);
 		NFAPair pair = null;
 		while (scanner.hasMore()) {
 			pair = NFAPair.connect(pair, nextFromScanner(scanner));
 		}
 		Assert.notNull(pair, String.format("由正则表达式构造 NFA 失败: %s", regex));
-		pair.getLast().setToken(token);
+		pair.getLast().addToken(token);
 		return pair.getFirst();
 	}
 
@@ -128,15 +124,15 @@ public class NFABuilder {
 		}
 		if (scanner.now() == CharSets.NONE_OR_ONE) {
 			scanner.next();
-			return noneOrOneNFA(pair);
+			return noneOrOne(pair);
 		}
 		if (scanner.now() == CharSets.ONE_OR_MORE) {
 			scanner.next();
-			return oneOrMoreNFA(pair);
+			return oneOrMore(pair);
 		}
 		if (scanner.now() == CharSets.NONE_OR_MORE) {
 			scanner.next();
-			return noneOrMoreNFA(pair);
+			return noneOrMore(pair);
 		}
 		if (scanner.now() == CharSets.OPEN_BRACE) {
 			throw new IBCompilerException("暂不支持 {x,y} 表示重复的形式");
@@ -151,9 +147,9 @@ public class NFABuilder {
 	 * @param pair
 	 * @return
 	 */
-	private static NFAPair oneOrMoreNFA(NFAPair pair) {
-		NFAStatus s0 = new NFAStatus();
-		NFAStatus s1 = new NFAStatus();
+	private static NFAPair oneOrMore(NFAPair pair) {
+		NFANode s0 = new NFANode();
+		NFANode s1 = new NFANode();
 		s0.addEpsilonNext(pair.getFirst());
 		pair.getLast().addEpsilonNext(pair.getFirst());
 		pair.getLast().addEpsilonNext(s1);
@@ -168,9 +164,9 @@ public class NFABuilder {
 	 * @param pair
 	 * @return
 	 */
-	private static NFAPair noneOrMoreNFA(NFAPair pair) {
-		NFAStatus s0 = new NFAStatus();
-		NFAStatus s1 = new NFAStatus();
+	private static NFAPair noneOrMore(NFAPair pair) {
+		NFANode s0 = new NFANode();
+		NFANode s1 = new NFANode();
 		s0.addEpsilonNext(pair.getFirst());
 		s0.addEpsilonNext(s1);
 		pair.getLast().addEpsilonNext(pair.getFirst());
@@ -185,9 +181,9 @@ public class NFABuilder {
 	 * @param pair
 	 * @return
 	 */
-	private static NFAPair noneOrOneNFA(NFAPair pair) {
-		NFAStatus s0 = new NFAStatus();
-		NFAStatus s1 = new NFAStatus();
+	private static NFAPair noneOrOne(NFAPair pair) {
+		NFANode s0 = new NFANode();
+		NFANode s1 = new NFANode();
 		s0.addEpsilonNext(pair.getFirst());
 		pair.getLast().addEpsilonNext(s1);
 		s0.addEpsilonNext(s1);

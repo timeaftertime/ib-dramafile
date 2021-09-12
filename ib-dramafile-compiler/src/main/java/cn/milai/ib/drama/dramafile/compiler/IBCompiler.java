@@ -4,10 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import cn.milai.beginning.collection.Mapping;
 import cn.milai.common.io.InputStreams;
 import cn.milai.ib.drama.dramafile.compiler.backend.CFG;
 import cn.milai.ib.drama.dramafile.compiler.backend.CompilerData;
@@ -69,10 +68,7 @@ public class IBCompiler {
 	}
 
 	private static Lexer newLexer() {
-		return new Lexer(
-			Arrays.stream(TokenType.values())
-				.map(t -> new TokenDefinition(t.getRE(), t.getCode())).collect(Collectors.toSet())
-		);
+		return new Lexer(Mapping.set(TokenType.values(), t -> new TokenDefinition(t.getRE(), t.getCode())));
 	}
 
 	private static byte[] build(CompilerData data) throws IOException {

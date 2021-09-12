@@ -11,7 +11,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>cn.milai.beginning</groupId>
-			<artifactId>beginning-base</artifactId>
+			<artifactId>beginning-collection</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>cn.milai.ibdramafile</groupId>
