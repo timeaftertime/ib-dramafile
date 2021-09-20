@@ -1,5 +1,6 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,7 +12,6 @@ import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.CharAcceptor;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.ExcludeAcceptor;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.IncludeAcceptor;
-import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.RegexAcceptor;
 
 /**
  * NFA(Non-deterministic-Finite-Automaton) 非确定性有限自动机的构造器。
@@ -197,23 +197,63 @@ public class NFABuilder {
 	 * @return
 	 */
 	private static CharAcceptor parseBracket(CharScanner scanner) {
-		StringBuilder regexBuilder = new StringBuilder();
-		boolean lastSlash = false;
-		while (scanner.hasMore()) {
-			char ch = scanner.next();
-			if (ch == CharSets.CLOSE_BRAKET && !lastSlash) {
-				String regex = regexBuilder.toString();
-				Assert.hasLength(regex, "中括号中正则表达式为空");
-				return new RegexAcceptor(regex);
-			}
-			if (lastSlash) {
-				lastSlash = false;
-			} else {
-				lastSlash = (ch == CharSets.SLASH);
-			}
-			regexBuilder.append(ch);
+		CharAcceptor accept = null;
+		char lastChar = 0;
+		boolean reverse = false;
+		if (scanner.now() == CharSets.INVERT) {
+			reverse = true;
+			scanner.next();
 		}
-		throw new IBCompilerException("未匹配到右中括号：regex = " + regexBuilder);
+		Set<Character> singleChars = new HashSet<>();
+		while (scanner.hasMore()) {
+
+			char ch = scanner.next();
+			switch (ch) {
+				case CharSets.SLASH : {
+					accept = or(accept, CharSets.slash(scanner.next()));
+					break;
+				}
+				case CharSets.CLOSE_BRAKET : {
+					if (!singleChars.isEmpty()) {
+						accept = or(accept, new IncludeAcceptor(singleChars));
+					}
+					Assert.notNull(accept, "中括号中表达式为空");
+					return reverse ? accept.negate() : accept;
+				}
+				case CharSets.RANGE : {
+					accept = or(accept, new IncludeAcceptor(Alphabet.rangeSet(lastChar, nextSingle(scanner) + 1)));
+					break;
+				}
+				default: {
+					singleChars.add(ch);
+					lastChar = ch;
+				}
+			}
+
+		}
+		throw new IBCompilerException("未匹配到右中括号");
+	}
+
+	private static CharAcceptor or(CharAcceptor a1, CharAcceptor a2) {
+		if (a1 == null) {
+			return a2;
+		}
+		if (a2 == null) {
+			return a1;
+		}
+		return CharAcceptor.or(a1, a2);
+	}
+
+	private static char nextSingle(CharScanner scanner) {
+		char ch = scanner.next();
+		if (ch == CharSets.SLASH) {
+			char next = scanner.next();
+			if (CharSets.isCanSlash(ch)) {
+				return next;
+			}
+			throw new IllegalArgumentException(String.format("%c%c不是单个字符", ch, next));
+		}
+		return ch;
 	}
 
 }

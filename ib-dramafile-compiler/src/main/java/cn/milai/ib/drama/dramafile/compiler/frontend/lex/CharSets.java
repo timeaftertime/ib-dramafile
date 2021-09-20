@@ -1,9 +1,9 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import cn.milai.beginning.collection.Creator;
 import cn.milai.common.base.Chars;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.CharAcceptor;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.ExcludeAcceptor;
@@ -33,18 +33,18 @@ public class CharSets {
 	public static final char UNDERLINE = '_';
 	public static final char INVERT = '^';
 	public static final char RANGE = '-';
-	
+
 	public static final char NONE_OR_ONE = '?';
 	public static final char ONE_OR_MORE = '+';
 	public static final char NONE_OR_MORE = '*';
-	
+
 	public static final char OPEN_BRACE = '{';
 	public static final char CLOSE_BRACE = '}';
 	public static final char OPEN_BRACKET = '[';
 	public static final char CLOSE_BRAKET = ']';
 	public static final char OPEN_PARENTHESIS = '(';
 	public static final char CLOSE_PARENTHESIS = ')';
-	
+
 	public static final char SLASH = '\\';
 	public static final char OR = '|';
 
@@ -104,16 +104,16 @@ public class CharSets {
 	 * @return
 	 */
 	public static CharAcceptor slash(char ch) {
-		if (SLASH_ORIGINAL.contains(ch)) {
-			return new IncludeAcceptor(new HashSet<>(Arrays.asList(ch)));
+		if (isCanSlash(ch)) {
+			return new IncludeAcceptor(Creator.asSet(ch));
 		}
 		switch (ch) {
 			case 't' :
-				return new IncludeAcceptor(new HashSet<>(Arrays.asList(TAB)));
+				return new IncludeAcceptor(Creator.asSet(TAB));
 			case 'n' :
-				return new IncludeAcceptor(new HashSet<>(Arrays.asList(Chars.C_LF)));
+				return new IncludeAcceptor(Creator.asSet(Chars.C_LF));
 			case 'r' :
-				return new IncludeAcceptor(new HashSet<>(Arrays.asList(Chars.C_CR)));
+				return new IncludeAcceptor(Creator.asSet(Chars.C_CR));
 			case 's' :
 				return new IncludeAcceptor(CharSets.unvisible());
 			case 'S' :
@@ -128,6 +128,15 @@ public class CharSets {
 				return new ExcludeAcceptor(numbers());
 		}
 		throw new IllegalArgumentException("未知转义字符：" + SLASH + ch);
+	}
+
+	/**
+	 * 判断指定字符是否可以通过斜杠 \ 转义
+	 * @param ch
+	 * @return
+	 */
+	public static boolean isCanSlash(char ch) {
+		return SLASH_ORIGINAL.contains(ch);
 	}
 
 }

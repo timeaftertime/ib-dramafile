@@ -24,6 +24,12 @@ public abstract class CharSetAcceptor implements CharAcceptor {
 		this.chs = new HashSet<>(chs);
 	}
 
+	/**
+	 * 获取持有的字符 {@link Set}
+	 * @return
+	 */
+	protected Set<Character> getChs() { return chs; }
+
 	@Override
 	public boolean accept(char c) {
 		return accept(chs, c);

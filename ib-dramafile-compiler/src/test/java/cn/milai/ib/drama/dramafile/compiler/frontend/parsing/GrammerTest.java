@@ -1,18 +1,18 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
+
+import cn.milai.beginning.collection.Creator;
+import cn.milai.beginning.collection.Mapping;
 
 public class GrammerTest {
 
@@ -25,72 +25,67 @@ public class GrammerTest {
 	public void testSelectSet() {
 		// Expr
 		checkSelects(
-			grammer.findSymbol(codes[0]), Arrays.asList(
-				new ArrayList<>(Arrays.asList("IDENTIFIER")),
-				new ArrayList<>(Arrays.asList("IDENTIFIER", "BRACKET_LEFT", "INT", "FLOAT"))
+			grammer.symbolOf(codes[0]), Arrays.asList(
+				Creator.asSet("IDENTIFIER"),
+				Creator.asSet("IDENTIFIER", "BRACKET_LEFT", "INT", "FLOAT")
 			)
 		);
 		// CFG
 		checkSelects(
-			grammer.findSymbol(codes[1]), Arrays.asList(
-				new ArrayList<>(Arrays.asList("IDENTIFIER", "BRACKET_LEFT", "INT", "FLOAT")),
-				new ArrayList<>(Arrays.asList("IDENTIFIER")),
-				new ArrayList<>(Arrays.asList("IDENTIFIER", "BRACKET_LEFT", "INT", "FLOAT"))
+			grammer.symbolOf(codes[1]), Arrays.asList(
+				Creator.asSet("IDENTIFIER", "BRACKET_LEFT", "INT", "FLOAT"),
+				Creator.asSet("IDENTIFIER"),
+				Creator.asSet("IDENTIFIER", "BRACKET_LEFT", "INT", "FLOAT")
 			)
 		);
 		// Factor
 		checkSelects(
-			grammer.findSymbol(codes[2]), Arrays.asList(
-				new ArrayList<>(Arrays.asList("IDENTIFIER")),
-				new ArrayList<>(Arrays.asList("BRACKET_LEFT")),
-				new ArrayList<>(Arrays.asList("INT")),
-				new ArrayList<>(Arrays.asList("FLOAT"))
+			grammer.symbolOf(codes[2]), Arrays.asList(
+				Creator.asSet("IDENTIFIER"),
+				Creator.asSet("BRACKET_LEFT"),
+				Creator.asSet("INT"),
+				Creator.asSet("FLOAT")
 			)
 		);
 		// Term
 		checkSelects(
-			grammer.findSymbol(codes[3]), Arrays.asList(
-				new ArrayList<>(Arrays.asList("BRACKET_LEFT")),
-				new ArrayList<>(Arrays.asList("INT")),
-				new ArrayList<>(Arrays.asList("FLOAT")),
-				new ArrayList<>(Arrays.asList("IDENTIFIER"))
+			grammer.symbolOf(codes[3]), Arrays.asList(
+				Creator.asSet("BRACKET_LEFT"),
+				Creator.asSet("INT"),
+				Creator.asSet("FLOAT"),
+				Creator.asSet("IDENTIFIER")
 			)
 		);
 		// Expr'
 		checkSelects(
-			grammer.findSymbol(codes[4]), Arrays.asList(
-				new ArrayList<>(Arrays.asList("ϵ", "$", "PLUS", "MINUS", "BRACKET_RIGHT")),
-				new ArrayList<>(Arrays.asList("PLUS")),
-				new ArrayList<>(Arrays.asList("MINUS"))
+			grammer.symbolOf(codes[4]), Arrays.asList(
+				Creator.asSet(Keywords.EPSILON, Keywords.EOF, "PLUS", "MINUS", "BRACKET_RIGHT"),
+				Creator.asSet("PLUS"),
+				Creator.asSet("MINUS")
 			)
 		);
 		// Term'
 		checkSelects(
-			grammer.findSymbol(codes[5]), Arrays.asList(
-				new ArrayList<>(Arrays.asList("ϵ", "$", "PLUS", "MINUS", "BRACKET_RIGHT")),
-				new ArrayList<>(Arrays.asList("TIMES")),
-				new ArrayList<>(Arrays.asList("DIVISION"))
+			grammer.symbolOf(codes[5]), Arrays.asList(
+				Creator.asSet(Keywords.EPSILON, Keywords.EOF, "PLUS", "MINUS", "BRACKET_RIGHT"),
+				Creator.asSet("TIMES"),
+				Creator.asSet("DIVISION")
 			)
 		);
 		// CFG'
 		checkSelects(
-			grammer.findSymbol(codes[6]), Arrays.asList(
-				new ArrayList<>(Arrays.asList("PLUS")),
-				new ArrayList<>(Arrays.asList("MINUS"))
+			grammer.symbolOf(codes[6]), Arrays.asList(
+				Creator.asSet("PLUS"),
+				Creator.asSet("MINUS")
 			)
 		);
 	}
 
-	private void checkSelects(Symbol s, List<List<String>> selectsCodes) {
+	private void checkSelects(Symbol s, List<Set<String>> selectsCodes) {
 		NonTerminalSymbol left = (NonTerminalSymbol) s;
 		List<Production> productions = left.getProductions();
 		assertEquals(selectsCodes.size(), productions.size());
-		for (int i = 0; i < productions.size(); i++) {
-			List<String> selectCodes = selectsCodes.get(i);
-			Set<Symbol> select = grammer.getSelect(productions.get(i));
-			assertEquals(selectCodes.size(), select.size());
-			assertTrue(selectCodes.containsAll(extractCodes(select)));
-		}
+		assertEquals(new HashSet<>(selectsCodes), Mapping.set(productions, p -> codeSet(grammer.getSelect(p))));
 	}
 
 	@Test
@@ -112,24 +107,28 @@ public class GrammerTest {
 		Set<String> follow1 = new HashSet<>(Arrays.asList("$", "PLUS", "MINUS", "BRACKET_RIGHT"));
 		Set<String> follow2 = new HashSet<>(Arrays.asList("$"));
 		Set<String> follow3 = new HashSet<>(Arrays.asList("$", "PLUS", "MINUS", "BRACKET_RIGHT", "TIMES", "DIVISION"));
-		assertEquals(first1, extractCodes(grammer.getFirst(codes[0])));
-		assertEquals(first1, extractCodes(grammer.getFirst(codes[1])));
-		assertEquals(first1, extractCodes(grammer.getFirst(codes[2])));
-		assertEquals(first1, extractCodes(grammer.getFirst(codes[3])));
-		assertEquals(first2, extractCodes(grammer.getFirst(codes[4])));
-		assertEquals(first3, extractCodes(grammer.getFirst(codes[5])));
-		assertEquals(first4, extractCodes(grammer.getFirst(codes[6])));
-		assertEquals(follow1, extractCodes(grammer.getFollow(codes[0])));
-		assertEquals(follow2, extractCodes(grammer.getFollow(codes[1])));
-		assertEquals(follow3, extractCodes(grammer.getFollow(codes[2])));
-		assertEquals(follow1, extractCodes(grammer.getFollow(codes[3])));
-		assertEquals(follow1, extractCodes(grammer.getFollow(codes[4])));
-		assertEquals(follow1, extractCodes(grammer.getFollow(codes[5])));
-		assertEquals(follow2, extractCodes(grammer.getFollow(codes[6])));
+		assertEquals(first1, codeSet(grammer.getFirst(codes[0])));
+		assertEquals(first1, codeSet(grammer.getFirst(codes[1])));
+		assertEquals(first1, codeSet(grammer.getFirst(codes[2])));
+		assertEquals(first1, codeSet(grammer.getFirst(codes[3])));
+		assertEquals(first2, codeSet(grammer.getFirst(codes[4])));
+		assertEquals(first3, codeSet(grammer.getFirst(codes[5])));
+		assertEquals(first4, codeSet(grammer.getFirst(codes[6])));
+		assertEquals(follow1, codeSet(grammer.getFollow(codes[0])));
+		assertEquals(follow2, codeSet(grammer.getFollow(codes[1])));
+		assertEquals(follow3, codeSet(grammer.getFollow(codes[2])));
+		assertEquals(follow1, codeSet(grammer.getFollow(codes[3])));
+		assertEquals(follow1, codeSet(grammer.getFollow(codes[4])));
+		assertEquals(follow1, codeSet(grammer.getFollow(codes[5])));
+		assertEquals(follow2, codeSet(grammer.getFollow(codes[6])));
 	}
 
-	private static Set<String> extractCodes(Collection<? extends Symbol> symbols) {
-		return symbols.stream().map(Symbol::getCode).collect(Collectors.toSet());
+	private static Set<String> codeSet(Collection<? extends Symbol> symbols) {
+		return Mapping.set(symbols, Symbol::getCode);
+	}
+
+	private static List<String> codeList(Collection<? extends Symbol> symbols) {
+		return Mapping.list(symbols, Symbol::getCode);
 	}
 
 	@Test
@@ -137,58 +136,58 @@ public class GrammerTest {
 		assertEquals(codes.length, grammer.getNonTerminals().size());
 		// Expr
 		checkNonTerminal(
-			grammer.findSymbol(codes[0]), Arrays.asList(
-				new ArrayList<>(Arrays.asList("IDENTIFIER", "ASSIGN", "Expr")),
-				new ArrayList<>(Arrays.asList("Term", "Expr\'"))
+			grammer.symbolOf(codes[0]), Arrays.asList(
+				Arrays.asList("IDENTIFIER", "ASSIGN", "Expr", "Expr\'"),
+				Arrays.asList("Term", "Expr\'")
 			)
 		);
 		// CFG
 		checkNonTerminal(
-			grammer.findSymbol(codes[1]), Arrays.asList(
-				new ArrayList<>(Arrays.asList("Term")),
-				new ArrayList<>(Arrays.asList("IDENTIFIER", "ASSIGN", "Expr")),
-				new ArrayList<>(Arrays.asList("Expr", "CFG\'"))
+			grammer.symbolOf(codes[1]), Arrays.asList(
+				Arrays.asList("Term"),
+				Arrays.asList("IDENTIFIER", "ASSIGN", "Expr"),
+				Arrays.asList("Expr", "CFG\'")
 			)
 		);
 		// Factor
 		checkNonTerminal(
-			grammer.findSymbol(codes[2]), Arrays.asList(
-				new ArrayList<>(Arrays.asList("IDENTIFIER")),
-				new ArrayList<>(Arrays.asList("BRACKET_LEFT", "Expr", "BRACKET_RIGHT")),
-				new ArrayList<>(Arrays.asList("INT")),
-				new ArrayList<>(Arrays.asList("FLOAT"))
+			grammer.symbolOf(codes[2]), Arrays.asList(
+				Arrays.asList("IDENTIFIER"),
+				Arrays.asList("BRACKET_LEFT", "Expr", "BRACKET_RIGHT"),
+				Arrays.asList("INT"),
+				Arrays.asList("FLOAT")
 			)
 		);
 		// Term
 		checkNonTerminal(
-			grammer.findSymbol(codes[3]), Arrays.asList(
-				new ArrayList<>(Arrays.asList("BRACKET_LEFT", "Expr", "BRACKET_RIGHT")),
-				new ArrayList<>(Arrays.asList("INT")),
-				new ArrayList<>(Arrays.asList("FLOAT")),
-				new ArrayList<>(Arrays.asList("IDENTIFIER", "Term\'"))
+			grammer.symbolOf(codes[3]), Arrays.asList(
+				Arrays.asList("BRACKET_LEFT", "Expr", "BRACKET_RIGHT", "Term\'"),
+				Arrays.asList("INT", "Term\'"),
+				Arrays.asList("FLOAT", "Term\'"),
+				Arrays.asList("IDENTIFIER", "Term\'")
 			)
 		);
 		// Expr'
 		checkNonTerminal(
-			grammer.findSymbol(codes[4]), Arrays.asList(
-				new ArrayList<>(),
-				new ArrayList<>(Arrays.asList("PLUS", "Term", "Expr\'")),
-				new ArrayList<>(Arrays.asList("MINUS", "Term", "Expr\'"))
+			grammer.symbolOf(codes[4]), Arrays.asList(
+				Arrays.asList(Keywords.EPSILON),
+				Arrays.asList("PLUS", "Term", "Expr\'"),
+				Arrays.asList("MINUS", "Term", "Expr\'")
 			)
 		);
 		// Term'
 		checkNonTerminal(
-			grammer.findSymbol(codes[5]), Arrays.asList(
-				new ArrayList<>(),
-				new ArrayList<>(Arrays.asList("TIMES", "Factor", "Term\'")),
-				new ArrayList<>(Arrays.asList("DIVISION", "Factor", "Term\'"))
+			grammer.symbolOf(codes[5]), Arrays.asList(
+				Arrays.asList(Keywords.EPSILON),
+				Arrays.asList("TIMES", "Factor", "Term\'"),
+				Arrays.asList("DIVISION", "Factor", "Term\'")
 			)
 		);
 		// CFG'
 		checkNonTerminal(
-			grammer.findSymbol(codes[6]), Arrays.asList(
-				new ArrayList<>(Arrays.asList("PLUS", "Term")),
-				new ArrayList<>(Arrays.asList("MINUS", "Term"))
+			grammer.symbolOf(codes[6]), Arrays.asList(
+				Arrays.asList("PLUS", "Term"),
+				Arrays.asList("MINUS", "Term")
 			)
 		);
 	}
@@ -202,19 +201,7 @@ public class GrammerTest {
 		assertTrue(s.isNonTerminal());
 		List<Production> productions = ((NonTerminalSymbol) s).getProductions();
 		assertEquals(productionsRights.size(), productions.size());
-		for (int i = 0; i < productionsRights.size(); i++) {
-			List<String> rightCodes = productionsRights.get(i);
-			List<Symbol> rights = productions.get(i).getRights();
-			if (rightCodes.isEmpty()) {
-				assertEquals(new ArrayList<>(Arrays.asList(Symbol.EPSILON)), rights);
-				continue;
-			}
-			assertEquals(rightCodes.size(), rights.size());
-			for (int j = 0; j < rightCodes.size(); j++) {
-				String rightCode = rightCodes.get(j);
-				assertSame(grammer.findSymbol(rightCode), productions.get(i).getRights().get(j));
-			}
-		}
+		assertEquals(new HashSet<>(productionsRights), Mapping.set(productions, p -> codeList(p.getRights())));
 	}
 
 }

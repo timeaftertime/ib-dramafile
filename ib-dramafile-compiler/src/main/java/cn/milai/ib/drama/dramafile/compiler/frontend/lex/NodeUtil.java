@@ -168,7 +168,7 @@ public class NodeUtil {
 	 * @return
 	 */
 	public static Set<Node> closure(Collection<Node> nodes) {
-		return Mapping.reduceSet(new HashSet<>(nodes), NodeUtil::closure);
+		return Mapping.reduceSet(nodes, NodeUtil::closure);
 	}
 
 	/**
@@ -180,7 +180,7 @@ public class NodeUtil {
 	 */
 	public static Set<Node> nextsOf(Collection<Node> nodes, char ch) {
 		return closure(
-			new HashSet<>(nodes).stream().map(s -> s.next(ch)).filter(n -> n != null).collect(Collectors.toSet())
+			nodes.stream().map(s -> s.next(ch)).filter(n -> n != null).collect(Collectors.toSet())
 		);
 	}
 

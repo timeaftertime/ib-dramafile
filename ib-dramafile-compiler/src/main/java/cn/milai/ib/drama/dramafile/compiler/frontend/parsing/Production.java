@@ -1,10 +1,11 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.util.CollectionUtils;
+
+import cn.milai.beginning.collection.Creator;
 
 /**
  * 语法分析产生式
@@ -19,7 +20,7 @@ public class Production {
 
 	public Production(NonTerminalSymbol left, List<Symbol> rights) {
 		if (CollectionUtils.isEmpty(rights)) {
-			rights = new ArrayList<>(Arrays.asList(Symbol.EPSILON));
+			rights = Creator.arrayList(Symbol.EPSILON);
 		}
 		this.left = left;
 		this.rights = rights;

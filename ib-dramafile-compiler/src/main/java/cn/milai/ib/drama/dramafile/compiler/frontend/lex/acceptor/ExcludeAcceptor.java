@@ -3,6 +3,8 @@ package cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor;
 import java.util.Collection;
 import java.util.Set;
 
+import cn.milai.beginning.collection.Filter;
+
 /**
  * 接受不在 {@link Set} 的字符的 {@link CharAcceptor}
  * @author milai
@@ -21,6 +23,11 @@ public class ExcludeAcceptor extends CharSetAcceptor {
 	@Override
 	protected boolean accept(Set<Character> chs, char c) {
 		return !chs.contains(c);
+	}
+
+	@Override
+	public Set<Character> accepts(Set<Character> alphabet) {
+		return Filter.nset(alphabet, c -> getChs().contains(c));
 	}
 
 	@Override

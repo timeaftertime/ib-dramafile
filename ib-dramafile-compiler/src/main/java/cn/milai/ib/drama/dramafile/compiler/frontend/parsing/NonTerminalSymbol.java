@@ -1,7 +1,9 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 语法分析的非终结符
@@ -10,7 +12,7 @@ import java.util.List;
  */
 public class NonTerminalSymbol extends Symbol {
 
-	private List<Production> productions = new ArrayList<>();
+	private Set<Production> productions = new HashSet<>();
 
 	public NonTerminalSymbol(String code) {
 		super(code);
@@ -40,6 +42,13 @@ public class NonTerminalSymbol extends Symbol {
 	 */
 	public boolean removeProduction(Production p) {
 		return productions.remove(p);
+	}
+
+	/**
+	 * 清空产生式
+	 */
+	public void clearProductions() {
+		this.productions.clear();
 	}
 
 	public List<Production> getProductions() { return new ArrayList<>(productions); }

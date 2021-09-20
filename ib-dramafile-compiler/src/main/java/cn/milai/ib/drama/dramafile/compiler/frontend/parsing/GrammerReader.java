@@ -1,16 +1,13 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import cn.milai.common.io.InputStreams;
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 
 /**
@@ -26,47 +23,43 @@ public class GrammerReader {
 	 * @return
 	 */
 	public static Grammer parseGrammer(InputStream input) {
-		BufferedReader in = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
-		Map<String, String> punctualToCode = new HashMap<>();
+		Map<String, String> aliases = new HashMap<>();
 		int lineNumber = 0;
 		Grammer.Builder builder = new Grammer.Builder();
-		for (String line : in.lines().collect(Collectors.toList())) {
+		for (String line : InputStreams.readLines(input)) {
 			lineNumber++;
-			if (StringUtils.isEmpty(line) || line.trim().startsWith("#")) {
+			if (isEmptyLine(line)) {
 				continue;
 			}
-			String[] words = line.split("\\s+");
-			if (words.length < 3) {
-				throw new IBCompilerException(String.format("语法定义不合法 line %d： %s", lineNumber, line));
-			}
-			if (words[1].equals("=")) {
-				punctualToCode.put(words[0], words[2]);
-				continue;
-			}
-			for (int i = 0; i < words.length; i++) {
-				if (i == 1) {
-					continue;
+			String[] words = parseWords(aliases, line);
+			if (words.length >= 3) {
+				switch (words[1]) {
+					case Keywords.ALIAS :
+						aliases.put(words[0], words[2]);
+						continue;
+					case Keywords.PRODUCTION :
+						builder.addProduction(words[0], Arrays.copyOfRange(words, 2, words.length));
+						continue;
 				}
-				words[i] = codeOf(punctualToCode, words[i]);
 			}
-			if (words[1].equals("->")) {
-				builder.addProduction(words[0], Arrays.copyOfRange(words, 2, words.length));
-				continue;
-			}
-			throw new IBCompilerException(String.format("未知语法 line %d： %s", lineNumber, line));
+			throw new IBCompilerException(String.format("未知语法 line %d: %s", lineNumber, line));
 		}
 		return builder.build();
 	}
 
-	/**
-	 * 获取 str 所对应的 code
-	 * @param refs
-	 * @param str
-	 */
-	private static String codeOf(Map<String, String> refs, String str) {
-		if (refs.containsKey(str)) {
-			return refs.get(str);
-		}
-		return str;
+	private static boolean isEmptyLine(String line) {
+		return StringUtils.isEmpty(line) || line.trim().startsWith("#");
 	}
+
+	private static String[] parseWords(Map<String, String> aliases, String line) {
+		String[] words = line.split("\\s+");
+		for (int i = 0; i < words.length; i++) {
+			if (i == 1) {
+				continue;
+			}
+			words[i] = aliases.getOrDefault(words[i], words[i]);
+		}
+		return words;
+	}
+
 }

@@ -35,4 +35,14 @@ public class CharSetsTest {
 		assertTrue(CharSets.slash('D').accept('a'));
 	}
 
+	@Test
+	public void testCanSlash() {
+		for (char ch : "{}[]\\".toCharArray()) {
+			assertTrue(CharSets.isCanSlash(ch));
+		}
+		assertFalse(CharSets.isCanSlash('a'));
+		assertFalse(CharSets.isCanSlash('9'));
+		assertFalse(CharSets.isCanSlash('5'));
+	}
+
 }

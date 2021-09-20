@@ -55,12 +55,12 @@ public abstract class Symbol implements Comparable<Symbol> {
 	 */
 	public abstract boolean isNonTerminal();
 
-	public static final Symbol EOF = new Symbol("$") {
+	public static final Symbol EOF = new Symbol(Keywords.EOF) {
 		@Override
 		public boolean isNonTerminal() { return false; }
 	};
 
-	public static final Symbol EPSILON = new Symbol("ϵ") {
+	public static final Symbol EPSILON = new Symbol(Keywords.EPSILON) {
 		@Override
 		public boolean isNonTerminal() { return false; }
 	};
@@ -81,6 +81,15 @@ public abstract class Symbol implements Comparable<Symbol> {
 	 */
 	public static boolean isEpsilon(Symbol s) {
 		return s == EPSILON;
+	}
+
+	/**
+	 * 判断指定 {@code code} 是否为 ϵ 符号的 {@link #code}
+	 * @param code
+	 * @return
+	 */
+	public static boolean isEpsilon(String code) {
+		return EPSILON.getCode().equals(code);
 	}
 
 }

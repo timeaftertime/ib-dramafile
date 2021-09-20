@@ -1,6 +1,6 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.springframework.util.Assert;
 
+import cn.milai.beginning.collection.Creator;
+import cn.milai.beginning.collection.Mapping;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.CharAcceptor;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.IncludeAcceptor;
 
@@ -46,7 +48,7 @@ public class NFANode implements Node {
 
 	@Override
 	public Set<Node> epsilonNexts() {
-		return new HashSet<>(epsilonNexts);
+		return Collections.unmodifiableSet(epsilonNexts);
 	}
 
 	@Override
@@ -70,18 +72,13 @@ public class NFANode implements Node {
 
 	@Override
 	public Set<String> tokens() throws UnsupportedOperationException {
-		return new HashSet<>(Arrays.asList(token()));
+		return Creator.hashSet(token());
 	}
 
 	@Override
 	public Set<Character> accepts() {
 		if (acceptSet == null) {
-			acceptSet = new HashSet<>();
-			for (char ch : Alphabet.all()) {
-				if (next(ch) != null) {
-					acceptSet.add(ch);
-				}
-			}
+			acceptSet = Mapping.reduceSet(edges.keySet(), a -> a.accepts(Alphabet.set()));
 		}
 		return acceptSet;
 	}

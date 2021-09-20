@@ -1,20 +1,22 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.apache.commons.lang3.CharUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Assert;
 
+import cn.milai.beginning.collection.Creator;
 import cn.milai.beginning.collection.Filter;
-import cn.milai.beginning.collection.Merge;
+import cn.milai.beginning.collection.Mapping;
+import cn.milai.common.base.Chars;
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 
 /**
@@ -24,14 +26,13 @@ import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
  */
 public class Grammer {
 
-	/**
-	 * 语法开始符号
-	 */
-	public static final String CFG_CODE = "CFG";
+	public static final char UNDERLINE = '_';
 
 	private NonTerminalSymbol startSymbol;
-	private List<NonTerminalSymbol> nonTerminals;
-	private List<TerminalSymbol> terminals;
+	private Set<NonTerminalSymbol> nonTerminals;
+	private Set<TerminalSymbol> terminals;
+
+	private Map<String, Symbol> codeToSymbols = new HashMap<>();
 
 	/**
 	 * 非终结符的 FOLLOW 集合，可以为 [ 终结符、EOF ]
@@ -49,36 +50,44 @@ public class Grammer {
 	private Map<Production, Set<Symbol>> selects = new HashMap<>();
 
 	private Grammer(Collection<NonTerminalSymbol> nonTerminals, Collection<TerminalSymbol> terminals) {
-		this.nonTerminals = new ArrayList<>(nonTerminals);
-		this.terminals = new ArrayList<>(terminals);
-		initStartSymbol();
+		initSymbols(nonTerminals, terminals);
 		eliminateLeftRecursion();
-		extractCommonLefts();
+		extractCommonLeft();
 		buildSets();
 		// TODO 校验语法合法性
+	}
+
+	private void initSymbols(Collection<NonTerminalSymbol> nonTerminals, Collection<TerminalSymbol> terminals) {
+		this.nonTerminals = new HashSet<>(nonTerminals);
+		this.terminals = new HashSet<>(terminals);
+		for (NonTerminalSymbol s : nonTerminals) {
+			codeToSymbols.put(s.getCode(), s);
+		}
+		for (TerminalSymbol s : terminals) {
+			codeToSymbols.put(s.getCode(), s);
+		}
+		initStartSymbol();
 	}
 
 	/**
 	 * 提取公共左因子式
 	 */
-	private void extractCommonLefts() {
+	private void extractCommonLeft() {
 		boolean changed = true;
 		while (changed) {
 			changed = false;
-			for (NonTerminalSymbol nonTerminal : getNonTerminals()) {
-				List<List<Production>> hasCommons = nonTerminal.getProductions().stream()
-					.filter(p -> !p.isEpsilon())
-					.collect(Collectors.groupingBy(p -> p.getRights().get(0)))
-					.values().stream()
-					.filter(p -> p.size() >= 2)
-					.collect(Collectors.toList());
-				for (List<Production> productions : hasCommons) {
-					List<Symbol> prefix = maxCommonPrefixOf(productions);
+			for (NonTerminalSymbol nonTerminal : copyOfNonTerminals()) {
+				Stream<Production> noEpsilons = Filter.stream(nonTerminal.getProductions(), p -> !p.isEpsilon());
+				for (List<Production> hasCommon : Mapping.map(noEpsilons, p -> p.getRights().get(0)).values()) {
+					if (hasCommon.size() <= 1) {
+						continue;
+					}
+					List<Symbol> prefix = maxCommonPrefixOf(hasCommon);
 					NonTerminalSymbol newNonTerminal = newNonTerminal(nonTerminal.getCode());
 					List<Symbol> rights = new ArrayList<>(prefix);
 					rights.add(newNonTerminal);
 					nonTerminal.addProduction(rights);
-					for (Production p : productions) {
+					for (Production p : hasCommon) {
 						nonTerminal.removeProduction(p);
 						if (prefix.size() == p.getRights().size()) {
 							newNonTerminal.addEpsilonProduction();
@@ -86,6 +95,7 @@ public class Grammer {
 							newNonTerminal.addProduction(p.getRights().subList(prefix.size(), p.getRights().size()));
 						}
 					}
+					changed = true;
 				}
 			}
 		}
@@ -98,21 +108,25 @@ public class Grammer {
 	 */
 	private List<Symbol> maxCommonPrefixOf(List<Production> productions) {
 		List<Symbol> prefix = new ArrayList<>();
-		int minSize = productions.stream()
-			.map(Production::getRights)
-			.map(List::size)
-			.min((i1, i2) -> i1 - i2)
-			.get();
-		for (int i = 0; i < minSize; i++) {
-			Symbol s = productions.get(0).getRights().get(i);
+		for (int i = 0;; i++) {
+			Symbol s = symbolAt(productions.get(0), i);
+			if (s == null) {
+				return prefix;
+			}
 			for (int j = 1; j < productions.size(); j++) {
-				if (productions.get(j).getRights().get(i) != s) {
+				if (symbolAt(productions.get(j), i) != s) {
 					return prefix;
 				}
 			}
 			prefix.add(s);
 		}
-		return prefix;
+	}
+
+	private Symbol symbolAt(Production p, int rightIndex) {
+		if (p.getRights().size() <= rightIndex) {
+			return null;
+		}
+		return p.getRights().get(rightIndex);
 	}
 
 	private void eliminateLeftRecursion() {
@@ -121,50 +135,39 @@ public class Grammer {
 	}
 
 	/**
-	 * 消除直接左递归
+	 * 消除直接左递归。
+	 * A -> Aa1|Aa2|...|b1|b2
+	 *           ↓
+	 * A -> b1A'|b2A'
+	 * A' -> a1A'|a2A'|...|ϵ
 	 * @throws IllegalStateException
 	 */
 	private void eliminateDirect() {
-		List<NonTerminalSymbol> symbols = getNonTerminals();
-		for (NonTerminalSymbol now : symbols) {
-			Production notCursion = null;
-			for (Production p : now.getProductions()) {
-				if (p.getRights().get(0) != now) {
-					// 找到任何一个非左递归产生式
-					notCursion = p;
-					break;
-				}
-			}
-			if (notCursion == null) {
-				throw new IllegalStateException(String.format("找不到非左递归的产生式：symbol = %s", now));
-			}
+		for (NonTerminalSymbol now : copyOfNonTerminals()) {
+			List<Production> notCursions = new ArrayList<>();
 			List<Production> leftCursions = new ArrayList<>();
 			for (Production p : now.getProductions()) {
-				if (p.getRights().get(0) == now) {
+				if (p.isEpsilon() || p.getRights().get(0) != now) {
+					notCursions.add(p);
+				} else {
 					leftCursions.add(p);
 				}
 			}
 			if (!leftCursions.isEmpty()) {
-				now.removeProduction(notCursion);
+				now.clearProductions();
 				NonTerminalSymbol newSymbol = newNonTerminal(now.getCode());
-				{
-					List<Symbol> newRights = new ArrayList<>();
-					if (!notCursion.isEpsilon()) {
-						newRights.addAll(notCursion.getRights());
-					}
+				for (Production p : notCursions) {
+					List<Symbol> newRights = new ArrayList<>(p.isEpsilon() ? Collections.emptyList() : p.getRights());
 					newRights.add(newSymbol);
 					now.addProduction(newRights);
 				}
-				newSymbol.addEpsilonProduction();
 				for (Production p : leftCursions) {
-					now.removeProduction(p);
-					{
-						List<Symbol> newRights = new ArrayList<>();
-						newRights.addAll(p.getRights().subList(1, p.getRights().size()));
-						newRights.add(newSymbol);
-						newSymbol.addProduction(newRights);
-					}
+					List<Symbol> newRights = new ArrayList<>();
+					newRights.addAll(p.getRights().subList(1, p.getRights().size()));
+					newRights.add(newSymbol);
+					newSymbol.addProduction(newRights);
 				}
+				newSymbol.addEpsilonProduction();
 			}
 		}
 	}
@@ -173,14 +176,14 @@ public class Grammer {
 	 * 间接左递归转换为直接左递归
 	 */
 	private void convertIndirectToDirect() {
-		List<NonTerminalSymbol> symbols = getNonTerminals();
+		List<NonTerminalSymbol> symbols = new ArrayList<>(nonTerminals);
 		for (int i = 0; i < symbols.size(); i++) {
 			NonTerminalSymbol s1 = symbols.get(i);
 			for (int j = 0; j < i; j++) {
 				NonTerminalSymbol s2 = symbols.get(j);
 				for (Production p1 : s1.getProductions()) {
 					List<Symbol> rights = p1.getRights();
-					// 若存在一个推导式 s1 -> s2X，其中 X 为任意符号串（可空）
+					// 若存在一个推导式 s1 -> s2X，(X 为可空任意符号串)，则替换为 s1 -> ${s2所有推导式}X
 					if (rights.get(0) == s2) {
 						s1.removeProduction(p1);
 						List<Symbol> p1Rights = rights.subList(1, rights.size());
@@ -202,10 +205,10 @@ public class Grammer {
 	 * 设置文法的开始符号
 	 */
 	private void initStartSymbol() {
-		for (NonTerminalSymbol symbol : getNonTerminals()) {
-			if (symbol.getCode().equals(CFG_CODE)) {
+		for (NonTerminalSymbol symbol : copyOfNonTerminals()) {
+			if (symbol.getCode().equals(Keywords.CFG)) {
 				startSymbol = symbol;
-				for (NonTerminalSymbol s : getNonTerminals()) {
+				for (NonTerminalSymbol s : copyOfNonTerminals()) {
 					for (Production p : s.getProductions()) {
 						if (p.getRights().contains(startSymbol)) {
 							throw new IBCompilerException("语法开始符号不允许出现在产生式右式：" + p);
@@ -215,7 +218,7 @@ public class Grammer {
 				return;
 			}
 		}
-		throw new IBCompilerException("找不到语法开始符号，请确认语言定义是否以 " + CFG_CODE + " 开始");
+		throw new IBCompilerException("找不到语法开始符号: " + Keywords.CFG);
 	}
 
 	private void buildSets() {
@@ -225,7 +228,7 @@ public class Grammer {
 	}
 
 	private void buildSelects() {
-		for (NonTerminalSymbol symbol : getNonTerminals()) {
+		for (NonTerminalSymbol symbol : copyOfNonTerminals()) {
 			for (Production p : symbol.getProductions()) {
 				Set<Symbol> first = firstOf(p.getRights());
 				if (first.contains(Symbol.EPSILON)) {
@@ -237,14 +240,14 @@ public class Grammer {
 	}
 
 	private void buildFollows() {
-		getNonTerminals().forEach(s -> follows.put(s, new HashSet<>()));
+		copyOfNonTerminals().forEach(s -> follows.put(s, new HashSet<>()));
 		follows.get(startSymbol).add(Symbol.EOF);
 		boolean changed = true;
 		while (changed) {
 			changed = false;
-			for (NonTerminalSymbol left : getNonTerminals()) {
+			for (NonTerminalSymbol left : copyOfNonTerminals()) {
 				for (Production p : left.getProductions()) {
-					Set<Symbol> tails = getFollow(left);
+					Set<Symbol> tails = copyFollowOf(left);
 					if (p.isEpsilon()) {
 						continue;
 					}
@@ -253,14 +256,14 @@ public class Grammer {
 						Symbol now = rights.get(i);
 						if (!now.isNonTerminal()) {
 							// 由于忽略了空产生式，这里的 now 一定是终结符
-							tails = getFirst(now);
+							tails = copyFirstOf(now);
 							continue;
 						}
 						changed |= follows.get(now).addAll(tails);
 						if (firsts.get(now).contains(Symbol.EPSILON)) {
 							tails.addAll(Filter.nset(firsts.get(now), Symbol::isEpsilon));
 						} else {
-							tails = getFirst(now);
+							tails = copyFirstOf(now);
 						}
 					}
 				}
@@ -269,14 +272,14 @@ public class Grammer {
 	}
 
 	private void buildFirsts() {
-		getNonTerminals().forEach(s -> firsts.put(s, new HashSet<>()));
-		getTerminals().forEach(s -> firsts.put(s, new HashSet<>(Arrays.asList(s))));
-		firsts.put(Symbol.EOF, new HashSet<>(Arrays.asList(Symbol.EOF)));
-		firsts.put(Symbol.EPSILON, new HashSet<>(Arrays.asList(Symbol.EPSILON)));
+		nonTerminals.forEach(s -> firsts.put(s, Creator.hashSet()));
+		terminals.forEach(s -> firsts.put(s, Creator.asSet(s)));
+		firsts.put(Symbol.EOF, Creator.asSet(Symbol.EOF));
+		firsts.put(Symbol.EPSILON, Creator.asSet(Symbol.EPSILON));
 		boolean changed = true;
 		while (changed) {
 			changed = false;
-			for (NonTerminalSymbol left : getNonTerminals()) {
+			for (NonTerminalSymbol left : nonTerminals) {
 				for (Production p : left.getProductions()) {
 					changed |= firsts.get(left).addAll(firstOf(p.getRights()));
 				}
@@ -312,22 +315,25 @@ public class Grammer {
 		}
 		NonTerminalSymbol symbol = new NonTerminalSymbol(code);
 		nonTerminals.add(symbol);
+		codeToSymbols.put(code, symbol);
 		return symbol;
 	}
 
 	public NonTerminalSymbol getStartSymbol() { return startSymbol; }
 
-	public List<NonTerminalSymbol> getNonTerminals() { return new ArrayList<>(nonTerminals); }
+	private Set<NonTerminalSymbol> copyOfNonTerminals() {
+		return new HashSet<>(nonTerminals);
+	}
 
-	public List<TerminalSymbol> getTerminals() { return new ArrayList<>(terminals); }
+	public Set<NonTerminalSymbol> getNonTerminals() { return Collections.unmodifiableSet(nonTerminals); }
 
 	/**
-	 * 获取指定 code 对应符号的 FIRST 集合
+	 * 获取指定 code 对应符号的 FIRST 集合的不可变副本
 	 * @param code
 	 * @return
 	 */
 	public Set<Symbol> getFirst(String code) {
-		return getFirst(findSymbol(code));
+		return Collections.unmodifiableSet(firsts.get(symbolOf(code)));
 	}
 
 	/**
@@ -336,15 +342,15 @@ public class Grammer {
 	 * @return
 	 */
 	public Set<Symbol> getFollow(String code) {
-		return getFollow(findSymbol(code));
+		return Collections.unmodifiableSet(follows.get(symbolOf(code)));
 	}
 
 	/**
-	 * 获取指定 code 对应符号的 FIRST 集合
+	 * 获取指定 code 对应符号的 FIRST 集合的副本
 	 * @param code
 	 * @return
 	 */
-	private Set<Symbol> getFirst(Symbol s) {
+	private Set<Symbol> copyFirstOf(Symbol s) {
 		return new HashSet<>(firsts.get(s));
 	}
 
@@ -353,12 +359,12 @@ public class Grammer {
 	 * @param code
 	 * @return
 	 */
-	private Set<Symbol> getFollow(Symbol s) {
+	private Set<Symbol> copyFollowOf(Symbol s) {
 		return new HashSet<>(follows.get(s));
 	}
 
 	public Set<Symbol> getSelect(Production p) {
-		return selects.get(p);
+		return Collections.unmodifiableSet(selects.get(p));
 	}
 
 	/**
@@ -367,16 +373,9 @@ public class Grammer {
 	 * @return
 	 * @throws IBCompilerException
 	 */
-	public Symbol findSymbol(String code) throws IBCompilerException {
-		for (Symbol s : getSymbols()) {
-			if (s.getCode().equals(code)) {
-				return s;
-			}
-		}
-		throw new IBCompilerException(String.format("符号 %s 不存在", code));
+	public Symbol symbolOf(String code) throws IBCompilerException {
+		return codeToSymbols.get(code);
 	}
-
-	private List<Symbol> getSymbols() { return Merge.list(getNonTerminals(), getTerminals()); }
 
 	public static class Builder {
 
@@ -385,45 +384,27 @@ public class Grammer {
 		private Map<String, TerminalSymbol> terminals = new HashMap<>();
 
 		/**
-		 * 新建并保存的或获取已经存在的、 code 为指定值的非终结符
+		 * 获取 code 为指定值的非终结符，若不存在，返回创建并保存的符号
 		 * @param code
 		 * @return
 		 */
 		private NonTerminalSymbol nonTerminalOf(String code) {
-			if (StringUtils.isEmpty(code)) {
-				throw new IllegalArgumentException("code 不能为空");
-			}
-			if (Symbol.EPSILON.getCode().equals(code)) {
-				throw new IBCompilerException(code + " 不能作为非终结符");
-			}
-			if (TokenType.findByCode(code) != null) {
-				throw new IBCompilerException(String.format("%s 已定义为终结符，不能作为非终结符", code));
-			}
-			if (!nonTerminals.containsKey(code)) {
-				nonTerminals.put(code, new NonTerminalSymbol(code));
-			}
-			return nonTerminals.get(code);
+			Assert.hasLength(code, "code 不能为空");
+			Assert.isTrue(!Symbol.isEpsilon(code), code + " 不能作为非终结符");
+			Assert.isTrue(!isRegisteredTerminal(code), String.format("%s 已定义为终结符，不能作为非终结符", code));
+			return nonTerminals.computeIfAbsent(code, c -> new NonTerminalSymbol(c));
 		}
 
 		/**
-		 * 新建并保存的或获取已经存在的、 code 为指定值的终结符
+		 * 获取 code 为指定值的终结符，若不存在，返回创建并保存的符号
 		 * @param code
 		 * @return
 		 */
 		private TerminalSymbol terminalOf(String code) {
-			if (StringUtils.isEmpty(code)) {
-				throw new IllegalArgumentException("code 不能为空");
-			}
-			if (Symbol.EPSILON.getCode().equals(code)) {
-				throw new IBCompilerException(code + "不能作为终结符");
-			}
-			if (TokenType.findByCode(code) == null) {
-				throw new IBCompilerException(String.format("%s 不是合法的终结符", code));
-			}
-			if (!terminals.containsKey(code)) {
-				terminals.put(code, new TerminalSymbol(code));
-			}
-			return terminals.get(code);
+			Assert.hasLength(code, "code 不能为空");
+			Assert.isTrue(!Symbol.isEpsilon(code), code + " 不能作为终结符");
+			Assert.isTrue(isRegisteredTerminal(code), String.format("未定义终结符: %s", code));
+			return terminals.computeIfAbsent(code, c -> new TerminalSymbol(c));
 		}
 
 		/**
@@ -432,10 +413,7 @@ public class Grammer {
 		 * @return
 		 */
 		private Symbol symbolOf(String code) {
-			if (TokenType.findByCode(code) != null) {
-				return terminalOf(code);
-			}
-			return nonTerminalOf(code);
+			return isRegisteredTerminal(code) ? terminalOf(code) : nonTerminalOf(code);
 		}
 
 		/**
@@ -453,20 +431,22 @@ public class Grammer {
 			for (String code : rightCodes) {
 				checkSymbolCode(code);
 			}
-			left.addProduction(Arrays.stream(rightCodes).map(this::symbolOf).collect(Collectors.toList()));
+			left.addProduction(Mapping.list(rightCodes, this::symbolOf));
 		}
 
 		public void checkSymbolCode(String code) {
 			for (char ch : code.toCharArray()) {
-				if (!CharUtils.isAsciiAlpha(ch) && ch != '_') {
-					throw new IllegalArgumentException("语法定义中的符号只允许使用字母和下划线：" + code);
-				}
+				Assert.isTrue(Chars.isLetter(ch) || ch == UNDERLINE, "语法定义中的符号只允许使用字母和下划线: " + code);
 			}
 		}
 
 		public Grammer build() {
 			return new Grammer(nonTerminals.values(), terminals.values());
 		}
+	}
+
+	private static boolean isRegisteredTerminal(String code) {
+		return TokenType.findByCode(code) != null;
 	}
 
 }
