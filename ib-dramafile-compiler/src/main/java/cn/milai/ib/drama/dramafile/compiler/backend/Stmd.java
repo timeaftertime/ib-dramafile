@@ -3,6 +3,7 @@ package cn.milai.ib.drama.dramafile.compiler.backend;
 import java.util.List;
 import java.util.Map;
 
+import cn.milai.common.base.BytesBuilder;
 import cn.milai.common.base.Strings;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.compiler.ConstantTable;
@@ -23,24 +24,24 @@ public class Stmd {
 
 	public byte[] toBytes(Map<String, String> alias, ConstantTable table) {
 		List<Node> children = node.getChildren();
-		ByteArrayBuilder bb = new ByteArrayBuilder();
+		BytesBuilder bb = new BytesBuilder();
 		switch (children.get(0).getToken().getType()) {
 			// Stmd -> SLEEP ( INT ) ;
 			case SLEEP : {
-				bb.appendByte(ActType.SLEEP.getCode());
-				bb.appendUInt16(table.longIndex(Long.parseLong(children.get(2).getOrigin())));
+				bb.appendInt8(ActType.SLEEP.getCode());
+				bb.appendInt16(table.longIndex(Long.parseLong(children.get(2).getOrigin())));
 				break;
 			}
 			// Stmd -> ADD IDENTIFIER ( Params ) ;
 			case ADD : {
 				String desciptor = parseParams(bb, alias, table, children.get(3));
-				bb.appendByte(ActType.ADD.getCode());
+				bb.appendInt8(ActType.ADD.getCode());
 				String className = children.get(1).getOrigin();
 				if (alias.containsKey(className)) {
 					className = alias.get(children.get(1).getOrigin());
 				}
-				bb.appendUInt16(table.utf8Index(className));
-				bb.appendUInt16(table.utf8Index(desciptor));
+				bb.appendInt16(table.utf8Index(className));
+				bb.appendInt16(table.utf8Index(desciptor));
 				break;
 			}
 			case IMG : {
@@ -56,7 +57,7 @@ public class Stmd {
 	}
 
 	/**
-	 * 解析 Params 语法树，并将对应字节写入 {@link ByteArrayBuilder}
+	 * 解析 Params 语法树，并将对应字节写入 {@link BytesBuilder}
 	 * 返回需要调用的函数的参数类型描述字符串
 	 * @param bb
 	 * @param alias
@@ -64,7 +65,7 @@ public class Stmd {
 	 * @param paramsNode
 	 * @return
 	 */
-	private static String parseParams(ByteArrayBuilder bb, Map<String, String> alias, ConstantTable table,
+	private static String parseParams(BytesBuilder bb, Map<String, String> alias, ConstantTable table,
 		Node paramsNode) {
 		List<Node> children = paramsNode.getChildren();
 		StringBuilder sb = new StringBuilder();
@@ -83,27 +84,27 @@ public class Stmd {
 		return sb.toString();
 	}
 
-	private static String parseFirstParam(ByteArrayBuilder bb, Map<String, String> alias, ConstantTable table,
+	private static String parseFirstParam(BytesBuilder bb, Map<String, String> alias, ConstantTable table,
 		Node firstParamNode) {
 		List<Node> children = firstParamNode.getChildren();
 		Node first = children.get(0);
 		switch (first.getToken().getType()) {
 			// FirstParam -> INT
 			case INT : {
-				bb.appendByte(ActType.LDC.getCode());
-				bb.appendUInt16(table.int32Index(Integer.parseInt(first.getOrigin())));
+				bb.appendInt8(ActType.LDC.getCode());
+				bb.appendInt16(table.int32Index(Integer.parseInt(first.getOrigin())));
 				return ValueType.INT.getCanonical();
 			}
 			// FirstParam -> FLOAT
 			case FLOAT : {
-				bb.appendByte(ActType.LDC.getCode());
-				bb.appendUInt16(table.floatIndex(Float.parseFloat(first.getOrigin())));
+				bb.appendInt8(ActType.LDC.getCode());
+				bb.appendInt16(table.floatIndex(Float.parseFloat(first.getOrigin())));
 				return ValueType.FLOAT.getCanonical();
 			}
 			// FirstParam -> STR
 			case STR : {
-				bb.appendByte(ActType.LDC.getCode());
-				bb.appendUInt16(table.utf8Index(Strings.slice(first.getOrigin(), 1, -1)));
+				bb.appendInt8(ActType.LDC.getCode());
+				bb.appendInt16(table.utf8Index(Strings.slice(first.getOrigin(), 1, -1)));
 				return ValueType.STR.getCanonical();
 			}
 			case ADD : {
@@ -111,15 +112,15 @@ public class Stmd {
 			}
 			// FirstParam -> IMG ( STR )
 			case IMG : {
-				bb.appendByte(ActType.IMG.getCode());
-				bb.appendUInt16(table.utf8Index(Strings.slice(children.get(2).getOrigin(), 1, -1)));
+				bb.appendInt8(ActType.IMG.getCode());
+				bb.appendInt16(table.utf8Index(Strings.slice(children.get(2).getOrigin(), 1, -1)));
 				return ValueType.IMG.getCanonical();
 			}
 			// FirstParam -> AUDIO ( STR , STR )
 			case AUDIO : {
-				bb.appendByte(ActType.AUDIO.getCode());
-				bb.appendUInt16(table.utf8Index(Strings.slice(children.get(2).getOrigin(), 1, -1)));
-				bb.appendUInt16(table.utf8Index(Strings.slice(children.get(4).getOrigin(), 1, -1)));
+				bb.appendInt8(ActType.AUDIO.getCode());
+				bb.appendInt16(table.utf8Index(Strings.slice(children.get(2).getOrigin(), 1, -1)));
+				bb.appendInt16(table.utf8Index(Strings.slice(children.get(4).getOrigin(), 1, -1)));
 				return ValueType.AUDIO.getCanonical();
 			}
 			default:

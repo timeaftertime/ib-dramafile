@@ -18,6 +18,6 @@ public class FloatConstant extends Constant<Float> {
 	public ConstantType getType() { return ConstantType.FLOAT; }
 
 	@Override
-	public byte[] getBytes() { return Bytes.fromInt(Float.floatToRawIntBits(value)); }
+	public byte[] getBytes() { return Bytes.fromInt32(Float.floatToRawIntBits(value)); }
 
 }

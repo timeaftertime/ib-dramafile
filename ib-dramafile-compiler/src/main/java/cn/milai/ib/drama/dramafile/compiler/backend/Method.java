@@ -3,6 +3,7 @@ package cn.milai.ib.drama.dramafile.compiler.backend;
 import java.util.List;
 import java.util.Map;
 
+import cn.milai.common.base.BytesBuilder;
 import cn.milai.ib.drama.dramafile.compiler.ConstantTable;
 
 /**
@@ -24,14 +25,14 @@ public class Method {
 	}
 
 	public byte[] toBytes(Map<String, String> alias, ConstantTable table) {
-		ByteArrayBuilder bytes = new ByteArrayBuilder();
-		bytes.appendUInt16(table.utf8Index(name));
-		bytes.appendUInt16(table.utf8Index(descriptor));
-		ByteArrayBuilder codeBytes = new ByteArrayBuilder();
+		BytesBuilder bytes = new BytesBuilder();
+		bytes.appendInt16(table.utf8Index(name));
+		bytes.appendInt16(table.utf8Index(descriptor));
+		BytesBuilder codeBytes = new BytesBuilder();
 		for (Stmd stmd : stmds) {
 			codeBytes.append(stmd.toBytes(alias, table));
 		}
-		bytes.appendUInt16(codeBytes.toBytes().length);
+		bytes.appendInt16(codeBytes.toBytes().length);
 		bytes.append(codeBytes);
 		return bytes.toBytes();
 	}

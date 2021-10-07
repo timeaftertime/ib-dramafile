@@ -7,16 +7,17 @@ import java.io.InputStream;
 import java.util.List;
 
 import cn.milai.beginning.collection.Mapping;
+import cn.milai.common.ex.unchecked.Uncheckeds;
 import cn.milai.common.io.InputStreams;
 import cn.milai.ib.drama.dramafile.compiler.backend.CFG;
 import cn.milai.ib.drama.dramafile.compiler.backend.CompilerData;
 import cn.milai.ib.drama.dramafile.compiler.backend.Method;
 import cn.milai.ib.drama.dramafile.compiler.constant.Constant;
-import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.CharScanner;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.Lexer;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.TokenDefinition;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.GrammerReader;
+import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Keywords;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Parser;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenType;
 
@@ -36,26 +37,22 @@ public class IBCompiler {
 	private static final String GRAMMER_FILE = "/grammer.txt";
 
 	public static byte[] compile(InputStream in) {
-		try {
-			CharScanner input = new CharScanner(filterCommentLines(InputStreams.readLines(in)));
-			return build(
+		CharScanner input = new CharScanner(filterCommentLines(InputStreams.readLines(in)));
+		return Uncheckeds.rethrow(
+			() -> build(
 				CFG.parse(
 					newParser().parse(
-						newLexer().lex(
-							input
-						)
+						newLexer().lex(input)
 					)
 				)
-			);
-		} catch (IOException e) {
-			throw new IBCompilerException(e);
-		}
+			)
+		);
 	}
 
 	private static String filterCommentLines(List<String> lines) {
 		StringBuilder sb = new StringBuilder();
 		for (String line : lines) {
-			if (line.trim().startsWith("#")) {
+			if (line.trim().startsWith(Keywords.COMMENT_START)) {
 				continue;
 			}
 			sb.append(line + "\n");

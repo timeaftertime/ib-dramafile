@@ -14,10 +14,9 @@ import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;
  * @author milai
  * @date 2020.04.16
  */
-public abstract class CFG {
+public class CFG {
 
 	private CFG() {
-
 	}
 
 	public static CompilerData parse(Node cfgNode) {

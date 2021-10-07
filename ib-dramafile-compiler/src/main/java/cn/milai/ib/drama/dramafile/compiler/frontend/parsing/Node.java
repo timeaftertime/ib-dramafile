@@ -3,6 +3,8 @@ package cn.milai.ib.drama.dramafile.compiler.frontend.parsing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.util.Assert;
+
 /**
  * 语法分析树的节点
  * @author milai
@@ -25,17 +27,17 @@ public class Node {
 	}
 
 	public Token getToken() {
-		if (symbol.isNonTerminal()) {
-			throw new UnsupportedOperationException("非终结符结点没有对应Token");
-		}
+		checkHasToken();
 		return token;
 	}
 
 	public void setToken(Token token) {
-		if (symbol.isNonTerminal()) {
-			throw new UnsupportedOperationException("非终结符结点没有对应Token");
-		}
+		checkHasToken();
 		this.token = token;
+	}
+
+	private void checkHasToken() {
+		Assert.isTrue(!symbol.isNonTerminal(), "非终结符结点没有对应Token: " + symbol.getCode());
 	}
 
 	/**
@@ -43,10 +45,12 @@ public class Node {
 	 * @return
 	 */
 	public int getProductionIndex() {
-		if (!symbol.isNonTerminal()) {
-			throw new UnsupportedOperationException("终结符结点没有子节点");
-		}
+		checkHasChildren();
 		return productionIndex;
+	}
+
+	private void checkHasChildren() {
+		Assert.isTrue(symbol.isNonTerminal(), "终结符结点没有子节点: " + symbol.getCode());
 	}
 
 	/**
@@ -59,9 +63,7 @@ public class Node {
 	}
 
 	public void setProductionIndex(int productionIndex) {
-		if (!symbol.isNonTerminal()) {
-			throw new UnsupportedOperationException("终结符结点没有子节点");
-		}
+		checkHasChildren();
 		this.productionIndex = productionIndex;
 	}
 
@@ -72,16 +74,12 @@ public class Node {
 	 * @param children
 	 */
 	public void setChildren(List<Node> children) {
-		if (!symbol.isNonTerminal()) {
-			throw new UnsupportedOperationException("终结符结点没有子节点");
-		}
+		checkHasChildren();
 		this.children = children;
 	}
 
 	public List<Node> getChildren() {
-		if (!symbol.isNonTerminal()) {
-			throw new UnsupportedOperationException("终结符结点没有子节点：symbol = " + symbol);
-		}
+		checkHasChildren();
 		return children;
 	}
 
@@ -94,31 +92,30 @@ public class Node {
 	 * @return
 	 */
 	public String getOrigin() {
+		if (Symbol.isEpsilon(symbol)) {
+			return "";
+		}
+		if (!symbol.isNonTerminal()) {
+			return token.getOrigin();
+		}
 		StringBuilder sb = new StringBuilder();
-		parseOrigin(sb, this);
-		return sb.toString();
-	}
-
-	private static void parseOrigin(StringBuilder sb, Node node) {
-		if (Symbol.isEpsilon(node.symbol)) {
-			return;
-		}
-		if (node.symbol.isNonTerminal()) {
-			for (Node c : node.children) {
-				parseOrigin(sb, c);
+		if (symbol.isNonTerminal()) {
+			for (Node c : children) {
+				sb.append(c.getOrigin());
 			}
-		} else {
-			sb.append(node.token.getOrigin());
 		}
+		return sb.toString();
 	}
 
 	@Override
 	public String toString() {
-		return "Node [symbol=" + symbol + ", pre=" + (pre == null ? pre : pre.symbol)
-			+ (symbol.isNonTerminal() ? ", productionIndex=" + productionIndex : "")
-			+ (symbol.isNonTerminal() ? ", children=" + children : "")
-			+ (symbol.isNonTerminal() ? "" : ", token=" + token)
-			+ "]";
+		boolean isNonterminal = symbol.isNonTerminal();
+		return String.format(
+			"Node [symbol=%s, pre=%s%s%s]",
+			symbol.getCode(), pre,
+			(isNonterminal ? String.format(", productionIndex = %d", productionIndex) : ""),
+			(isNonterminal ? String.format(", children = %s", children) : "")
+		);
 	}
 
 }

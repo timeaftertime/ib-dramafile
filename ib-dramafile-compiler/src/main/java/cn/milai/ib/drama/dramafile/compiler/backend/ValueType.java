@@ -12,19 +12,27 @@ import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenType;
  */
 public class ValueType {
 
+	private static final String TYPE_VOID = "void";
+	private static final String TYPE_INT = "int";
+	private static final String TYPE_FLOAT = "float";
+	private static final String TYPE_STR = "str";
+	private static final String TYPE_IMG = "img";
+	private static final String TYPE_AUDIO = "audio";
+
 	private String name;
 	private String canonical;
 
 	private static Map<String, ValueType> types = new HashMap<>();
 
-	public static final ValueType VOID = of("void");
-	public static final ValueType INT = of("int");
-	public static final ValueType FLOAT = of("float");
-	public static final ValueType STR = of("str");
-	public static final ValueType IMG = of("img");
-	public static final ValueType AUDIO = of("audio");
+	public static final ValueType VOID = of(TYPE_VOID);
+	public static final ValueType INT = of(TYPE_INT);
+	public static final ValueType FLOAT = of(TYPE_FLOAT);
+	public static final ValueType STR = of(TYPE_STR);
+	public static final ValueType IMG = of(TYPE_IMG);
+	public static final ValueType AUDIO = of(TYPE_AUDIO);
 
-	private ValueType() {}
+	private ValueType() {
+	}
 
 	/**
 	 * 获取类型名
@@ -62,27 +70,27 @@ public class ValueType {
 		return types.computeIfAbsent(typeName, name -> {
 			String canonical;
 			switch (name) {
-				case "void" : {
+				case TYPE_VOID : {
 					canonical = "V";
 					break;
 				}
-				case "int" : {
+				case TYPE_INT : {
 					canonical = "I";
 					break;
 				}
-				case "float" : {
+				case TYPE_FLOAT : {
 					canonical = "F";
 					break;
 				}
-				case "str" : {
+				case TYPE_STR : {
 					canonical = "S";
 					break;
 				}
-				case "img" : {
+				case TYPE_IMG : {
 					canonical = "P";
 					break;
 				}
-				case "audio" : {
+				case TYPE_AUDIO : {
 					canonical = "A";
 					break;
 				}

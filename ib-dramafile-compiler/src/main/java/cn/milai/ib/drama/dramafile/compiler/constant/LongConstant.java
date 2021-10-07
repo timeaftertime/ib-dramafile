@@ -18,6 +18,6 @@ public class LongConstant extends Constant<Long> {
 	public ConstantType getType() { return ConstantType.LONG; }
 
 	@Override
-	public byte[] getBytes() { return Bytes.fromLong(value); }
+	public byte[] getBytes() { return Bytes.fromInt64(value); }
 
 }

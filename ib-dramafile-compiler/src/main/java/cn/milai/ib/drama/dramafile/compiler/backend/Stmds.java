@@ -10,7 +10,10 @@ import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;
  * @author milai
  * @date 2020.04.16
  */
-public abstract class Stmds {
+public class Stmds {
+
+	private Stmds() {
+	}
 
 	public static List<Stmd> parse(Node stmdsNode) {
 		List<Stmd> stmds = new ArrayList<>();

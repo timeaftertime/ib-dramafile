@@ -35,4 +35,9 @@ public class Keywords {
 	 */
 	public static final String ALIAS = "=";
 
+	/**
+	 * 注释行开始符号
+	 */
+	public static final String COMMENT_START = "#";
+
 }

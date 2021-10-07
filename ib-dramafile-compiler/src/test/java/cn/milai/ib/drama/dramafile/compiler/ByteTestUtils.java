@@ -22,7 +22,7 @@ public class ByteTestUtils {
 
 	@Test
 	public void printIntBytes() {
-		for (byte b : Bytes.fromInt(-67)) {
+		for (byte b : Bytes.fromInt32(-67)) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
@@ -31,7 +31,7 @@ public class ByteTestUtils {
 
 	@Test
 	public void printShortBytes() {
-		for (byte b : Bytes.fromShort(85)) {
+		for (byte b : Bytes.fromInt16(85)) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");
@@ -40,7 +40,7 @@ public class ByteTestUtils {
 
 	@Test
 	public void printLongBytes() {
-		for (byte b : Bytes.fromLong(20L)) {
+		for (byte b : Bytes.fromInt64(20L)) {
 			String s = b >= 0 ? "" : "-";
 			System.out.print(s + "0x" + Integer.toString(Math.abs(b), 16));
 			System.out.print(", ");

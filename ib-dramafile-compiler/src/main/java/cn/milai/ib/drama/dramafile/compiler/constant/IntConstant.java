@@ -15,7 +15,7 @@ public class IntConstant extends Constant<Integer> {
 	}
 
 	@Override
-	public byte[] getBytes() { return Bytes.fromInt(value); }
+	public byte[] getBytes() { return Bytes.fromInt32(value); }
 
 	@Override
 	public ConstantType getType() { return ConstantType.INT; }

@@ -48,7 +48,7 @@ public class GrammerReader {
 	}
 
 	private static boolean isEmptyLine(String line) {
-		return StringUtils.isEmpty(line) || line.trim().startsWith("#");
+		return StringUtils.isEmpty(line) || line.trim().startsWith(Keywords.COMMENT_START);
 	}
 
 	private static String[] parseWords(Map<String, String> aliases, String line) {

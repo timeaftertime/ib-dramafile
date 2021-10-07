@@ -10,9 +10,10 @@ import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.Node;
  * @author milai
  * @date 2020.04.16
  */
-public abstract class Methods {
+public class Methods {
 
-	private Methods() {}
+	private Methods() {
+	}
 
 	public static List<Method> parse(Node methodsNode) {
 		List<Method> methods = new ArrayList<>();
