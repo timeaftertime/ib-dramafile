@@ -2,7 +2,7 @@ package cn.milai.ib.drama.dramafile.interpreter.act;
 
 import java.io.IOException;
 
-import cn.milai.ib.container.DramaContainer;
+import cn.milai.ib.container.Stage;
 import cn.milai.ib.drama.dramafile.interpreter.act.ex.ActExecuteException;
 import cn.milai.ib.drama.dramafile.interpreter.act.ex.ActNotInitializedException;
 import cn.milai.ib.drama.dramafile.interpreter.act.ex.ActReadOperandsException;
@@ -21,7 +21,7 @@ public abstract class AbstractAct implements Act {
 	private boolean initialized = false;
 
 	@Override
-	public void execute(Frame frame, DramaContainer container) {
+	public void execute(Frame frame, Stage container) {
 		if (!initialized) {
 			throw new ActNotInitializedException();
 		}
@@ -38,7 +38,7 @@ public abstract class AbstractAct implements Act {
 	 * @param frame
 	 * @param container
 	 */
-	protected abstract void action(Frame frame, DramaContainer container) throws Exception;
+	protected abstract void action(Frame frame, Stage container) throws Exception;
 
 	@Override
 	public void initiailze(ByteReader reader) {

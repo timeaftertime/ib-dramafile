@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import cn.milai.common.http.Https;
 import cn.milai.common.io.Files;
 import cn.milai.common.io.InputStreams;
-import cn.milai.ib.IBCore;
+import cn.milai.ib.IBBeans;
 import cn.milai.ib.conf.PathConf;
 import cn.milai.ib.conf.RepoConf;
 import cn.milai.ib.drama.dramafile.compiler.IBCompiler;
@@ -27,7 +27,7 @@ public class DramaFileLoader {
 	private static final String DRAMA_PREFIX = "drama/";
 	private static final String DRAMA_SUFFIX = ".drama";
 
-	private static RepoConf repoConf = IBCore.getBean(RepoConf.class);
+	private static RepoConf repoConf = IBBeans.getBean(RepoConf.class);
 
 	/**
 	 * 加载指定的剧本片段

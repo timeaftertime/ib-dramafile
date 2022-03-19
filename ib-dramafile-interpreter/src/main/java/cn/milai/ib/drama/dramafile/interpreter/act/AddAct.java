@@ -5,7 +5,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import cn.milai.ib.config.ItemConfigApplier;
-import cn.milai.ib.container.DramaContainer;
+import cn.milai.ib.container.Stage;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.act.ex.IllegalOperandsException;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
@@ -31,7 +31,7 @@ public class AddAct extends AbstractAct implements ItemConfigApplier {
 	private int descriptorIndex;
 
 	@Override
-	protected void action(Frame frame, DramaContainer container) throws Exception {
+	protected void action(Frame frame, Stage container) throws Exception {
 		OperandsStack operands = frame.getOperands();
 		Clip clip = frame.getClip();
 		String className = clip.getUTF8Const(characteClassIndex);
@@ -40,7 +40,7 @@ public class AddAct extends AbstractAct implements ItemConfigApplier {
 	}
 
 	private Item createInstance(OperandsStack operands, String className, String descriptor,
-		DramaContainer container)
+		Stage container)
 		throws Exception {
 		Class<?> clazz = Class.forName(className);
 		if (!Item.class.isAssignableFrom(clazz)) {

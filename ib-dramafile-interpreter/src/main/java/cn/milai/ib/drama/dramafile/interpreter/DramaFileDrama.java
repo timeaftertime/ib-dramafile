@@ -1,6 +1,6 @@
 package cn.milai.ib.drama.dramafile.interpreter;
 
-import cn.milai.ib.container.DramaContainer;
+import cn.milai.ib.container.Stage;
 import cn.milai.ib.drama.dramafile.interpreter.act.Act;
 import cn.milai.ib.drama.dramafile.interpreter.act.ActFactory;
 import cn.milai.ib.drama.dramafile.interpreter.act.ByteReader;
@@ -33,7 +33,7 @@ public class DramaFileDrama extends AbstractDrama {
 	}
 
 	@Override
-	public void doRun(DramaContainer container) {
+	public void doRun(Stage container) {
 		container.setBackgroud(image(BACKGROUND_IMG));
 		while (!dramaSpace.isFinished() && !Thread.currentThread().isInterrupted()) {
 			Frame frame = dramaSpace.currentFrame();
