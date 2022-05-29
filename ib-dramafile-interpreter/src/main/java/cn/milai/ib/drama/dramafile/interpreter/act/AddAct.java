@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import cn.milai.ib.config.ItemConfigApplier;
-import cn.milai.ib.container.Stage;
+import cn.milai.ib.actor.Actor;
+import cn.milai.ib.actor.config.ItemConfigApplier;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.act.ex.IllegalOperandsException;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.OperandsStack;
-import cn.milai.ib.item.Item;
+import cn.milai.ib.stage.Stage;
 
 /**
  * 添加对象的动作
@@ -36,16 +36,16 @@ public class AddAct extends AbstractAct implements ItemConfigApplier {
 		Clip clip = frame.getClip();
 		String className = clip.getUTF8Const(characteClassIndex);
 		String descriptor = clip.getUTF8Const(descriptorIndex);
-		container.addObject(createInstance(operands, className, descriptor, container));
+		container.addActor(createInstance(operands, className, descriptor, container));
 	}
 
-	private Item createInstance(OperandsStack operands, String className, String descriptor,
+	private Actor createInstance(OperandsStack operands, String className, String descriptor,
 		Stage container)
 		throws Exception {
 		Class<?> clazz = Class.forName(className);
-		if (!Item.class.isAssignableFrom(clazz)) {
+		if (!Actor.class.isAssignableFrom(clazz)) {
 			throw new IllegalOperandsException(
-				this, String.format("ADD 指令的参数必须为 %s 子类的全类名: %s", Item.class.getName(), clazz.getName())
+				this, String.format("ADD 指令的参数必须为 %s 子类的全类名: %s", Actor.class.getName(), clazz.getName())
 			);
 		}
 		int paramCnt = countsParam(descriptor) - 2;
@@ -58,7 +58,7 @@ public class AddAct extends AbstractAct implements ItemConfigApplier {
 		}
 		Constructor<?>[] cs = clazz.getConstructors();
 		for (Constructor<?> c : cs) {
-			Item obj = createIfFit(params, c);
+			Actor obj = createIfFit(params, c);
 			if (obj != null) {
 				double centerY = operands.pop(Float.class);
 				double centerX = operands.pop(Float.class);
@@ -82,7 +82,7 @@ public class AddAct extends AbstractAct implements ItemConfigApplier {
 	 * @throws IllegalArgumentException
 	 * @throws InvocationTargetException
 	 */
-	private Item createIfFit(Object[] params, Constructor<?> c)
+	private Actor createIfFit(Object[] params, Constructor<?> c)
 		throws InstantiationException,
 		IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Class<?>[] types = c.getParameterTypes();
@@ -104,7 +104,7 @@ public class AddAct extends AbstractAct implements ItemConfigApplier {
 		if (inputIndex < params.length) {
 			return null;
 		}
-		return (Item) c.newInstance(args);
+		return (Actor) c.newInstance(args);
 	}
 
 	private boolean fit(Object obj, Class<?> clazz) {

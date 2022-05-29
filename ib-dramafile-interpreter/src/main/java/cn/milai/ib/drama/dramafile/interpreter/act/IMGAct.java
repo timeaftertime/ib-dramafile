@@ -2,12 +2,12 @@ package cn.milai.ib.drama.dramafile.interpreter.act;
 
 import java.io.IOException;
 
-import cn.milai.ib.container.Stage;
-import cn.milai.ib.container.plugin.ui.Image;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
 import cn.milai.ib.loader.ImageLoader;
+import cn.milai.ib.plugin.ui.Image;
+import cn.milai.ib.stage.Stage;
 
 /**
  * 加载一张图片并压入栈顶的指令

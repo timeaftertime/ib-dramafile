@@ -109,7 +109,7 @@
 			</dependency>
 			<dependency>
 				<groupId>cn.milai.ib</groupId>
-				<artifactId>ib-container</artifactId>
+				<artifactId>ib-stage</artifactId>
 				<version>${ib.version}</version>
 			</dependency>
 			<dependency>

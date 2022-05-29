@@ -1,8 +1,8 @@
 package cn.milai.ib.drama.dramafile.interpreter.act;
 
-import cn.milai.ib.container.Stage;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
+import cn.milai.ib.stage.Stage;
 
 /**
  * 剧情里的一个动作

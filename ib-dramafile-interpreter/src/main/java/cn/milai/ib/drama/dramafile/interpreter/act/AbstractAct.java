@@ -2,11 +2,11 @@ package cn.milai.ib.drama.dramafile.interpreter.act;
 
 import java.io.IOException;
 
-import cn.milai.ib.container.Stage;
 import cn.milai.ib.drama.dramafile.interpreter.act.ex.ActExecuteException;
 import cn.milai.ib.drama.dramafile.interpreter.act.ex.ActNotInitializedException;
 import cn.milai.ib.drama.dramafile.interpreter.act.ex.ActReadOperandsException;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
+import cn.milai.ib.stage.Stage;
 
 /**
  * 动作的抽象基类

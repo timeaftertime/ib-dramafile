@@ -2,12 +2,12 @@ package cn.milai.ib.drama.dramafile.interpreter.act;
 
 import java.io.IOException;
 
-import cn.milai.ib.container.Stage;
-import cn.milai.ib.container.plugin.media.Audio;
 import cn.milai.ib.drama.dramafile.act.ActType;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Clip;
 import cn.milai.ib.drama.dramafile.interpreter.runtime.Frame;
 import cn.milai.ib.loader.AudioLoader;
+import cn.milai.ib.plugin.audio.Audio;
+import cn.milai.ib.stage.Stage;
 
 /**
  * 加载一个音频实例并压入栈顶
