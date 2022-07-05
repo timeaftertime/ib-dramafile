@@ -2,9 +2,9 @@ package cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor;
 
 import java.util.Set;
 
-import cn.milai.beginning.collection.Filter;
-import cn.milai.beginning.collection.Intersection;
-import cn.milai.beginning.collection.Merge;
+import cn.milai.common.collection.Filter;
+import cn.milai.common.collection.Intersection;
+import cn.milai.common.collection.Merge;
 
 /**
  * 字符接收器

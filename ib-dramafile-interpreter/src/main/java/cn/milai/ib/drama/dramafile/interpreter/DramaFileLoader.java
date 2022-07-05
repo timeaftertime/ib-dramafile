@@ -6,7 +6,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.milai.common.http.Https;
 import cn.milai.common.io.Files;
 import cn.milai.common.io.InputStreams;
 import cn.milai.ib.IBBeans;
@@ -14,6 +13,7 @@ import cn.milai.ib.conf.PathConf;
 import cn.milai.ib.conf.RepoConf;
 import cn.milai.ib.drama.dramafile.compiler.IBCompiler;
 import cn.milai.ib.drama.dramafile.interpreter.statics.DramaMetadata;
+import cn.milai.ib.util.Https;
 
 /**
  * 剧本文件加载器

@@ -3,8 +3,8 @@ package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 import java.util.HashSet;
 import java.util.Set;
 
-import cn.milai.beginning.collection.Creator;
 import cn.milai.common.base.Chars;
+import cn.milai.common.collection.Creator;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.CharAcceptor;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.ExcludeAcceptor;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.IncludeAcceptor;

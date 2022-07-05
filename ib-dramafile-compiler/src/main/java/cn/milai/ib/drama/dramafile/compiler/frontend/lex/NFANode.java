@@ -8,8 +8,8 @@ import java.util.Set;
 
 import org.springframework.util.Assert;
 
-import cn.milai.beginning.collection.Creator;
-import cn.milai.beginning.collection.Mapping;
+import cn.milai.common.collection.Creator;
+import cn.milai.common.collection.Mapping;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.CharAcceptor;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor.IncludeAcceptor;
 

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import cn.milai.beginning.collection.Mapping;
+import cn.milai.common.collection.Mapping;
 import cn.milai.common.ex.unchecked.Uncheckeds;
 import cn.milai.common.io.InputStreams;
 import cn.milai.ib.drama.dramafile.compiler.backend.CFG;

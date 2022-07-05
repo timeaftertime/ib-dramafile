@@ -11,8 +11,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
-import cn.milai.beginning.collection.Filter;
-import cn.milai.beginning.collection.Mapping;
+import cn.milai.common.collection.Filter;
+import cn.milai.common.collection.Mapping;
 
 /**
  * DFA 工具类

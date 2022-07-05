@@ -3,7 +3,7 @@ package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 import java.util.Iterator;
 import java.util.Set;
 
-import cn.milai.beginning.collection.Creator;
+import cn.milai.common.collection.Creator;
 
 /**
  * 字母表

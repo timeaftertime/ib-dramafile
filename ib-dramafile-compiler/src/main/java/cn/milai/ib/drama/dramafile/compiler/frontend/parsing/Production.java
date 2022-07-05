@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import cn.milai.beginning.collection.Creator;
+import cn.milai.common.collection.Creator;
 
 /**
  * 语法分析产生式

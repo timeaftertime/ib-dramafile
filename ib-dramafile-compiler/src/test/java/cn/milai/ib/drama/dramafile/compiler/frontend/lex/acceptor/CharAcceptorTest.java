@@ -11,8 +11,8 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import cn.milai.beginning.collection.Creator;
 import cn.milai.common.base.Chars;
+import cn.milai.common.collection.Creator;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.Alphabet;
 import cn.milai.ib.drama.dramafile.compiler.frontend.lex.CharSets;
 

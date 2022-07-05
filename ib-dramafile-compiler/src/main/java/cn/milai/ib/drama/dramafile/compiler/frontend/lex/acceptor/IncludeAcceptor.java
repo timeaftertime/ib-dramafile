@@ -3,7 +3,7 @@ package cn.milai.ib.drama.dramafile.compiler.frontend.lex.acceptor;
 import java.util.Collection;
 import java.util.Set;
 
-import cn.milai.beginning.collection.Filter;
+import cn.milai.common.collection.Filter;
 
 /**
  * 接受在字符 {@link Set} 的 {@link CharAcceptor}

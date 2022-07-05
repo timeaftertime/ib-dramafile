@@ -1,6 +1,6 @@
 package cn.milai.ib.drama.dramafile.compiler.frontend.lex;
 
-import cn.milai.beginning.collection.Mapping;
+import cn.milai.common.collection.Mapping;
 import cn.milai.ib.drama.dramafile.compiler.frontend.parsing.TokenType;
 
 /**

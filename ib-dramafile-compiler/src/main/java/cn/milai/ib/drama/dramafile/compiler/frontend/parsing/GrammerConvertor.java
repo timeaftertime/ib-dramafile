@@ -8,8 +8,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import cn.milai.beginning.collection.Creator;
-import cn.milai.beginning.collection.Filter;
+import cn.milai.common.collection.Creator;
+import cn.milai.common.collection.Filter;
 
 /**
  * 用于输出最终生成的语法推导式的工具类

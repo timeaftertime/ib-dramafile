@@ -11,8 +11,8 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import cn.milai.beginning.collection.Creator;
-import cn.milai.beginning.collection.Mapping;
+import cn.milai.common.collection.Creator;
+import cn.milai.common.collection.Mapping;
 
 public class GrammerTest {
 

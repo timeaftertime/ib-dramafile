@@ -7,7 +7,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import cn.milai.beginning.collection.Mapping;
+import cn.milai.common.collection.Mapping;
 
 /**
  * DFA 构造器

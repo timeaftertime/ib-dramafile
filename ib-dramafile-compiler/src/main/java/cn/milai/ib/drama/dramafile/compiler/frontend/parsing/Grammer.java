@@ -13,10 +13,10 @@ import java.util.stream.Stream;
 
 import org.springframework.util.Assert;
 
-import cn.milai.beginning.collection.Creator;
-import cn.milai.beginning.collection.Filter;
-import cn.milai.beginning.collection.Mapping;
 import cn.milai.common.base.Chars;
+import cn.milai.common.collection.Creator;
+import cn.milai.common.collection.Filter;
+import cn.milai.common.collection.Mapping;
 import cn.milai.ib.drama.dramafile.compiler.ex.IBCompilerException;
 
 /**

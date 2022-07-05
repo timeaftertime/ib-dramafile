@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import cn.milai.beginning.collection.Merge;
+import cn.milai.common.collection.Merge;
 import cn.milai.ib.drama.dramafile.compiler.constant.Constant;
 import cn.milai.ib.drama.dramafile.compiler.constant.FloatConstant;
 import cn.milai.ib.drama.dramafile.compiler.constant.IntConstant;
