@@ -74,7 +74,7 @@
 		<dependencies>
 		<dependency>
 				<groupId>cn.milai.beginning</groupId>
-				<artifactId>beginning-collection</artifactId>
+				<artifactId>beginning-util</artifactId>
 				<version>${beginning.version}</version>
 			</dependency>
 			<dependency>
